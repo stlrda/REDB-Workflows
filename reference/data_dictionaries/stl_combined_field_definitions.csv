@@ -1,0 +1,258 @@
+Data Type,Name,Label,Data Type,Vocabulary,FileName
+OccPermFD,ActCode,Action Code,String,Permit Action Codes,occupancy-permits-field-definitions.xlsx
+OccPermFD,ActDate,Action Date,Date,,occupancy-permits-field-definitions.xlsx
+OccPermFD,ActInit,Action Initials,String,,occupancy-permits-field-definitions.xlsx
+OccPermFD,AddrAdjusted,Address Adjusted,Boolean,,occupancy-permits-field-definitions.xlsx
+OccPermFD,AddrNum,Address Number,Integer,,occupancy-permits-field-definitions.xlsx
+OccPermFD,AddrSuf,Address Suffix,String,,occupancy-permits-field-definitions.xlsx
+OccPermFD,AppDate,Application Date,Date,,occupancy-permits-field-definitions.xlsx
+OccPermFD,AppDescription,Application Description,String,,occupancy-permits-field-definitions.xlsx
+OccPermFD,AppNum,Application Number,Integer,,occupancy-permits-field-definitions.xlsx
+OccPermFD,AppNum,Application Number,Integer,,occupancy-permits-field-definitions.xlsx
+OccPermFD,AppSource,Application Source,Integer,,occupancy-permits-field-definitions.xlsx
+OccPermFD,AppType,Application Type,String,Permit Application Type,occupancy-permits-field-definitions.xlsx
+OccPermFD,AppType,Application Type,String,Permit Application Type,occupancy-permits-field-definitions.xlsx
+OccPermFD,AsrNbrhd,Assessor Neighborhood,Integer,,occupancy-permits-field-definitions.xlsx
+OccPermFD,CancelDate,Canceled Date,Date,,occupancy-permits-field-definitions.xlsx
+OccPermFD,CancelType,Cancel Type,String,,occupancy-permits-field-definitions.xlsx
+OccPermFD,CDADist,CDA District,Integer,,occupancy-permits-field-definitions.xlsx
+OccPermFD,CDASubDist,CDA Sub District,Integer,,occupancy-permits-field-definitions.xlsx
+OccPermFD,CensBlock00,2000 Census Block,Decimal,,occupancy-permits-field-definitions.xlsx
+OccPermFD,CensGroup10,2010 Census Group,Integer,,occupancy-permits-field-definitions.xlsx
+OccPermFD,CensTract10,2010 Census Tract,Decimal,,occupancy-permits-field-definitions.xlsx
+OccPermFD,CityBlock,City Block,Decimal,,occupancy-permits-field-definitions.xlsx
+OccPermFD,CompleteDate,Completed Date,Date,,occupancy-permits-field-definitions.xlsx
+OccPermFD,CorrAddr,Correspondent Address,String,,occupancy-permits-field-definitions.xlsx
+OccPermFD,CorrCity,Correspondent City,String,,occupancy-permits-field-definitions.xlsx
+OccPermFD,CorrCo,Correspondent Care Of,String,,occupancy-permits-field-definitions.xlsx
+OccPermFD,CorrName,Correspondent Name,String,,occupancy-permits-field-definitions.xlsx
+OccPermFD,CorrState,Correspondent State,String,,occupancy-permits-field-definitions.xlsx
+OccPermFD,CorrZIP,Correspondent ZIP,String,,occupancy-permits-field-definitions.xlsx
+OccPermFD,EstProjectCost,Estimated Project Cost,Decimal,,occupancy-permits-field-definitions.xlsx
+OccPermFD,FirstDate,First Appearance Date,Date,,occupancy-permits-field-definitions.xlsx
+OccPermFD,GeoCityBLockPart,City Block Part,Decimal,,occupancy-permits-field-definitions.xlsx
+OccPermFD,Handle,Handle,String,,occupancy-permits-field-definitions.xlsx
+OccPermFD,InspArea10,2012 Inspection Precinct,Integer,,occupancy-permits-field-definitions.xlsx
+OccPermFD,IssueDate,Issued Date,Date,,occupancy-permits-field-definitions.xlsx
+OccPermFD,LastDate,Last Date Appeared,Date,,occupancy-permits-field-definitions.xlsx
+OccPermFD,MainStrucType,Main Structure Type,Integer,Permit Structure Type,occupancy-permits-field-definitions.xlsx
+OccPermFD,Nbrhd,Neighborhood,Integer,Neighborhood,occupancy-permits-field-definitions.xlsx
+OccPermFD,NbrOfUnits,Units,Integer,,occupancy-permits-field-definitions.xlsx
+OccPermFD,NewUse,New Use,String,,occupancy-permits-field-definitions.xlsx
+OccPermFD,NewUseGroup1,New User Group 1,String,Permit Use Group,occupancy-permits-field-definitions.xlsx
+OccPermFD,NewUseGroup2,New User Group 2,String,Permit Use Group,occupancy-permits-field-definitions.xlsx
+OccPermFD,NewUseGroup3,New User Group 3,String,Permit Use Group,occupancy-permits-field-definitions.xlsx
+OccPermFD,NLC,NLC,Decimal,,occupancy-permits-field-definitions.xlsx
+OccPermFD,OccAddr,Occupant Address,String,,occupancy-permits-field-definitions.xlsx
+OccPermFD,OccCity,Occupant City,String,,occupancy-permits-field-definitions.xlsx
+OccPermFD,OccCo,Occupant Care Of,String,,occupancy-permits-field-definitions.xlsx
+OccPermFD,OccName,Occupant Name,String,,occupancy-permits-field-definitions.xlsx
+OccPermFD,OccState,Occupant State,String,,occupancy-permits-field-definitions.xlsx
+OccPermFD,OccZIP,Occupant ZIP,String,,occupancy-permits-field-definitions.xlsx
+OccPermFD,OldUse,Old Use,String,,occupancy-permits-field-definitions.xlsx
+OccPermFD,OldUseGroup1,Old User Group 1,String,Permit Use Group,occupancy-permits-field-definitions.xlsx
+OccPermFD,OldUseGroup2,Old User Group 2,String,Permit Use Group,occupancy-permits-field-definitions.xlsx
+OccPermFD,OldUseGroup3,Old User Group 3,String,Permit Use Group,occupancy-permits-field-definitions.xlsx
+OccPermFD,OwnerAddr,Owner Address,String,,occupancy-permits-field-definitions.xlsx
+OccPermFD,OwnerCity,Owner City,String,,occupancy-permits-field-definitions.xlsx
+OccPermFD,OwnerCo,Owner Care Of,String,,occupancy-permits-field-definitions.xlsx
+OccPermFD,OwnerCode,Owner Code,Integer,,occupancy-permits-field-definitions.xlsx
+OccPermFD,OwnerName,Owner Name,String,,occupancy-permits-field-definitions.xlsx
+OccPermFD,OwnerState,Owner State,String,,occupancy-permits-field-definitions.xlsx
+OccPermFD,OwnerZIP,Owner ZIP,String,,occupancy-permits-field-definitions.xlsx
+OccPermFD,Parcel,Parcel Number,Integer,,occupancy-permits-field-definitions.xlsx
+OccPermFD,Parcel9,Parcel 9,Integer,,occupancy-permits-field-definitions.xlsx
+OccPermFD,Parity,Parity,String,,occupancy-permits-field-definitions.xlsx
+OccPermFD,PoliceDist,Police District,Integer,,occupancy-permits-field-definitions.xlsx
+OccPermFD,PrclErr,Geocoding Error Code,Integer,,occupancy-permits-field-definitions.xlsx
+OccPermFD,Precinct02,2002 Inspection Precinct,Integer,,occupancy-permits-field-definitions.xlsx
+OccPermFD,Precinct10,2012 Precinct,Integer,,occupancy-permits-field-definitions.xlsx
+OccPermFD,ProjectType,Project Type,Integer,Permit Project Type,occupancy-permits-field-definitions.xlsx
+OccPermFD,RtType,Routing Department,String,Permit Routing Department,occupancy-permits-field-definitions.xlsx
+OccPermFD,RtTypeOther,Routing Department Other,String,,occupancy-permits-field-definitions.xlsx
+OccPermFD,StDir,Street Direction,String,,occupancy-permits-field-definitions.xlsx
+OccPermFD,StName,Street Name,String,,occupancy-permits-field-definitions.xlsx
+OccPermFD,StrucType1,Structure Type 1,Integer,Permit Structure Type,occupancy-permits-field-definitions.xlsx
+OccPermFD,StrucType2,Structure Type 2,Integer,Permit Structure Type,occupancy-permits-field-definitions.xlsx
+OccPermFD,StrucType3,Structure Type 3,Integer,Permit Structure Type,occupancy-permits-field-definitions.xlsx
+OccPermFD,StType,Street Type,String,,occupancy-permits-field-definitions.xlsx
+OccPermFD,TmpCityBlock,Temp City Block,Decimal,,occupancy-permits-field-definitions.xlsx
+OccPermFD,TmpParcel,Temp Parcel,Integer,,occupancy-permits-field-definitions.xlsx
+OccPermFD,UnitNum,Unit Number,String,,occupancy-permits-field-definitions.xlsx
+OccPermFD,UpDateGeo,Geo Updated,Date,,occupancy-permits-field-definitions.xlsx
+OccPermFD,Ward00,2002 Ward,Integer,,occupancy-permits-field-definitions.xlsx
+OccPermFD,Ward10,2012 Ward,Integer,,occupancy-permits-field-definitions.xlsx
+BuilPermFD,AddrAdjusted,Address Adjusted,Boolean,,building-permits-field-definitions.xlsx
+BuilPermFD,AddrNum,Address Number,Integer,,building-permits-field-definitions.xlsx
+BuilPermFD,AddrSuf,Address Suffix,String,,building-permits-field-definitions.xlsx
+BuilPermFD,AppDate,Application Date,Date,,building-permits-field-definitions.xlsx
+BuilPermFD,AppDescription,Application Description,String,,building-permits-field-definitions.xlsx
+BuilPermFD,AppNum,Application Number,Integer,,building-permits-field-definitions.xlsx
+BuilPermFD,AppSource,Application Source,Integer,,building-permits-field-definitions.xlsx
+BuilPermFD,AppType,Application Type,String,Permit Application Type,building-permits-field-definitions.xlsx
+BuilPermFD,AsrNbrhd,Assessor Neighborhood,Integer,,building-permits-field-definitions.xlsx
+BuilPermFD,CancelDate,Canceled Date,Date,,building-permits-field-definitions.xlsx
+BuilPermFD,CancelType,Cancel Type,String,,building-permits-field-definitions.xlsx
+BuilPermFD,CDADist,CDA District,Integer,,building-permits-field-definitions.xlsx
+BuilPermFD,CDASubDist,CDA Sub District,Integer,,building-permits-field-definitions.xlsx
+BuilPermFD,CensBlock00,2000 Census Block,Decimal,,building-permits-field-definitions.xlsx
+BuilPermFD,CensGroup10,2010 Census Group,Integer,,building-permits-field-definitions.xlsx
+BuilPermFD,CensTract10,2010 Census Tract,Decimal,,building-permits-field-definitions.xlsx
+BuilPermFD,CityBlock,City Block,Decimal,,building-permits-field-definitions.xlsx
+BuilPermFD,CompleteDate,Completed Date,Date,,building-permits-field-definitions.xlsx
+BuilPermFD,ContrAddr,Contractor Address,String,,building-permits-field-definitions.xlsx
+BuilPermFD,ContrCity,Contractor City,String,,building-permits-field-definitions.xlsx
+BuilPermFD,ContrContact,Contractor Contact Person,String,,building-permits-field-definitions.xlsx
+BuilPermFD,ContrName,Contractor Name,String,,building-permits-field-definitions.xlsx
+BuilPermFD,ContrNum,Contractor License Number,Decimal,,building-permits-field-definitions.xlsx
+BuilPermFD,ContrPhone,Contractor Phone,String,,building-permits-field-definitions.xlsx
+BuilPermFD,ContrState,Contractor State,String,,building-permits-field-definitions.xlsx
+BuilPermFD,ContrZIP,Contractor ZIP,String,,building-permits-field-definitions.xlsx
+BuilPermFD,CorrAddr,Correspondent Address,String,,building-permits-field-definitions.xlsx
+BuilPermFD,CorrCity,Correspondent City,String,,building-permits-field-definitions.xlsx
+BuilPermFD,CorrCo,Correspondent Care Of,String,,building-permits-field-definitions.xlsx
+BuilPermFD,CorrName,Correspondent Name,String,,building-permits-field-definitions.xlsx
+BuilPermFD,CorrState,Correspondent State,String,,building-permits-field-definitions.xlsx
+BuilPermFD,CorrZIP,Correspondent ZIP,String,,building-permits-field-definitions.xlsx
+BuilPermFD,EstProjectCost,Estimated Project Cost,Decimal,,building-permits-field-definitions.xlsx
+BuilPermFD,FirstDate,First Appearance Date,Date,,building-permits-field-definitions.xlsx
+BuilPermFD,GeoCityBLockPart,City Block Part,Decimal,,building-permits-field-definitions.xlsx
+BuilPermFD,Handle,Handle,String,,building-permits-field-definitions.xlsx
+BuilPermFD,InspArea10,2012 Inspection Precinct,Integer,,building-permits-field-definitions.xlsx
+BuilPermFD,IssueDate,Issued Date,Date,,building-permits-field-definitions.xlsx
+BuilPermFD,LastDate,Last Date Appeared,Date,,building-permits-field-definitions.xlsx
+BuilPermFD,MainStrucType,Main Structure Type,Integer,Permit Structure Type,building-permits-field-definitions.xlsx
+BuilPermFD,Nbrhd,Neighborhood,Integer,Neighborhood,building-permits-field-definitions.xlsx
+BuilPermFD,NbrOfUnits,Units,Integer,,building-permits-field-definitions.xlsx
+BuilPermFD,NewUse,New Use,String,,building-permits-field-definitions.xlsx
+BuilPermFD,NewUseGroup1,New User Group 1,String,Permit Use Group,building-permits-field-definitions.xlsx
+BuilPermFD,NewUseGroup2,New User Group 2,String,Permit Use Group,building-permits-field-definitions.xlsx
+BuilPermFD,NewUseGroup3,New User Group 3,String,Permit Use Group,building-permits-field-definitions.xlsx
+BuilPermFD,NLC,NLC,Decimal,,building-permits-field-definitions.xlsx
+BuilPermFD,OccAddr,Occupant Address,String,,building-permits-field-definitions.xlsx
+BuilPermFD,OccCity,Occupant City,String,,building-permits-field-definitions.xlsx
+BuilPermFD,OccCo,Occupant Care Of,String,,building-permits-field-definitions.xlsx
+BuilPermFD,OccName,Occupant Name,String,,building-permits-field-definitions.xlsx
+BuilPermFD,OccState,Occupant State,String,,building-permits-field-definitions.xlsx
+BuilPermFD,OccZIP,Occupant ZIP,String,,building-permits-field-definitions.xlsx
+BuilPermFD,OldUse,Old Use,String,,building-permits-field-definitions.xlsx
+BuilPermFD,OldUseGroup1,Old User Group 1,String,Permit Use Group,building-permits-field-definitions.xlsx
+BuilPermFD,OldUseGroup2,Old User Group 2,String,Permit Use Group,building-permits-field-definitions.xlsx
+BuilPermFD,OldUseGroup3,Old User Group 3,String,Permit Use Group,building-permits-field-definitions.xlsx
+BuilPermFD,OwnerAddr,Owner Address,String,,building-permits-field-definitions.xlsx
+BuilPermFD,OwnerCity,Owner City,String,,building-permits-field-definitions.xlsx
+BuilPermFD,OwnerCo,Owner Care Of,String,,building-permits-field-definitions.xlsx
+BuilPermFD,OwnerCode,Owner Code,Integer,,building-permits-field-definitions.xlsx
+BuilPermFD,OwnerName,Owner Name,String,,building-permits-field-definitions.xlsx
+BuilPermFD,OwnerState,Owner State,String,,building-permits-field-definitions.xlsx
+BuilPermFD,OwnerZIP,Owner ZIP,String,,building-permits-field-definitions.xlsx
+BuilPermFD,Parcel,Parcel Number,Integer,,building-permits-field-definitions.xlsx
+BuilPermFD,Parcel9,Parcel 9,Integer,,building-permits-field-definitions.xlsx
+BuilPermFD,Parity,Parity,String,,building-permits-field-definitions.xlsx
+BuilPermFD,PoliceDist,Police District,Integer,,building-permits-field-definitions.xlsx
+BuilPermFD,PrclErr,Geocoding Error Code,Integer,,building-permits-field-definitions.xlsx
+BuilPermFD,Precinct02,2002 Inspection Precinct,Integer,,building-permits-field-definitions.xlsx
+BuilPermFD,Precinct10,2012 Precinct,Integer,,building-permits-field-definitions.xlsx
+BuilPermFD,ProjectType,Project Type,Integer,Permit Project Type,building-permits-field-definitions.xlsx
+BuilPermFD,StDir,Street Direction,String,,building-permits-field-definitions.xlsx
+BuilPermFD,StName,Street Name,String,,building-permits-field-definitions.xlsx
+BuilPermFD,StrucType1,Structure Type 1,Integer,Permit Structure Type,building-permits-field-definitions.xlsx
+BuilPermFD,StrucType2,Structure Type 2,Integer,Permit Structure Type,building-permits-field-definitions.xlsx
+BuilPermFD,StrucType3,Structure Type 3,Integer,Permit Structure Type,building-permits-field-definitions.xlsx
+BuilPermFD,StType,Street Type,String,,building-permits-field-definitions.xlsx
+BuilPermFD,TmpCityBlock,Temp City Block,Decimal,,building-permits-field-definitions.xlsx
+BuilPermFD,TmpParcel,Temp Parcel,Integer,,building-permits-field-definitions.xlsx
+BuilPermFD,UnitNum,Unit Number,String,,building-permits-field-definitions.xlsx
+BuilPermFD,UpDateGeo,Geo Updated,Date,,building-permits-field-definitions.xlsx
+BuilPermFD,Ward00,2002 Ward,Integer,,building-permits-field-definitions.xlsx
+BuilPermFD,Ward10,2012 Ward,Integer,,building-permits-field-definitions.xlsx
+DemoPermFD,AddrAdjusted,Address Adjusted,Boolean,,demolition-permits-field-definitions.xlsx
+DemoPermFD,AddrNum,Address Number,Integer,,demolition-permits-field-definitions.xlsx
+DemoPermFD,AddrSuf,Address Suffix,String,,demolition-permits-field-definitions.xlsx
+DemoPermFD,AppDate,Application Date,Date,,demolition-permits-field-definitions.xlsx
+DemoPermFD,AppDescription,Application Description,String,,demolition-permits-field-definitions.xlsx
+DemoPermFD,AppNum,Application Number,Integer,,demolition-permits-field-definitions.xlsx
+DemoPermFD,AppSource,Application Source,Integer,,demolition-permits-field-definitions.xlsx
+DemoPermFD,AppType,Application Type,String,Permit Application Type,demolition-permits-field-definitions.xlsx
+DemoPermFD,AsrNbrhd,Assessor Neighborhood,Integer,,demolition-permits-field-definitions.xlsx
+DemoPermFD,CancelDate,Canceled Date,Date,,demolition-permits-field-definitions.xlsx
+DemoPermFD,CancelType,Cancel Type,String,,demolition-permits-field-definitions.xlsx
+DemoPermFD,CDADist,CDA District,Integer,,demolition-permits-field-definitions.xlsx
+DemoPermFD,CDASubDist,CDA Sub District,Integer,,demolition-permits-field-definitions.xlsx
+DemoPermFD,CensBlock00,2000 Census Block,Decimal,,demolition-permits-field-definitions.xlsx
+DemoPermFD,CensGroup10,2010 Census Group,Integer,,demolition-permits-field-definitions.xlsx
+DemoPermFD,CensTract10,2010 Census Tract,Decimal,,demolition-permits-field-definitions.xlsx
+DemoPermFD,CityBlock,City Block,Decimal,,demolition-permits-field-definitions.xlsx
+DemoPermFD,CompleteDate,Completed Date,Date,,demolition-permits-field-definitions.xlsx
+DemoPermFD,ContrAddr,Contractor Address,String,,demolition-permits-field-definitions.xlsx
+DemoPermFD,ContrCity,Contractor City,String,,demolition-permits-field-definitions.xlsx
+DemoPermFD,ContrContact,Contractor Contact Person,String,,demolition-permits-field-definitions.xlsx
+DemoPermFD,ContrName,Contractor Name,String,,demolition-permits-field-definitions.xlsx
+DemoPermFD,ContrNum,Contractor License Number,Decimal,,demolition-permits-field-definitions.xlsx
+DemoPermFD,ContrPhone,Contractor Phone,String,,demolition-permits-field-definitions.xlsx
+DemoPermFD,ContrState,Contractor State,String,,demolition-permits-field-definitions.xlsx
+DemoPermFD,ContrZIP,Contractor ZIP,String,,demolition-permits-field-definitions.xlsx
+DemoPermFD,CorrAddr,Correspondent Address,String,,demolition-permits-field-definitions.xlsx
+DemoPermFD,CorrCity,Correspondent City,String,,demolition-permits-field-definitions.xlsx
+DemoPermFD,CorrCo,Correspondent Care Of,String,,demolition-permits-field-definitions.xlsx
+DemoPermFD,CorrName,Correspondent Name,String,,demolition-permits-field-definitions.xlsx
+DemoPermFD,CorrState,Correspondent State,String,,demolition-permits-field-definitions.xlsx
+DemoPermFD,CorrZIP,Correspondent ZIP,String,,demolition-permits-field-definitions.xlsx
+DemoPermFD,DemoType,Demolition Source,String,Demolition Source,demolition-permits-field-definitions.xlsx
+DemoPermFD,EstProjectCost,Estimated Project Cost,Decimal,,demolition-permits-field-definitions.xlsx
+DemoPermFD,FirstDate,First Appearance Date,Date,,demolition-permits-field-definitions.xlsx
+DemoPermFD,GeoCityBLockPart,City Block Part,Decimal,,demolition-permits-field-definitions.xlsx
+DemoPermFD,Handle,Handle,String,,demolition-permits-field-definitions.xlsx
+DemoPermFD,InspArea10,2012 Inspection Precinct,Integer,,demolition-permits-field-definitions.xlsx
+DemoPermFD,IssueDate,Issued Date,Date,,demolition-permits-field-definitions.xlsx
+DemoPermFD,LastDate,Last Date Appeared,Date,,demolition-permits-field-definitions.xlsx
+DemoPermFD,MainStrucType,Main Structure Type,Integer,Permit Structure Type,demolition-permits-field-definitions.xlsx
+DemoPermFD,Nbrhd,Neighborhood,Integer,Neighborhood,demolition-permits-field-definitions.xlsx
+DemoPermFD,NbrOfUnits,Units,Integer,,demolition-permits-field-definitions.xlsx
+DemoPermFD,NewUse,New Use,String,,demolition-permits-field-definitions.xlsx
+DemoPermFD,NewUseGroup1,New User Group 1,String,Permit Use Group,demolition-permits-field-definitions.xlsx
+DemoPermFD,NewUseGroup2,New User Group 2,String,Permit Use Group,demolition-permits-field-definitions.xlsx
+DemoPermFD,NewUseGroup3,New User Group 3,String,Permit Use Group,demolition-permits-field-definitions.xlsx
+DemoPermFD,NLC,NLC,Decimal,,demolition-permits-field-definitions.xlsx
+DemoPermFD,OccAddr,Occupant Address,String,,demolition-permits-field-definitions.xlsx
+DemoPermFD,OccCity,Occupant City,String,,demolition-permits-field-definitions.xlsx
+DemoPermFD,OccCo,Occupant Care Of,String,,demolition-permits-field-definitions.xlsx
+DemoPermFD,OccName,Occupant Name,String,,demolition-permits-field-definitions.xlsx
+DemoPermFD,OccState,Occupant State,String,,demolition-permits-field-definitions.xlsx
+DemoPermFD,OccZIP,Occupant ZIP,String,,demolition-permits-field-definitions.xlsx
+DemoPermFD,OldUse,Old Use,String,,demolition-permits-field-definitions.xlsx
+DemoPermFD,OldUseGroup1,Old User Group 1,String,Permit Use Group,demolition-permits-field-definitions.xlsx
+DemoPermFD,OldUseGroup2,Old User Group 2,String,Permit Use Group,demolition-permits-field-definitions.xlsx
+DemoPermFD,OldUseGroup3,Old User Group 3,String,Permit Use Group,demolition-permits-field-definitions.xlsx
+DemoPermFD,OwnerAddr,Owner Address,String,,demolition-permits-field-definitions.xlsx
+DemoPermFD,OwnerCity,Owner City,String,,demolition-permits-field-definitions.xlsx
+DemoPermFD,OwnerCo,Owner Care Of,String,,demolition-permits-field-definitions.xlsx
+DemoPermFD,OwnerCode,Owner Code,Integer,,demolition-permits-field-definitions.xlsx
+DemoPermFD,OwnerName,Owner Name,String,,demolition-permits-field-definitions.xlsx
+DemoPermFD,OwnerState,Owner State,String,,demolition-permits-field-definitions.xlsx
+DemoPermFD,OwnerZIP,Owner ZIP,String,,demolition-permits-field-definitions.xlsx
+DemoPermFD,Parcel,Parcel Number,Integer,,demolition-permits-field-definitions.xlsx
+DemoPermFD,Parcel9,Parcel 9,Integer,,demolition-permits-field-definitions.xlsx
+DemoPermFD,Parity,Parity,String,,demolition-permits-field-definitions.xlsx
+DemoPermFD,PoliceDist,Police District,Integer,,demolition-permits-field-definitions.xlsx
+DemoPermFD,PrclErr,Geocoding Error Code,Integer,,demolition-permits-field-definitions.xlsx
+DemoPermFD,Precinct02,2002 Inspection Precinct,Integer,,demolition-permits-field-definitions.xlsx
+DemoPermFD,Precinct10,2012 Precinct,Integer,,demolition-permits-field-definitions.xlsx
+DemoPermFD,ProjectType,Project Type,Integer,Permit Project Type,demolition-permits-field-definitions.xlsx
+DemoPermFD,StDir,Street Direction,String,,demolition-permits-field-definitions.xlsx
+DemoPermFD,StName,Street Name,String,,demolition-permits-field-definitions.xlsx
+DemoPermFD,StrucType1,Structure Type 1,Integer,Permit Structure Type,demolition-permits-field-definitions.xlsx
+DemoPermFD,StrucType2,Structure Type 2,Integer,Permit Structure Type,demolition-permits-field-definitions.xlsx
+DemoPermFD,StrucType3,Structure Type 3,Integer,Permit Structure Type,demolition-permits-field-definitions.xlsx
+DemoPermFD,StType,Street Type,String,,demolition-permits-field-definitions.xlsx
+DemoPermFD,TmpCityBlock,Temp City Block,Decimal,,demolition-permits-field-definitions.xlsx
+DemoPermFD,TmpParcel,Temp Parcel,Integer,,demolition-permits-field-definitions.xlsx
+DemoPermFD,UnitArea,Unit Area,Integer,,demolition-permits-field-definitions.xlsx
+DemoPermFD,UnitHeight,Unit Height,Integer,,demolition-permits-field-definitions.xlsx
+DemoPermFD,UnitLength,Unit Length,Integer,,demolition-permits-field-definitions.xlsx
+DemoPermFD,UnitNum,Unit Number,String,,demolition-permits-field-definitions.xlsx
+DemoPermFD,UnitVolume,Unit Volume,Integer,,demolition-permits-field-definitions.xlsx
+DemoPermFD,UnitWidth,Unit Width,Integer,,demolition-permits-field-definitions.xlsx
+DemoPermFD,UpDateGeo,Geo Updated,Date,,demolition-permits-field-definitions.xlsx
+DemoPermFD,Ward00,2002 Ward,Integer,,demolition-permits-field-definitions.xlsx
+DemoPermFD,Ward10,2012 Ward,Integer,,demolition-permits-field-definitions.xlsx

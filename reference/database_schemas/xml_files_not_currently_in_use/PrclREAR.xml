@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?><schema>
+<column comment="" default="" key="true" label="CityBlock" length="255" nullable="true" originalDbColumnName="CityBlock" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="true" label="Parcel" length="255" nullable="true" originalDbColumnName="Parcel" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="true" label="OwnerCode" length="255" nullable="true" originalDbColumnName="OwnerCode" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="true" label="BillYear" length="255" nullable="true" originalDbColumnName="BillYear" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="true" label="BillSuffix" length="255" nullable="true" originalDbColumnName="BillSuffix" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="LastUpdate" length="255" nullable="true" originalDbColumnName="LastUpdate" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="OriginalCharge" length="255" nullable="true" originalDbColumnName="OriginalCharge" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="TaxAmt" length="255" nullable="true" originalDbColumnName="TaxAmt" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="LandValue" length="255" nullable="true" originalDbColumnName="LandValue" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="ImproveValue" length="255" nullable="true" originalDbColumnName="ImproveValue" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="TotalValue" length="255" nullable="true" originalDbColumnName="TotalValue" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="TaxBal" length="255" nullable="true" originalDbColumnName="TaxBal" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="NbrOfSewerLines" length="255" nullable="true" originalDbColumnName="NbrOfSewerLines" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="IsAdd" length="255" nullable="true" originalDbColumnName="IsAdd" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="IsDeleted" length="255" nullable="true" originalDbColumnName="IsDeleted" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="IsPaidUnderProtest" length="255" nullable="true" originalDbColumnName="IsPaidUnderProtest" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="IsPrior" length="255" nullable="true" originalDbColumnName="IsPrior" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="ComResCode" length="255" nullable="true" originalDbColumnName="ComResCode" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="SpecBusDist" length="255" nullable="true" originalDbColumnName="SpecBusDist" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="SewerLineSplit" length="255" nullable="true" originalDbColumnName="SewerLineSplit" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="ResTaxAmt" length="255" nullable="true" originalDbColumnName="ResTaxAmt" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="ComLandValue" length="255" nullable="true" originalDbColumnName="ComLandValue" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="ComImproveValue" length="255" nullable="true" originalDbColumnName="ComImproveValue" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="ComTotalValue" length="255" nullable="true" originalDbColumnName="ComTotalValue" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="ComTaxAmt" length="255" nullable="true" originalDbColumnName="ComTaxAmt" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="SurTaxAmt" length="255" nullable="true" originalDbColumnName="SurTaxAmt" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="SBDTaxAmt" length="255" nullable="true" originalDbColumnName="SBDTaxAmt" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="LatSewerAmt" length="255" nullable="true" originalDbColumnName="LatSewerAmt" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="DemoCharge" length="255" nullable="true" originalDbColumnName="DemoCharge" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="NuisanceTax" length="255" nullable="true" originalDbColumnName="NuisanceTax" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="TIFDist" length="255" nullable="true" originalDbColumnName="TIFDist" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="TIFSplit" length="255" nullable="true" originalDbColumnName="TIFSplit" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="SpecBusDist2" length="255" nullable="true" originalDbColumnName="SpecBusDist2" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+</schema>
+
+

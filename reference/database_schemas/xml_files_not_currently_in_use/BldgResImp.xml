@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?><schema>
+<column comment="" default="" key="true" label="CityBlock" length="255" nullable="true" originalDbColumnName="CityBlock" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="true" label="Parcel" length="255" nullable="true" originalDbColumnName="Parcel" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="true" label="OwnerCode" length="255" nullable="true" originalDbColumnName="OwnerCode" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="true" label="BldgNum" length="255" nullable="true" originalDbColumnName="BldgNum" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="true" label="ImpNum" length="255" nullable="true" originalDbColumnName="ImpNum" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="ImpCode" length="255" nullable="true" originalDbColumnName="ImpCode" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+</schema>
+
+

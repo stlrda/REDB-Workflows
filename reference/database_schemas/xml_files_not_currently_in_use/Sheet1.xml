@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?><schema>
+<column comment="" default="" key="true" label="Name" length="255" nullable="true" originalDbColumnName="Name" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="Label" length="255" nullable="true" originalDbColumnName="Label" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="Data Type" length="255" nullable="true" originalDbColumnName="Data Type" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="Vocabulary" length="255" nullable="true" originalDbColumnName="Vocabulary" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="true" label="Name" length="255" nullable="true" originalDbColumnName="Name" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="Label" length="255" nullable="true" originalDbColumnName="Label" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="Data Type" length="255" nullable="true" originalDbColumnName="Data Type" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="Vocabulary" length="255" nullable="true" originalDbColumnName="Vocabulary" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="true" label="Name" length="255" nullable="true" originalDbColumnName="Name" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="Label" length="255" nullable="true" originalDbColumnName="Label" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="Data Type" length="255" nullable="true" originalDbColumnName="Data Type" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="Vocabulary" length="255" nullable="true" originalDbColumnName="Vocabulary" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+</schema>

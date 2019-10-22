@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?><schema>
+<column comment="" default="" key="true" label="SectionCode" length="255" nullable="true" originalDbColumnName="SectionCode" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="Descr" length="255" nullable="true" originalDbColumnName="Descr" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+</schema>
+
+
