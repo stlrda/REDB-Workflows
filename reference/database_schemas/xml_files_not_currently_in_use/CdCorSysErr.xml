@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?><schema>
+<column comment="" default="" key="true" label="ErrField" length="255" nullable="true" originalDbColumnName="ErrField" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="true" label="ErrInc" length="255" nullable="true" originalDbColumnName="ErrInc" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="Name" length="255" nullable="true" originalDbColumnName="Name" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="ErrCode" length="255" nullable="true" originalDbColumnName="ErrCode" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="Descr" length="255" nullable="true" originalDbColumnName="Descr" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="CorAdjOpts" length="255" nullable="true" originalDbColumnName="CorAdjOpts" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+</schema>
+
+

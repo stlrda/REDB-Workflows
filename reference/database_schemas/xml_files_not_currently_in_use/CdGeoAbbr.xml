@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?><schema>
+<column comment="" default="" key="true" label="Code4" length="255" nullable="true" originalDbColumnName="Code4" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="true" label="FieldName" length="255" nullable="true" originalDbColumnName="FieldName" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="Code3" length="255" nullable="true" originalDbColumnName="Code3" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="Code2" length="255" nullable="true" originalDbColumnName="Code2" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+</schema>
+
+

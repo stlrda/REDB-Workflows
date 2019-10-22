@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?><schema>
+<column comment="" default="" key="true" label="CodeText" length="255" nullable="true" originalDbColumnName="CodeText" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="CodeStandard" length="255" nullable="true" originalDbColumnName="CodeStandard" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="CommonType" length="255" nullable="true" originalDbColumnName="CommonType" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="CorCode" length="255" nullable="true" originalDbColumnName="CorCode" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="CorType" length="255" nullable="true" originalDbColumnName="CorType" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="SnType" length="255" nullable="true" originalDbColumnName="SnType" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="UaType" length="255" nullable="true" originalDbColumnName="UaType" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="UiType" length="255" nullable="true" originalDbColumnName="UiType" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="PermMatch" length="255" nullable="true" originalDbColumnName="PermMatch" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="Ind1" length="255" nullable="true" originalDbColumnName="Ind1" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="Ind2" length="255" nullable="true" originalDbColumnName="Ind2" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+</schema>
+
+

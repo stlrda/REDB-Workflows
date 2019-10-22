@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?><schema>
+<column comment="" default="" key="true" label="Record_No" length="255" nullable="true" originalDbColumnName="Record_No" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="Handle" length="255" nullable="true" originalDbColumnName="Handle" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="ParcelID" length="255" nullable="true" originalDbColumnName="ParcelID" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="Address" length="255" nullable="true" originalDbColumnName="Address" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="Add_Suffix" length="255" nullable="true" originalDbColumnName="Add_Suffix" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="Direction" length="255" nullable="true" originalDbColumnName="Direction" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="Name" length="255" nullable="true" originalDbColumnName="Name" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="Type" length="255" nullable="true" originalDbColumnName="Type" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="Class" length="255" nullable="true" originalDbColumnName="Class" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="Acquisition_dt" length="255" nullable="true" originalDbColumnName="Acquisition_dt" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="CenterX" length="255" nullable="true" originalDbColumnName="CenterX" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="CenterY" length="255" nullable="true" originalDbColumnName="CenterY" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="Value" length="255" nullable="true" originalDbColumnName="Value" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="Value_Estimated" length="255" nullable="true" originalDbColumnName="Value_Estimated" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="Value_Est_Dt" length="255" nullable="true" originalDbColumnName="Value_Est_Dt" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="Entered_Date" length="255" nullable="true" originalDbColumnName="Entered_Date" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="Usage" length="255" nullable="true" originalDbColumnName="Usage" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="Cost" length="255" nullable="true" originalDbColumnName="Cost" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="Property_Source" length="255" nullable="true" originalDbColumnName="Property_Source" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="Purchase_Type" length="255" nullable="true" originalDbColumnName="Purchase_Type" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="Parcel_Status" length="255" nullable="true" originalDbColumnName="Parcel_Status" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+</schema>
+
+

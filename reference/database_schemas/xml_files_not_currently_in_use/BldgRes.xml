@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?><schema>
+<column comment="" default="" key="true" label="CityBlock" length="255" nullable="true" originalDbColumnName="CityBlock" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="true" label="Parcel" length="255" nullable="true" originalDbColumnName="Parcel" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="true" label="OwnerCode" length="255" nullable="true" originalDbColumnName="OwnerCode" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="true" label="BldgNum" length="255" nullable="true" originalDbColumnName="BldgNum" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="ResOccType" length="255" nullable="true" originalDbColumnName="ResOccType" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="BsmtType" length="255" nullable="true" originalDbColumnName="BsmtType" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="BsmtFinishType" length="255" nullable="true" originalDbColumnName="BsmtFinishType" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="BsmtAreaFinished" length="255" nullable="true" originalDbColumnName="BsmtAreaFinished" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="BsmtAreaPartial" length="255" nullable="true" originalDbColumnName="BsmtAreaPartial" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="ResExtWallType" length="255" nullable="true" originalDbColumnName="ResExtWallType" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="LivingAreaTotal" length="255" nullable="true" originalDbColumnName="LivingAreaTotal" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="LivingAreaAtGrade" length="255" nullable="true" originalDbColumnName="LivingAreaAtGrade" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="LivingAreaUpDown" length="255" nullable="true" originalDbColumnName="LivingAreaUpDown" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="RoomArea" length="255" nullable="true" originalDbColumnName="RoomArea" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="ResStoriesCode" length="255" nullable="true" originalDbColumnName="ResStoriesCode" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="FullBaths" length="255" nullable="true" originalDbColumnName="FullBaths" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="HalfBaths" length="255" nullable="true" originalDbColumnName="HalfBaths" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="AirCondCentral" length="255" nullable="true" originalDbColumnName="AirCondCentral" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="AirCondWindow" length="255" nullable="true" originalDbColumnName="AirCondWindow" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="CentralHeating" length="255" nullable="true" originalDbColumnName="CentralHeating" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="Attic" length="255" nullable="true" originalDbColumnName="Attic" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="Garage1" length="255" nullable="true" originalDbColumnName="Garage1" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="Garage2" length="255" nullable="true" originalDbColumnName="Garage2" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="Carport1" length="255" nullable="true" originalDbColumnName="Carport1" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="Carport2" length="255" nullable="true" originalDbColumnName="Carport2" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="YearBuilt" length="255" nullable="true" originalDbColumnName="YearBuilt" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="ResModelCode" length="255" nullable="true" originalDbColumnName="ResModelCode" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="ResModelAdjCode" length="255" nullable="true" originalDbColumnName="ResModelAdjCode" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="EffectiveYearBuilt" length="255" nullable="true" originalDbColumnName="EffectiveYearBuilt" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="FunctionalDep" length="255" nullable="true" originalDbColumnName="FunctionalDep" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="LocationalDep" length="255" nullable="true" originalDbColumnName="LocationalDep" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="FirstDate" length="255" nullable="true" originalDbColumnName="FirstDate" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="LastDate" length="255" nullable="true" originalDbColumnName="LastDate" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="LastUpDate" length="255" nullable="true" originalDbColumnName="LastUpDate" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+</schema>
+
+
