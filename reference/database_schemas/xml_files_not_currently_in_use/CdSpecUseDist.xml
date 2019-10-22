@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?><schema>
+<column comment="" default="" key="true" label="SpecUseDist" length="255" nullable="true" originalDbColumnName="SpecUseDist" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="Name" length="255" nullable="true" originalDbColumnName="Name" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="Ordinance" length="255" nullable="true" originalDbColumnName="Ordinance" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="StartDate" length="255" nullable="true" originalDbColumnName="StartDate" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="EndDate" length="255" nullable="true" originalDbColumnName="EndDate" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="AmendOrd" length="255" nullable="true" originalDbColumnName="AmendOrd" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+<column comment="" default="" key="false" label="AmendDate" length="255" nullable="true" originalDbColumnName="AmendDate" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
+</schema>
+
+
