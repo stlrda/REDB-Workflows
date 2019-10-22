@@ -1,0 +1,5 @@
+[deafult]
+aws_access_key_id=accesskeygoeshere
+aws_secret_access_key=secretkeygoeshere
+aws_region=pickyourregion
+aws_s3_bucket=nameyourbucket
