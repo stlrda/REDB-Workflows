@@ -1,0 +1,146 @@
+//ENTITIES
+Table parcel {
+	parcel_id varchar [pk, note: 'REDB identifier, not municipal identifier. CCCCC.PPPPPPPP.000.0000']
+	county_id varchar [ref: > county.county_id]
+	city_block_number  varchar
+	parcel_number varchar
+	parcelt_taxing_status varchar [note: 'maps to Saint Louis City Owner Code']
+	primary_addresses_count varchar
+	owner_id varchar [ref: > legal_entity.legal_entity_id]
+	description varchar
+	frontage_to_street int [note: 'number of feet that face the street']
+	land_area int [note: 'sq footage']
+	zoning_class varchar
+	ward varchar
+	voting_precinct varchar
+	inspection_area varchar
+	neighborhood_id varchar [ref: > neighborhood.neighborhood_id]
+	police_district varchar
+	census_tract varchar
+	census_block varchar
+	asr_neighborhood varchar
+	special_parcel_type_code varchar [ref: > special_parcel_type.special_parcel_type_code]
+	sub_parcel_type_code varchar [ref: > sub_parcel_type.sub_parcel_type_code]
+	gis_city_block varchar
+	gis_parcel varchar
+	gis_owner_code varchar
+	  // all table fields
+ 	create_date date
+  	current_flag boolean
+  	removed_flag boolean
+  	etl_job varchar
+  	update_date date
+}
+
+Table building {
+	building_id varchar [pk, note: 'REDB identifier, not municipal identifier. CCCCC.PPPPPPPP.BBB.0000']
+	parcel_id varchar [ref: > parcel.parcel_id]
+	owner_id varchar [ref: > legal_entity.legal_entity_id]
+	description varchar
+	apartment_count int
+	  // all table fields
+ 	create_date date
+  	current_flag boolean
+  	removed_flag boolean
+  	etl_job varchar
+  	update_date date
+}
+
+Table unit {
+	unit_id varchar [pk, note: 'REDB identifier, not municipal identifier. CCCCC.PPPPPPPP.BBB.UUUU']
+	building_id varchar [ref: > building.building_id]
+	description varchar
+	condominium boolean
+	  // all table fields
+ 	create_date date
+  	current_flag boolean
+  	removed_flag boolean
+  	etl_job varchar
+  	update_date date
+}
+
+Table legal_entity {
+	legal_entity_id varchar [pk]
+	legal_entity_name varchar
+	legal_entity_secondary_name varchar
+	address_id varchar [ref: > address.address_id]
+	  // all table fields
+ 	create_date date
+  	current_flag boolean
+  	removed_flag boolean
+  	etl_job varchar
+  	update_date date
+}
+
+Table address {
+	address_id varchar [pk]
+	street_number varchar
+ 	street_name_prefix varchar
+  	street_name varchar
+  	street_name_suffix varchar
+  	secondary_designator varchar
+	county_id varchar [ref: > county.county_id]
+	city varchar
+	state varchar
+	country varchar
+	zip varchar
+	  // all table fields
+ 	create_date date
+  	current_flag boolean
+  	removed_flag boolean
+  	etl_job varchar
+  	update_date date
+}
+
+table county_id_mapping_table {
+	county_id varchar [ref: > county.county_id]
+	parcel_id varchar [ref: > parcel.parcel_id, note: 'REDB identifier']
+	county_parcel_id varchar [note: 'This is the identifier the county uses']
+	county_parcel_id_type varchar [note: 'The name the county uses to refer to their identifier']
+	  // all table fields
+ 	create_date date
+  	current_flag boolean
+  	removed_flag boolean
+  	etl_job varchar
+  	update_date date
+}
+
+table county {
+	county_id varchar [pk]
+	county_name varchar
+	county_state varchar
+	  // all table fields
+ 	create_date date
+  	current_flag boolean
+  	removed_flag boolean
+  	etl_job varchar
+  	update_date date
+}
+
+table neighborhood {
+	neighborhood_id varchar [pk]
+	neighborhood_name varchar
+	county_id varchar [ref: > county.county_id]
+	  // all table fields
+ 	create_date date
+  	current_flag boolean
+  	removed_flag boolean
+  	etl_job varchar
+  	update_date date
+}
+
+table sub_parcel_type {
+  sub_parcel_type_code varchar
+  sub_parcel_type varchar
+}
+
+table special_parcel_type {
+  special_parcel_type_code varchar
+  special_parcel_type varchar
+}
+//Views to Create
+//special_parcel_type
+//sub_parcel_type
+//vacancy
+//asr_land_use
+//cda_land_use
