@@ -1,16 +1,10 @@
-Zip File Name,Database File Name,Direct URL
+Zip File Name,Database File Names,Direct URL
 prcl.zip,prcl.mdb,https://www.stlouis-mo.gov/data/upload/data-files/prcl.zip
-codes.zip,PrclCode.mdb,https://www.stlouis-mo.gov/data/upload/data-files/codes.zip
-codes.zip,corcode.mdb,https://www.stlouis-mo.gov/data/upload/data-files/codes.zip
-codes.zip,bincode.mdb,https://www.stlouis-mo.gov/data/upload/data-files/codes.zip
-codes.zip,cndcode.mdb,https://www.stlouis-mo.gov/data/upload/data-files/codes.zip
-prmemp.zip,prmcode.mdb,https://www.stlouis-mo.gov/data/upload/data-files/prmemp.zip
-prmemp.zip,prmemp.mdb,https://www.stlouis-mo.gov/data/upload/data-files/prmemp.zip
-prmbdo.zip,prmbdo.mdb,https://www.stlouis-mo.gov/data/upload/data-files/prmbdo.zip
+codes.zip,PrclCode.mdb|corcode.mdb|bincode.mdb|cndcode.mdb|ComCode.mdb,https://www.stlouis-mo.gov/data/upload/data-files/codes.zip
+prmemp.zip,prmcode.mdb|prmemp.mdb|prmbdo.mdb,https://www.stlouis-mo.gov/data/upload/data-files/prmemp.zip
 bldginsp.zip,bldinsp.mdb,https://www.stlouis-mo.gov/data/upload/data-files/bldginsp.zip
 hcd.zip,hcd.mdb,https://www.stlouis-mo.gov/data/upload/data-files/hcd.zip
 prclsale.zip,prclsale.mdb,https://www.stlouis-mo.gov/data/upload/data-files/prclsale.zip
 condemn.zip,condemn.txt,https://www.stlouis-mo.gov/data/upload/data-files/condemn.zip
 lra_public.zip,lra_public.mdb,https://www.stlouis-mo.gov/data/upload/data-files/lra_public.zip
 forestry-maintenance-properties.csv,forestry-maintenance-properties.csv,https://www.stlouis-mo.gov/data/upload/data-files/forestry-maintenance-properties.csv
-codes.zip,ComCode.mdb,https://www.stlouis-mo.gov/data/upload/data-files/codes.zip

@@ -12,7 +12,7 @@ def files_to_download(url):
     print(city_files_list)
 
     zip_file_list = city_files_list['Zip File Name']
-    database_file_list = city_files_list['Database File Name']
+    database_file_list = city_files_list['Database File Names']
     url_list = city_files_list['Direct URL']
 
     city_file_array = [
