@@ -39,5 +39,5 @@ Thumbs.db
 # Config files #
 ################
 # These contain secrets, make sure to include an example version of them appended with .example
-*.secret
 .idea
+credentials.py
