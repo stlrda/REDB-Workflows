@@ -2,7 +2,10 @@ from python.download_city_file import download_city_file
 from python.list_files import listfiles
 from python.retrieve_city_file_array import files_to_download
 from python.variables import entity_database_name, source_urls, lambda_folder
+from python.unzip_files_in_directory import unpack_dir
+import os
 
+os.environ['http_proxy']=''
 
 #Create function looping through, downloading files to ~
 
@@ -15,7 +18,11 @@ for row in db_file_array[2]:
 
 listfiles(lambda_folder)
 
-# Unzip Files to ~ until no longer .zip
+#unpack all zip files in lambda_folder directory
+unpack_dir(lambda_folder)
+
+listfiles(lambda_folder)
+
 
 
 
