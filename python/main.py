@@ -4,8 +4,11 @@ from python.retrieve_city_file_array import files_to_download
 from python.variables import entity_database_name, source_urls, lambda_folder
 from python.unzip_files_in_directory import unpack_dir
 import os
+import ssl
 
-os.environ['http_proxy']=''
+if (not os.environ.get('PYTHONHTTPSVERIFY', '') and
+    getattr(ssl, '_create_unverified_context', None)):
+    ssl._create_default_https_context = ssl._create_unverified_context
 
 #Create function looping through, downloading files to ~
 
@@ -22,10 +25,6 @@ listfiles(lambda_folder)
 unpack_dir(lambda_folder)
 
 listfiles(lambda_folder)
-
-
-
-
 
 #determine file type and read
 
