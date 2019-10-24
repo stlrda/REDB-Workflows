@@ -11,4 +11,4 @@ retrieve_city_file_list.files_to_download(variables.source_urls)
 
 #export to ~ delimited file, save to S3
 
-#Boto is library for AWS functions
+#Boto is library for AWS functions*
