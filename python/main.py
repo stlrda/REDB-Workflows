@@ -8,11 +8,9 @@ from python.variables import entity_database_name, source_urls, lambda_folder
 db_file_array = files_to_download(source_urls)
 
 # for each array row in 'db_file_array'
-for row in db_file_array:
-    # download_city_file(row[2], lambda_folder + row[0])
-    print(row)
-
-    # download_city_file(row[3], lambda_folder)
+for row in db_file_array[2]:
+    # download_city_file(row, lambda_folder + row[0])
+    download_city_file(row, lambda_folder)
 
 
 
