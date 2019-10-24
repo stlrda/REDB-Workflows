@@ -1,6 +1,5 @@
 import os
 import zipfile
-from python.variables import lambda_folder
 import glob
 
 
@@ -19,6 +18,4 @@ def unpack_dir(mypath):
                 os.remove(arch_name)  # delete zipped file
         unpack_dir(mypath)
 
-
-unpack_dir(lambda_folder)
 
