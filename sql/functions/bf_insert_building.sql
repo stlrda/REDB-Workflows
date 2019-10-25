@@ -1,6 +1,6 @@
 CREATE OR REPLACE FUNCTION insert_building_bf()
-RETURNS VOID
-AS $$	
+RETURNS void
+AS $$
 	DECLARE
 		building record;
 		parcel_id varchar;
@@ -23,6 +23,7 @@ AS $$
 					, concat("LegalDesc1", "LegalDesc2", "LegalDesc3", "LegalDesc4", "LegalDesc5") Description
 					, "NbrOfApts"
 					, "Handle"
+					, '1' as "BldgNum"
 			FROM staging.prcl_prcl
 			WHERE "Parcel"::integer > 8000
 			UNION
@@ -34,6 +35,7 @@ AS $$
 					, concat(P."LegalDesc1", P."LegalDesc2", P."LegalDesc3", P."LegalDesc4", P."LegalDesc5") Description
 					, P."NbrOfApts"
 					, P."Handle"
+					, C."BldgNum"
 			FROM staging.prcl_prcl AS P
 				JOIN staging.prcl_bldgcom C
 				   ON P."CityBlock" = C."CityBlock" AND P."Parcel" = C."Parcel" AND P."OwnerCode" = C."OwnerCode"
@@ -49,6 +51,7 @@ AS $$
 					, concat(P."LegalDesc1", P."LegalDesc2", P."LegalDesc3", P."LegalDesc4", P."LegalDesc5") Description
 					, P."NbrOfApts"
 					, P."Handle"
+					, R."BldgNum"
 			FROM staging.prcl_prcl AS P
 				JOIN staging.prcl_bldgres R
 				   ON P."CityBlock" = R."CityBlock" AND P."Parcel" = R."Parcel" AND P."OwnerCode" = R."OwnerCode"
@@ -111,4 +114,4 @@ AS $$
 		END LOOP;
 	END;
 $$
-LANGUAGE plpgsql
+LANGUAGE plpgsql;
