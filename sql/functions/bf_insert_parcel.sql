@@ -2,7 +2,7 @@ CREATE OR REPLACE FUNCTION public.insert_parcel_bf(countyid character varying)
  RETURNS integer
  LANGUAGE plpgsql
 AS $function$
-		DECLARE
+			DECLARE
 		counter integer;
 		parcel RECORD;
 		cityblock varchar;
@@ -14,6 +14,8 @@ AS $function$
 		redb_id varchar;
 		frontage float;
 		landarea integer;
+		specparceltype varchar;
+		subparceltype varchar;
 	BEGIN
 		FOR parcel in 
 			SELECT "CityBlock"
@@ -79,15 +81,26 @@ AS $function$
 			frontage = parcel."Frontage";
 			
 			--fix invalid spec/sub parcels
--- 			IF parcel."SpecParcelType" = '' THEN
--- 				parcel."SpecParcelType" = NULL;
--- 			END IF;
--- 			IF parcel."SubParcelType" = '' THEN
--- 				parcel."SubParcelType" = NULL;
--- 			END IF;
-			--ignoring spec/sub parcels for now
-			parcel."SpecParcelType" = NULL;
-			parcel."SubParcelType" = NULL;
+ 			IF parcel."SpecParcelType" = '' THEN
+ 				specparceltype = NULL;
+			ELSE
+				EXECUTE
+					E'SELECT redb_code
+					FROM core.county_code_lookup
+					WHERE "county_id" = $1 AND "code_type" = \'specparceltype\' AND "county_code" = $2'
+					INTO specparceltype
+					USING county_id, parcel."SpecParcelType";
+ 			END IF;
+			IF parcel."SubParcelType" = '' THEN
+ 				subparceltype = NULL;
+			ELSE
+				EXECUTE
+					E'SELECT redb_code
+					FROM core.county_code_lookup
+					WHERE "county_id" = $1 AND "code_type" = \'subparceltype\' AND "county_code" = $2'
+					INTO subparceltype
+					USING county_id, parcel."SubParcelType";
+ 			END IF;
 			
 		  	EXECUTE
 				-- change to insert into parcel with the 30ish fields
@@ -97,11 +110,10 @@ AS $function$
 				 VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24)'
 			USING redb_id, county_id, parcel."CityBlock", parcel."Parcel", parcel."OwnerCode", parcel."PrimAddrRecNum", legal_entity_id, parcel."description", 
 			frontage, landarea, parcel."Zoning", parcel."Ward10", parcel."Precinct10", parcel."InspArea10", parcel."Nbrhd", parcel."PoliceDist",
-			parcel."CensTract10", parcel."CensBlock10", parcel."AsrNbrhd", parcel."SpecParcelType", parcel."SubParcelType", parcel."GisCityBLock", parcel."GisParcel",
-			parcel."GisOwnerCode";
+			parcel."CensTract10", parcel."CensBlock10", parcel."AsrNbrhd", specparceltype, subparceltype, parcel."GisCityBLock", parcel."GisParcel", parcel."GisOwnerCode";
 		  END IF;
 		END LOOP;
-		RETURN counter;
 	END;
+
 $function$
 ;
