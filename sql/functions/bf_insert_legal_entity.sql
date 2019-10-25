@@ -31,7 +31,7 @@ AS $function$
 			--counter = counter + 1;
 			EXECUTE 
 				E'SELECT current_highest_value
-				FROM highest_id
+				FROM core.highest_id
 				WHERE id_name = \'legal_entity_id\''
 				INTO counter;
 			IF counter is null THEN
@@ -47,5 +47,6 @@ AS $function$
 		END LOOP;
 		RETURN counter;
 	END;
+
 $function$
 ;
