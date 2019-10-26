@@ -43,9 +43,9 @@ credentials.py
 
 # Terraform files #
 ###################
-.tfvars
+*.tfvars
 backend.tf
-.tfstate
+*.tfstate
 override.tf
 override.tf.json
 *_override.tf
