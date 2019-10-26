@@ -1,8 +1,7 @@
-CREATE OR REPLACE FUNCTION public.insert_parcel_bf(countyid character varying)
- RETURNS integer
+CREATE OR REPLACE FUNCTION public.insert_parcel_dwp(countyid character varying)
+ RETURNS void
  LANGUAGE plpgsql
-AS $function$
-		DECLARE
+AS $function$		DECLARE
 		counter integer;
 		parcel RECORD;
 		cityblock varchar;
@@ -16,7 +15,7 @@ AS $function$
 		landarea integer;
 	BEGIN
 		FOR parcel in 
-			SELECT "CityBlock"
+			SELECT "CityBlock" --Select all the fields we want for redb parcel table
 			, "Parcel"
 			, "OwnerCode"
 			, "PrimAddrRecNum"
@@ -40,18 +39,20 @@ AS $function$
 			, "OwnerName"
 			, "OwnerName2"
 			FROM staging.prcl_prcl
-			WHERE CONCAT(LEFT("Handle", 7), 0, RIGHT("Handle", 3)) = prcl11_to_handle("ParcelId")
-			  AND "OwnerCode" != '8'
+			WHERE "Parcel" = "GisParcel" --where the Parcel is the same as the GIS Parcel
+			  AND "OwnerCode" = "GisOwnerCode"
+			  AND "OwnerCode" != '8' --excluding all billboards
+			  -- limit 3000 --only for first 1000 rows
 		LOOP
-		  EXECUTE 
+		  -- EXECUTE 
 		  	--check if key fields already exist
-			'SELECT "city_block_number"
-			FROM core.parcel
-			WHERE "city_block_number" = $1 AND "parcel_number" = $2 AND "parcel_taxing_status" = $3'
-		  		INTO cityblock
-				USING parcel."CityBlock", parcel."Parcel", parcel."OwnerCode";
-		  RAISE NOTICE '%', legal_entity_id;
-		  IF cityblock is NULL THEN
+			-- 'SELECT "city_block_number"
+			-- FROM core.parcel
+--			WHERE "city_block_number" = $1 AND "parcel_number" = $2 AND "parcel_taxing_status" = $3'
+--		  		INTO cityblock
+--				USING parcel."CityBlock", parcel."Parcel", parcel."OwnerCode";
+		  -- RAISE NOTICE '%', legal_entity_id;
+		  -- IF cityblock is NULL THEN
 		  	--fetch legal_entity_id
 			EXECUTE 
 			'SELECT legal_entity_id 
@@ -99,9 +100,8 @@ AS $function$
 			frontage, landarea, parcel."Zoning", parcel."Ward10", parcel."Precinct10", parcel."InspArea10", parcel."Nbrhd", parcel."PoliceDist",
 			parcel."CensTract10", parcel."CensBlock10", parcel."AsrNbrhd", parcel."SpecParcelType", parcel."SubParcelType", parcel."GisCityBLock", parcel."GisParcel",
 			parcel."GisOwnerCode";
-		  END IF;
+		  -- END IF;
 		END LOOP;
-		RETURN counter;
 	END;
 $function$
 ;

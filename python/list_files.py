@@ -3,6 +3,9 @@ from os.path import isfile, join
 
 
 def listfiles(mypath):
-    onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
-    print(onlyfiles)
-    return onlyfiles
+    print('Files in directory: ',mypath)
+    for f in listdir(mypath):
+        if isfile(join(mypath, f)):
+            print('\t',f)
+    # onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
+    # print(onlyfiles)
