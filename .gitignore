@@ -39,5 +39,20 @@ Thumbs.db
 # Config files #
 ################
 # These contain secrets, make sure to include an example version of them appended with .example
-.idea
 credentials.py
+
+# Terraform files #
+###################
+.tfvars
+backend.tf
+.tfstate
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+
+
+# IDE files #
+#############
+.idea
