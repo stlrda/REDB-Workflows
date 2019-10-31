@@ -1,0 +1,12 @@
+region = "us-east-2"
+vpc_name = "stl-rda-airflow"
+//at least three vpc_availability_zones
+vpc_availability_zones = [
+  "us-east-2a"
+]
+cluster_name = "stl-rda-airflow"
+cluster_stage = "prod"
+db_username = "jonathanleek"
+db_password = ""
+fernet_key = ""
+key_pair = "airflow"

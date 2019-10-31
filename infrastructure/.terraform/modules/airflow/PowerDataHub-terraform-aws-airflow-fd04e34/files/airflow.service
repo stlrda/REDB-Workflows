@@ -1,0 +1,16 @@
+[Unit]
+Description=Airflow daemon
+After=network.target
+
+[Service]
+EnvironmentFile=/etc/sysconfig/airflow
+User=ubuntu
+Group=ubuntu
+Type=simple
+Restart=always
+ExecStart=/usr/bin/terraform-aws-airflow
+RestartSec=5s
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,6 @@
+terraform.tfvars
+.terraform
+.terraform.tfstate.lock.info
+*.tfstate
+*.tfstate.backup
+*.retry
