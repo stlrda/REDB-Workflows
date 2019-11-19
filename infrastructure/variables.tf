@@ -34,3 +34,20 @@ variable "s3_log_bucket" {
 
 variable "key_pair" {
 }
+
+variable "private_keypath" {
+}
+
+variable "public_keypath" {
+}
+
+variable "admin_email" {
+}
+
+variable "admin_lastname" {}
+
+variable "admin_name" {}
+
+variable "admin_password" {}
+
+variable "admin_username" {}
