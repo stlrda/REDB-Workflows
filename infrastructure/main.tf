@@ -2,5 +2,6 @@
 //CHANGING THIS IS NOT SUFFICIENT TO SWITCH TO A DIFFERENT PROVIDER
 
 provider "aws" {
+  profile = "default"
   region = var.region
 }
