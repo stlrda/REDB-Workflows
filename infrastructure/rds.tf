@@ -4,7 +4,6 @@ module "db" {
   version = "~> 2.0"
 
   name = var.redb_db_name
-  allowed_cidr_blocks = var.redb_db_allowed_cidr_blocks
   apply_immediately = "true"
   backup_retention_period = var.redb_db_backup_retention_period
   database_name = var.redb_db_name
@@ -22,4 +21,5 @@ module "db" {
   replica_scale_max = var.redb_db_replica_scale_max
   replica_scale_min = var.redb_db_replica_scale_min
   tags = var.redb_tags
+  vpc_id = var.redb_db_vpc_id
 }

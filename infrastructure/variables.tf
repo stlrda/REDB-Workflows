@@ -16,16 +16,21 @@ variable "airflow_vpc_availability_zones" {
     "us-east-1a",
     "us-east-1b",
     "us-east-1c"
-  ] }
+  ]
+}
+
 variable "airflow_db_username" {}
 variable "airflow_db_password" {}
 variable "airflow_cluster_name" {
-  default = "airflow_cluster" }
+  default = "airflow_cluster"
+}
 variable "airflow_cluster_stage" {
-  default = "dev" }
+  default = "dev"
+}
 variable "airflow_fernet_key" {}
 variable "airflow_s3_log_bucket" {
-  default = "airflow_logs" }
+  default = "airflow_logs"
+}
 variable "airflow_key_pair" {}
 variable "airflow_private_keypath" {}
 variable "airflow_public_keypath" {}
@@ -35,20 +40,19 @@ variable "airflow_admin_name" {}
 variable "airflow_admin_password" {}
 variable "airflow_admin_username" {}
 variable "airflow_tags" {
-  default = [
-  "airflow",
-  "STLRDA"
-  ]
 }
 #REDB
-variable "redb_db_allowed_cidr_blocks" {}
+
 variable "redb_db_backup_retention_period" {
   #in days
-  default = "7" }
+  default = "7"
+}
 variable "redb_db_name" {}
 variable "redb_deletion_protection" {
-  default = "true" }
-variable "redb_db_engine" {default = "aurora-postgresql"
+  default = "true"
+}
+variable "redb_db_engine" {
+  default = "aurora-postgresql"
 }
 variable "redb_db_master_username" {
 }
@@ -81,10 +85,10 @@ variable "redb_db_replica_scale_min" {
   default = "1"
 }
 variable "redb_tags" {
-  default = [
-  "redb",
-  "STLRDA"]
+
 }
 variable "redb_db_instance_type" {
   default = "db.r4.large"
 }
+
+variable "redb_db_vpc_id" {}
