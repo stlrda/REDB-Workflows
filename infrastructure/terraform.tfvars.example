@@ -46,3 +46,4 @@ redb_db_replica_scale_max = "3"
 redb_db_replica_scale_min = "1"
 redb_tags = [
 ]
+redb_db_instance_type = "db.r4.large"

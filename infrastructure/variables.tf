@@ -85,3 +85,6 @@ variable "redb_tags" {
   "redb",
   "STLRDA"]
 }
+variable "redb_db_instance_type" {
+  default = "db.r4.large"
+}
