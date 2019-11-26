@@ -1,4 +1,3 @@
-
 module "db" {
   source = "terraform-aws-modules/rds-aurora/aws"
   version = "~> 2.0"
@@ -21,5 +20,5 @@ module "db" {
   replica_scale_max = var.redb_db_replica_scale_max
   replica_scale_min = var.redb_db_replica_scale_min
   tags = var.redb_tags
-  vpc_id = var.redb_db_vpc_id
+  vpc_id = module.vpc.default_vpc_id
 }
