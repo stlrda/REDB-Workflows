@@ -90,5 +90,3 @@ variable "redb_tags" {
 variable "redb_db_instance_type" {
   default = "db.r4.large"
 }
-
-variable "redb_db_vpc_id" {}

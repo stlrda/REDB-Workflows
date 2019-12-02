@@ -8,6 +8,7 @@ module "db" {
   database_name = var.redb_db_name
   deletion_protection = var.redb_deletion_protection
   engine = var.redb_db_engine
+  engine_version = "11.4"
   instance_type = var.redb_db_instance_type
   username = var.redb_db_master_username
   password = var.redb_db_master_password
@@ -20,5 +21,7 @@ module "db" {
   replica_scale_max = var.redb_db_replica_scale_max
   replica_scale_min = var.redb_db_replica_scale_min
   tags = var.redb_tags
-  vpc_id = module.vpc.default_vpc_id
+  vpc_id = module.vpc.vpc_id
+  db_subnet_group_name = module.vpc.database_subnet_group
+  vpc_security_group_ids = [module.vpc.default_security_group_id]
 }

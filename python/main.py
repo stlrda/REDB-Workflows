@@ -3,7 +3,7 @@ import datetime
 from python.download_city_file import download_city_file
 from python.list_files import listfiles
 from python.retrieve_city_file_array import files_to_download
-from python.variables import entity_database_name, source_urls, lambda_folder
+from python.variables import source_urls, lambda_folder
 from python.unzip_files_in_directory import unpack_dir
 import os
 import ssl
