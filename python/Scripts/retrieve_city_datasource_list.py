@@ -7,4 +7,4 @@ def retrieve_city_datasource_list():
     print('Downloading list of city datasources...')
     urllib.request.urlretrieve(city_datasource_list_url, working_directory+'/city_datasource_list.csv')
 
-# retrieve_city_datasource_list()
+retrieve_city_datasource_list()
