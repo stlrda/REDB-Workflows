@@ -2,7 +2,7 @@ import os
 import zipfile
 import glob
 
-working_directory = '/Users/jonathanleek/Desktop/working'
+working_directory = '/Users/jonathanleek/Desktop/working' # TODO modify unzip_directory to utilize s3 bucket
 
 def unpack_dir(mypath):
     zipcounter = len(glob.glob1(mypath,"*.zip"))
@@ -17,7 +17,7 @@ def unpack_dir(mypath):
                 zip_ref.extractall(mypath + '/' + item[:-4])  # extract file to dir
                 zip_ref.close()  # close file
                 os.remove(arch_name)  # delete zipped file
-                unpack_dir(mypath + '/' + item[:-4])
+                unpack_dir(mypath + '/' + item[:-4]) # TODO this only does 2 levels of unzip. make fully recursive?
         unpack_dir(mypath)
 
-unpack_dir('/Users/jonathanleek/Desktop/working')
+#unpack_dir('/Users/jonathanleek/Desktop/working')
