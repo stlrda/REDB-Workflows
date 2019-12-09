@@ -83,9 +83,3 @@ def unzip(bucket, profile = 'default'):
                         pass
             else:
                 pass
-
-
-
-
-if if __name__ == "__main__":
-    unzip(bucket = 'dayne-ccp')
