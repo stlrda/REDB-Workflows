@@ -6,6 +6,7 @@ import wget
 import tempfile
 import io
 import pandas as pd
+import zipfile
 
 def upload_file(url, bucket, profile='default'):
     
@@ -40,3 +41,51 @@ def upload_file(url, bucket, profile='default'):
                 logging.error(e)
                 return False
             return True
+
+
+
+
+
+
+def unzip(bucket, profile = 'default'):
+
+
+    #setting up environment specifying profile to use
+    boto3.setup_default_session(profile_name = profile)
+
+    #initializing s3_resource, s3_client, paginator
+    s3_resource = boto3.resource('s3')
+    s3_client = boto3.client('s3')
+    paginator = s3_client.get_paginator("list_objects_v2")
+
+
+
+    for page in paginator.paginate(Bucket=bucket):
+        for obj in page['Contents']:
+            if obj['Key'].endswith('.zip'):
+                key = obj['Key']
+                zip_obj = s3_resource.Object(bucket_name=bucket, key=key)
+                buffer = io.BytesIO(zip_obj.get()["Body"].read())
+                z = zipfile.ZipFile(buffer)
+                for filename in z.namelist():
+                    print(filename)
+                    file_info = z.getinfo(filename)
+                    print(file_info)
+                    s3_resource.meta.client.upload_fileobj(
+                        z.open(filename),
+                        Bucket=bucket,
+                        Key = f'{key[:-4]}/{filename}')
+                    s3_resource.Object(bucket, key).delete()
+                    print('uploaded')
+                    if filename.endswith('.zip'):
+                        unzip(bucket)
+                    else:
+                        pass
+            else:
+                pass
+
+
+
+
+if if __name__ == "__main__":
+    unzip(bucket = 'dayne-ccp')
