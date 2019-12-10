@@ -8,7 +8,7 @@ import io
 import pandas as pd
 import zipfile
 
-def upload_file(url, bucket, profile='default'):
+def upload_file(url, bucket, profile='default'): # TODO currently this only loads a single file to s3
     
     """Upload a file to an S3 bucket
     :param url: URL to file location
@@ -39,12 +39,6 @@ def upload_file(url, bucket, profile='default'):
                 s3_client.upload_file(tmpdirname + "/" + row['Zip File Name'], bucket, row['Zip File Name'])
             except ClientError as e:
                 logging.error(e)
-                return False
-            return True
-
-
-
-
 
 
 def unzip(bucket, profile = 'default'):
@@ -83,3 +77,6 @@ def unzip(bucket, profile = 'default'):
                         pass
             else:
                 pass
+
+#upload_file("https://raw.githubusercontent.com/stlrda/redb_python/master/config/redb_source_databases_urls.csv", "stl-rda-airflow-bucket")
+#unzip('stl-rda-airflow-bucket')
