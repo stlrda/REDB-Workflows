@@ -8,7 +8,7 @@ import io
 import pandas as pd
 import zipfile
 
-def upload_file(url, bucket, profile='default'): # TODO currently this only loads a single file to s3
+def upload_file(url, bucket, profile='default'): #
     
     """Upload a file to an S3 bucket
     :param url: URL to file location
@@ -41,9 +41,7 @@ def upload_file(url, bucket, profile='default'): # TODO currently this only load
                 logging.error(e)
 
 
-def unzip(bucket, profile = 'default'):
-
-
+def unzip(bucket, profile = 'default'): # TODO throws (NoSuchKey) error at end
     #setting up environment specifying profile to use
     boto3.setup_default_session(profile_name = profile)
 
@@ -51,8 +49,6 @@ def unzip(bucket, profile = 'default'):
     s3_resource = boto3.resource('s3')
     s3_client = boto3.client('s3')
     paginator = s3_client.get_paginator("list_objects_v2")
-
-
 
     for page in paginator.paginate(Bucket=bucket):
         for obj in page['Contents']:
