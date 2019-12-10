@@ -11,9 +11,9 @@ import zipfile
 def upload_file(url, bucket, profile='default'):
     
     """Upload a file to an S3 bucket
-    :param file_name: File to upload
+    :param url: URL to file location
     :param bucket: Bucket to upload to
-    :param object_name: S3 object name. If not specified then file_name is used
+    :param profile: identify which credentials you want to use
     :return: True if file was uploaded, else False
     """
     
@@ -23,7 +23,7 @@ def upload_file(url, bucket, profile='default'):
         targets = pd.read_csv(io.StringIO(s.decode('utf-8')))
         
     except:
-        return (f'error {url}')
+        return (f'ERROR please check that you have the correct url: {url}')
         
     #If no profile specified use default
     boto3.setup_default_session(profile_name=profile) 
