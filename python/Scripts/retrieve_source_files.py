@@ -68,11 +68,12 @@ def unzip(bucket, profile = 'default'): # TODO throws (NoSuchKey) error at end
                     s3_resource.Object(bucket, key).delete()
                     print('uploaded')
                     if filename.endswith('.zip'):
-                        unzip(bucket)
+                        unzip(bucket, profile)
                     else:
                         pass
             else:
                 pass
 
-#upload_file("https://raw.githubusercontent.com/stlrda/redb_python/master/config/redb_source_databases_urls.csv", "stl-rda-airflow-bucket")
-#unzip('stl-rda-airflow-bucket')
+
+# upload_file("https://raw.githubusercontent.com/stlrda/redb_python/master/config/redb_source_databases_urls.csv", "stl-rda-airflow-bucket")
+# unzip('stl-rda-airflow-bucket')
