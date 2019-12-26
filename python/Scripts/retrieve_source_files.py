@@ -7,8 +7,16 @@ import tempfile
 import io
 import pandas as pd
 import zipfile
+import argparse
 
-def upload_file(url, bucket, profile='default'): #
+parser = argparse.ArgumentParser()
+parser.add_argument("--url", "-url", help = "URL destination to grab files from")
+parser.add_argument("--bucket", "-b", help = "s3 Bucket")
+parser.add_argument("--profile", "-p", help = "AWS Profile")
+
+args = parser.parse_args()
+
+def upload_file(url, bucket, profile='default'): 
     
     """Upload a file to an S3 bucket
     :param url: URL to file location
@@ -39,6 +47,8 @@ def upload_file(url, bucket, profile='default'): #
                 s3_client.upload_file(tmpdirname + "/" + row['Zip File Name'], bucket, row['Zip File Name'])
             except ClientError as e:
                 logging.error(e)
+    
+    unzip(bucket, profile)
 
 
 def unzip(bucket, profile = 'default'): # TODO throws (NoSuchKey) error at end
@@ -74,6 +84,7 @@ def unzip(bucket, profile = 'default'): # TODO throws (NoSuchKey) error at end
             else:
                 pass
 
+upload_file(args.url, args.bucket)
 
 # upload_file("https://raw.githubusercontent.com/stlrda/redb_python/master/config/redb_source_databases_urls.csv", "stl-rda-airflow-bucket")
 # unzip('stl-rda-airflow-bucket')
