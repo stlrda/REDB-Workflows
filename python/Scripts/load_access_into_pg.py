@@ -38,22 +38,11 @@ def psql_insert_copy(table, conn, keys, data_iter):
 
 
 
-
-
-### df_to_postgres can be combined with table_data depends on if they want the process parallelized?
-def df_to_postgres(table_name, csv_file):
+def table_data(table_names):
     PGusername = 'YourUsernameHere'
     PGpassword = 'YourPasswordHere'
     PGendpoint = 'YourEndpointHere'
-    
-    df = pd.read_csv(csv_file, low_memory=False)
-    
-    engine = create_engine(f'postgresql://{PGusername}:{PGpassword}@{PGendpoint}:5432/postgres')
-    
-    df.to_sql(table_name.lower(), engine, if_exists='replace', method=psql_insert_copy)
-    print(f'{table_name} inserted into PG')
 
-def table_data(table_names):
     cwd = os.getcwd()
     print(cwd)
     path = (f'{cwd}/csv')
@@ -70,15 +59,12 @@ def table_data(table_names):
             data = StringIO(s)
             df=pd.read_csv(data, low_memory=False)
 
+    engine = create_engine(f'postgresql://{PGusername}:{PGpassword}@{PGendpoint}:5432/postgres')
+    
+    df.to_sql(table_name.lower(), engine, if_exists='replace', method=psql_insert_copy)
+    print(f'{table_name} inserted into PG')
 
 
-
-            df.to_csv(f'{path}/{key[:-4]}_{item}.csv')
-            csv_file = f'{path}/{key[:-4]}_{item}.csv'
-            print(f'{csv_file} has been created')
-            df_to_postgres(item, csv_file)
-
-            
 
 
 def get_tables(path):
