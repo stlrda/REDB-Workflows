@@ -3,7 +3,7 @@ module "airflow" {
   private_key_path=var.airflow_private_keypath
   public_key_path=var.airflow_public_keypath
   source="PowerDataHub/airflow/aws"
-  version="0.9.2"
+  version="0.10.24"
   cluster_name=var.airflow_cluster_name
   cluster_stage= var.airflow_cluster_stage
   db_password=var.airflow_db_password
@@ -17,4 +17,7 @@ module "airflow" {
   admin_name = var.airflow_admin_name
   admin_password = var.airflow_admin_password
   admin_username = var.airflow_admin_username
+  vpc_id = "${module.vpc.vpc_id}"
+  db_subnet_group_name = "${module.vpc.database_subnet_group}"
 }
+

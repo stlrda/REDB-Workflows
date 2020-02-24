@@ -7,7 +7,7 @@ A terraform module to create a vpc
 module "vpc" {
   source = "terraform-aws-modules/vpc/aws"
 
-  name = "redb_vpc"
+  name = "${var.airflow_vpc_name}"
 
   cidr = "10.10.0.0/16"
 

@@ -10,7 +10,9 @@ variable "region" {
 
 
 #Airflow
-variable "airflow_vpc_name" {}
+variable "airflow_vpc_name" {
+  default = "redb_vpc"
+}
 variable "airflow_vpc_availability_zones" {
   default = [
     "us-east-1a",
