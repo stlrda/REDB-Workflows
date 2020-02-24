@@ -7,14 +7,7 @@ import tempfile
 import io
 import pandas as pd
 import zipfile
-import argparse
 
-parser = argparse.ArgumentParser()
-parser.add_argument("--url", "-url", help = "URL destination to grab files from")
-parser.add_argument("--bucket", "-b", help = "s3 Bucket")
-parser.add_argument("--profile", "-p", help = "AWS Profile")
-
-args = parser.parse_args()
 
 def upload_file(url, bucket, profile='default'): 
     
@@ -29,7 +22,6 @@ def upload_file(url, bucket, profile='default'):
     try:
         s = requests.get(url).content
         targets = pd.read_csv(io.StringIO(s.decode('utf-8')))
-        
     except:
         return (f'ERROR please check that you have the correct url: {url}')
         
@@ -39,19 +31,18 @@ def upload_file(url, bucket, profile='default'):
     #iterate through list of url and download zip
     for index, row in targets.iterrows():
         with tempfile.TemporaryDirectory() as tmpdirname:
-            print("Retieving " + row['Zip File Name'])
-            wget.download(row['Direct URL'], tmpdirname + "/" + row['Zip File Name'])
+            print("Retrieving " + row['Zip File Name'])
+            wget.download(row['Direct URL'], tmpdirname + "/" + row['Zip File Name'], bar=None)
             print("Downloaded "+ row['Zip File Name'])
             s3_client = boto3.client('s3')
             try:
                 s3_client.upload_file(tmpdirname + "/" + row['Zip File Name'], bucket, row['Zip File Name'])
             except ClientError as e:
                 logging.error(e)
-    
     unzip(bucket, profile)
 
 
-def unzip(bucket, profile = 'default'): # TODO throws (NoSuchKey) error at end
+def unzip(bucket, profile='default'):
     #setting up environment specifying profile to use
     boto3.setup_default_session(profile_name = profile)
 
@@ -60,31 +51,33 @@ def unzip(bucket, profile = 'default'): # TODO throws (NoSuchKey) error at end
     s3_client = boto3.client('s3')
     paginator = s3_client.get_paginator("list_objects_v2")
 
+    zip_files = []
+
     for page in paginator.paginate(Bucket=bucket):
         for obj in page['Contents']:
             if obj['Key'].endswith('.zip'):
-                key = obj['Key']
-                zip_obj = s3_resource.Object(bucket_name=bucket, key=key)
-                buffer = io.BytesIO(zip_obj.get()["Body"].read())
-                z = zipfile.ZipFile(buffer)
-                for filename in z.namelist():
-                    print(filename)
-                    file_info = z.getinfo(filename)
-                    print(file_info)
-                    s3_resource.meta.client.upload_fileobj(
-                        z.open(filename),
-                        Bucket=bucket,
-                        Key = f'{key[:-4]}/{filename}')
-                    s3_resource.Object(bucket, key).delete()
-                    print('uploaded')
-                    if filename.endswith('.zip'):
-                        unzip(bucket, profile)
-                    else:
-                        pass
+                zip_files.append(obj['Key'])
             else:
                 pass
 
-upload_file(args.url, args.bucket)
+    if len(zip_files) > 0:
+        print(zip_files)
+        for key in zip_files:
+            zip_obj = s3_resource.Object(bucket_name=bucket, key=key)
+            buffer = io.BytesIO(zip_obj.get()["Body"].read())
+            z = zipfile.ZipFile(buffer)
+            for filename in z.namelist():
+                file_info = z.getinfo(filename)
+                s3_resource.meta.client.upload_fileobj(
+                    z.open(filename),
+                    Bucket=bucket,
+                    Key = f'{key[:-4]}/{filename}')
+            s3_resource.Object(bucket, key).delete()
+        unzip(bucket)
+    else:
+        print('Finished')
 
-# upload_file("https://raw.githubusercontent.com/stlrda/redb_python/master/config/redb_source_databases_urls.csv", "stl-rda-airflow-bucket")
-# unzip('stl-rda-airflow-bucket')
+
+# if __name__ == "__main__":
+#     upload_file('https://raw.githubusercontent.com/stlrda/redb_python/master/config/redb_source_databases_urls.csv', 'amtestbucket11')
+    # unzip('amtestbucket11')
