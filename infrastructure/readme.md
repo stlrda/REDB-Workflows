@@ -1,1 +1,0 @@
-This is where terraform scripts that create an Apache Airflow environment in AWS will live.
