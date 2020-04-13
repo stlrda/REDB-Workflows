@@ -17,19 +17,17 @@ os.environ["AWS_SECRET_ACCESS_KEY"] = ""
 
 default_args = {
     'owner': 'airflow',
-    'start_date': dt.datetime(2020, 4, 9, 21, 35, 00),
+    'start_date': dt.datetime(2020, 4, 13, 18, 00, 00),
     'concurrency': 1,
     'retries': 0
 }
-# 10 * * * * https://crontab.guru/#10_*_*_*_*
+
+# https://crontab.guru/#10_*_*_*_*
 
 with DAG('SourcesToS3',
          default_args=default_args,
-         schedule_interval='*/15 * * * *',
+         schedule_interval='*/35 * * * *',
          ) as dag:
     transfer = PythonOperator(task_id='Transfer',
                                python_callable=tempfile_to_s3)
-
-    unzip = PythonOperator(task_id='Unzip',
-                                 python_callable=unzip)
-transfer >> unzip
+transfer
