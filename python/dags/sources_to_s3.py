@@ -13,7 +13,7 @@ from airflow.hooks.base_hook import BaseHook
 sys.path.append(".")
 from Scripts.transfer_to_s3 import main
 
-CONN = BaseHook.get_connection('redb-test')
+CONN = BaseHook.get_connection('airflow_workbucket')
 BUCKET = CONN.conn_id
 AWS_ACCESS_KEY_ID = json.loads(CONN.extra)['aws_access_key_id']
 AWS_SECRET_ACCESS_KEY = json.loads(CONN.extra)['aws_secret_access_key']
