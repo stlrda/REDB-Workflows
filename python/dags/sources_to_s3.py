@@ -11,7 +11,7 @@ from airflow.operators.python_operator import PythonOperator
 sys.path.append(".")
 from Scripts.transfer_to_s3 import tempfile_to_s3
 from Scripts.unzip_s3_objects import unzip
-from credentials import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
+from Scripts.credentials import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
 
 os.environ["AWS_ACCESS_KEY_ID"] = AWS_ACCESS_KEY_ID
 os.environ["AWS_SECRET_ACCESS_KEY"] = AWS_SECRET_ACCESS_KEY
