@@ -1,5 +1,5 @@
 import psycopg2
-# from credentials import redb_host, redb_dbname, redb_port, redb_username, redb_password
+
 
 # Create conncetion to database
 connection = psycopg2.connect(
@@ -12,10 +12,13 @@ connection = psycopg2.connect(
     """
 )
 
+# Create cursor to execute sql statements/queries
 cursor = connection.cursor()
 
-sql_statement_create_schema = """
-    CREATE SCHEMA IF NOT EXISTS staging_2;
-    """
+# Read sql file to get sql statements/queries
+file = open("./sql/staging_2/create_staging2_schema.sql", "r")
+create_staging2_schema = file.read()
+file.close()
 
-cursor.execute(sql_statement_create_schema)
+
+cursor.execute(create_staging2_schema)
