@@ -1,3 +1,11 @@
+# Files created upon Dockerization for Airflow testing environment (via Docker volume)
+python/airflow*
+python/unittests*
+python/*.cfg
+python/src
+python/logs/
+__pycache__/
+
 # Compiled source #
 ###################
 *.com
@@ -39,5 +47,22 @@ Thumbs.db
 # Config files #
 ################
 # These contain secrets, make sure to include an example version of them appended with .example
-.idea
 credentials.py
+
+# Terraform files #
+###################
+*.tfvars
+backend.tf
+*.tfstate
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+#  Local .terraform directories
+**/.terraform/*
+
+# IDE files #
+#############
+.idea
+python/__pycache__
