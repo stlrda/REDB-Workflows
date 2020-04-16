@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 
 # Third Party
 from airflow import DAG
-from airflow.operators.python_operator import python_operator
+from airflow.operators.python_operator import PythonOperator
 from airflow.hooks.base_hook import BaseHook
 
 # Make python folder a module
@@ -23,7 +23,7 @@ PORT = CONN.port
 
 default_args = {
     "owner": "airflow",
-    "start_date": datetime(2020, 4, 15, 03, 00, 00),
+    "start_date": datetime(2020, 4, 15, 3, 00, 00),
     "concurrency": 1,
     "retries": 3
 }
@@ -31,32 +31,34 @@ default_args = {
 
 dag = DAG(
     "staging_2",
-    default_arg=default_args,
+    default_args=default_args,
     schedule_interval=timedelta(days=1)
 )
 
 create_schema = PythonOperator(
     task_id="create_schema",
     python_callable=create_schema,
-    op_kwargs-{
+    op_kwargs={
         "database": BUCKET,
         "host": HOST,
         "username": LOGIN,
         "password": PASSWORD,
         "port": PORT
-    }
+    },
+    dag=dag
 )
 
 create_tables = PythonOperator(
     task_id="create_tables",
     python_callable=create_tables,
-    op_kwargs-{
+    op_kwargs={
         "database": BUCKET,
         "host": HOST,
         "username": LOGIN,
         "password": PASSWORD,
         "port": PORT
-    }
+    },
+    dag=dag
 )
 
 create_schema >> create_tables

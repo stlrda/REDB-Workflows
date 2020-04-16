@@ -391,3 +391,8 @@ CREATE TABLE IF NOT EXISTS staging_2.prcl_sbd (
     sbd_type VARCHAR(255),
     sbd_amount VARCHAR(255)
 );
+
+CREATE TABLE IF NOT EXISTS staging_2.dead_parcels (
+    parcel_id VARCHAR(255),
+    date VARCHAR(255)
+)

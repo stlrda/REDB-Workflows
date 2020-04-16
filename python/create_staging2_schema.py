@@ -6,7 +6,7 @@ def create_schema(database, host, username, password, port):
     connection = psycopg2.connect(
         f"""
         host={host}
-        database={database}
+        dbname={database}
         port={port}
         user={username}
         password={password}
@@ -25,6 +25,9 @@ def create_schema(database, host, username, password, port):
     # Execute sql statement to create staging_2 schema
     cursor.execute(create_staging2_schema)
 
+    # Commit changes to database
+    connection.commit()
+
     # Close cursor and connection
     cursor.close()
     connection.close()
@@ -35,7 +38,7 @@ def create_tables(database, host, username, password, port):
     connection = psycopg2.connect(
         f"""
         host={host}
-        database={database}
+        dbname={database}
         port={port}
         user={username}
         password={password}
@@ -56,8 +59,10 @@ def create_tables(database, host, username, password, port):
 
     # Loop through the create table commands to pull out each individual sql statement
     # Execute sql statements to create tables
+    # Commit changes made to database
     for statement in statements:
         cursor.execute(statement)
+        connection.commit()
 
     # Close cursor and connection
     cursor.close()
