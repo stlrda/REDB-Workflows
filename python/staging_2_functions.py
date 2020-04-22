@@ -195,3 +195,6 @@ def copy_data(database, host, username, password, port):
     # Close cursor and connection
     cursor.close()
     connection.close()
+
+    # TODO: not replacing data, just appending
+    
