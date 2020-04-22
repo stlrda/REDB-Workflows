@@ -22,7 +22,8 @@ default_args = {
     'owner': 'airflow',
     'start_date': dt.datetime(2020, 4, 14, 19, 00, 00),
     'concurrency': 1,
-    'retries': 0
+    'retries': 0,
+    'catchup': False
 }
 
 with DAG('SourcesToS3',

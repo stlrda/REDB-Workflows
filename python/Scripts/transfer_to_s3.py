@@ -1,4 +1,4 @@
-# Standard Library
+# Standard library
 import os
 import re
 import tempfile
