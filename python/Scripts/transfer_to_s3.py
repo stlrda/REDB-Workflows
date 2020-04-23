@@ -6,15 +6,11 @@ from zipfile import ZipFile
 
 # Third party
 import wget
-import boto3
 import pandas as pd
 from colorama import Fore, Style
-from botocore.exceptions import ClientError
 
-SOURCES_CSV = "resources/redb_source_databases_all-info.csv" # ! Relative (for Dockerized Airflow testing)
-#SOURCES_CSV = "../resources/redb_source_databases_all-info.csv" # ! Relative for local testing.
-SOURCES_DATAFRAME = pd.read_csv(SOURCES_CSV)
-SOURCES_VISITED = []
+# Custom
+from Classes.S3 import S3
 
 
 def get_list_of_files(directory):
@@ -45,8 +41,8 @@ def unzip(files, targetDirectory):
     """
     Unzips a List of files to specified directory.
 
-    :param: files -> List of absolute filepaths.
-    :param: targetDirectory -> absolute path for result of unzipped file.
+    :param files: List of absolute filepaths.
+    :param targetDirectory: absolute path for result of unzipped file.
     """
     for file in files:
 
@@ -64,38 +60,14 @@ def unzip(files, targetDirectory):
         print([name[-4:] for name in os.listdir(targetDirectory)])
 
 
-def upload_file(file):
-    """Upload a file to an S3 bucket
-
-    :param file: Path for file to upload
-    :param bucket: Name of bucket to upload to
-    :return: True if file was uploaded, else False
-    """
-    
-    # Removes all text prior to final forward slash (UNIX) or final backslash (Windows).
-    # This value then becomes the name of the file in the S3 bucket.
-    object_name = re.sub(r'.*(/|\\)', '', file)
-
-    s3_client = boto3.client('s3', aws_access_key_id=AWS_ACCESS_KEY_ID,
-                      aws_secret_access_key=AWS_SECRET_ACCESS_KEY)
-
-    # Upload the file
-    try:
-        print(f'\nUploading {file} to {BUCKET_NAME} in s3...')
-        s3_client.upload_file(file, BUCKET_NAME, object_name)
-        print(f'{Fore.GREEN}{object_name} successfully uploaded to {BUCKET_NAME} in s3.{Style.RESET_ALL}')
-
-    except Exception as e:
-        print(e)
-        return False
-
-    return True
-
-
-def tempfile_to_s3():
+def tempfile_to_s3(SOURCES_DATAFRAME, s3):
     """
       Creates temporary folder that is then used to unzip and upload source files.
+
+      :param SOURCES_DATAFRAME: A pandas DataFrame containing rows for "Link Name", "File Name", and "Direct URL"
+      :param s3: An s3 client object that includes an "upload_file" method.
     """
+    SOURCES_VISITED = []
 
     for index, row in SOURCES_DATAFRAME.iterrows():
 
@@ -116,7 +88,7 @@ def tempfile_to_s3():
                 try:
                     print(downloading)
                     SOURCES_VISITED.append(url)
-                    wget.download(url, path, bar=None) # ! Use bar=None to avoid errors.
+                    wget.download(url, path, bar=None) # ! Use bar=None to avoid Airflow errors.
                     print(success + " @ " + path)
                     unzip(get_list_of_files(tmp), tmp)
                     
@@ -126,15 +98,14 @@ def tempfile_to_s3():
 
                 for file in os.listdir(tmp):
                     path = os.path.join(tmp, file)
-                    upload_file(path)
+                    s3.upload_file(path)
 
 
 def main(bucket, aws_access_key_id, aws_secret_access_key):
-    
-    global BUCKET_NAME, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
 
-    BUCKET_NAME = bucket
-    AWS_ACCESS_KEY_ID = aws_access_key_id
-    AWS_SECRET_ACCESS_KEY = aws_secret_access_key
+    SOURCES_CSV = "resources/redb_source_databases_sample.csv" # Prepend "../" if executing outside Airflow container. 
+    SOURCES_DATAFRAME = pd.read_csv(SOURCES_CSV)
 
-    tempfile_to_s3()
+    s3 = S3(bucket, aws_access_key_id, aws_secret_access_key)
+
+    tempfile_to_s3(SOURCES_DATAFRAME, s3)

@@ -8,7 +8,7 @@ from colorama import Fore, Style
 from botocore.exceptions import ClientError
 
 
-
+# Class for target s3 Bucket that overrides boto3 default functionality with custom features.
 class S3():
 
     def __init__(self, bucket_name, aws_access_key_id, aws_secret_access_key):
@@ -68,22 +68,21 @@ class S3():
         """ Return a list of s3 objects
         :param extension: Limits objects returned to specified file extension. Default = None.
         :param field: Limits objects returned to specified field. Default = None.
+
+        boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3.html#S3.Client.list_objects
         """
 
-        if field == None:
-            s3_objects = self.client.list_objects(Bucket=self.bucket_name)['Contents']
-        else:
-            s3_objects = self.client.list_objects(Bucket=self.bucket_name)['Contents'][field]
-
-        if extension == None:
+        s3_objects = self.client.list_objects(Bucket=self.bucket_name)['Contents']
+        extension_length = 0 if extension == None else len(extension)
+        filtered_objects = []
+        
+        if (field == None) and (extension == None):
             return s3_objects
 
-        else:
-            extension_length = 0 if extension == None else len(extension)
-            filtered_objects = []
-
-            for s3_object in s3_objects:
-                if s3_object[extension_length:] == extension:
-                    filtered_objects.append(s3_object)
+        for s3_object in s3_objects:
+            s3_object = s3_object[field] if field != None else s3_object
+            
+            if s3_object[extension_length:] == extension:
+                filtered_objects.append(s3_object)
 
             return filtered_objects

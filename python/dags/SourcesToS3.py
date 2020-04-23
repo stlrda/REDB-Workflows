@@ -13,14 +13,14 @@ from airflow.hooks.base_hook import BaseHook
 sys.path.append(".")
 from Scripts.transfer_to_s3 import main
 
-CONN = BaseHook.get_connection('airflow_workbucket')
+CONN = BaseHook.get_connection('redb-test')
 BUCKET = CONN.conn_id
 AWS_ACCESS_KEY_ID = json.loads(CONN.extra)['aws_access_key_id']
 AWS_SECRET_ACCESS_KEY = json.loads(CONN.extra)['aws_secret_access_key']
 
 default_args = {
     'owner': 'airflow',
-    'start_date': dt.datetime(2020, 4, 14, 19, 00, 00),
+    'start_date': dt.datetime.now(),
     'concurrency': 1,
     'retries': 0,
     'catchup': False
@@ -28,7 +28,7 @@ default_args = {
 
 with DAG('SourcesToS3',
          default_args=default_args,
-         schedule_interval='*/35 * * * *',
+         schedule_interval='@once',
          ) as dag:
     transfer = PythonOperator(task_id='Transfer',
                                python_callable=main,

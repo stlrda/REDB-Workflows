@@ -1,6 +1,7 @@
 from sqlalchemy import *
 
 
+# Class for target database that overrides default sqlalchemy functionality with custom features.
 class Database():
 
     def __init__(self, user, password, host, port, database_name):
@@ -11,7 +12,7 @@ class Database():
     def create_schema(self, schema):
         """ Creates a schema within the database if it doesn't exists.
 
-        :param schema:  Name of schema to be created
+        :param schema:  Name of schema to be created.
         """
         try:
             self.ENGINE.execute(f'CREATE SCHEMA IF NOT EXISTS {schema};')
@@ -23,8 +24,9 @@ class Database():
             return False
 
 
-    def create_table(self, schema, table_name, example_row):
+    def replace_table(self, schema, table_name, example_row):
         """ Creates table within database with no constraints and all types as VARCHAR(250)
+        Will delete table if it already exists in the target database.
 
         :param schema: Desired schema for table.
         :param table_name: Desired name for table.
@@ -36,7 +38,7 @@ class Database():
         for key in example_row.keys():
             table.append_column(Column(key, VARCHAR(250)))
 
-        if self.ENGINE.dialect.has_table(self.ENGINE, table_name):
+        if self.ENGINE.dialect.has_table(self.ENGINE, table_name, schema=schema):
             table.drop()
 
         try:

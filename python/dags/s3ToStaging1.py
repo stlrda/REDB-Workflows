@@ -14,7 +14,7 @@ sys.path.append(".")
 from Scripts.mdb_to_postgres import main
 
 # Credentials for S3 Bucket
-BUCKET_CONN = BaseHook.get_connection('airflow_workbucket')
+BUCKET_CONN = BaseHook.get_connection('redb-test')
 BUCKET_NAME = BUCKET_CONN.conn_id
 AWS_ACCESS_KEY_ID = json.loads(BUCKET_CONN.extra)['aws_access_key_id']
 AWS_SECRET_ACCESS_KEY = json.loads(BUCKET_CONN.extra)['aws_secret_access_key']
@@ -36,7 +36,7 @@ default_args = {
     'catchup': False
 }
 
-with DAG('s3ToPostgreSQL',
+with DAG('s3ToStaging1',
          default_args=default_args,
          schedule_interval='@once',
          ) as dag:
