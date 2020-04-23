@@ -9,7 +9,7 @@ class Database():
         self.METADATA = MetaData(self.ENGINE)
 
 
-    def create_schema(self, schema):
+    def replace_schema(self, schema):
         """ Creates a schema within the database if it doesn't exists.
 
         :param schema:  Name of schema to be created.

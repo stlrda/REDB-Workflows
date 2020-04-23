@@ -64,27 +64,7 @@ def initialize_global_IO(kwargs):
 
     s3 = S3(BUCKET_NAME, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
     db = Database(PG_USER, PG_PASSWORD, PG_HOST, PG_PORT, PG_DATABASE)
-
-
-def convert_scientific_notation(current_row):
-    """ Identifies scientific notation values then converts to float.
-
-    :param current_row: The row that is to be converted.
-    The current_row must be passed in as a Python Dictionary.
-    """
-    converted_row = {}
-
-    for key, value in current_row.items():
-
-        # value = re.sub(r'\n', " ", value)
-
-        if re.search(r'^\d{1}[.]\d*[Ee][+-]\d+$', value):
-            converted_row[key] = float(value)
-            
-        else:
-            converted_row[key] = value
-
-    return converted_row
+    db.replace_schema("staging_1")
 
 
 def get_tables(path_to_database):
@@ -140,6 +120,58 @@ def get_table_columns(table, path_to_database):
     return columns
 
 
+def convert_scientific_notation(current_row):
+    """ Identifies scientific notation values then converts to float.
+
+    :param current_row: The row that is to be converted.
+    The current_row must be passed in as a Python Dictionary.
+    """
+    converted_row = {}
+
+    for key, value in current_row.items():
+
+        value = str(value)
+
+        if re.search(r'^\d{1}[.]\d*[Ee][+-]\d+$', value):
+            converted_row[key] = float(value)
+            
+        else:
+            converted_row[key] = value
+
+    return converted_row
+
+# TODO Improve "merge_split_rows" function such that it can handle any number of newlines / broken rows.
+def merge_split_rows(column_count, column_names, current_row):
+    """ Will merge to rows that have been broken in two thanks to a newline in one of the fields.
+
+    :param column_count: Number of columns in table.
+    :param column names: A List of column names.
+    :current_row: Current iteration of Generator object
+    """
+
+    broken_row_1 = current_row
+    broken_row_2 = next(row)
+
+    values_1 = list(broken_row_1.values())
+    values_2 = list(broken_row_2.values())
+
+    values_1[-1] = values_1[-1] + values_2.pop(0)
+
+    all_values = values_1 + values_2
+    current_row = {}
+
+    for index, value in enumerate(all_values):
+        column = column_names[index]
+        current_row[column] = value
+
+    fixed_row = convert_scientific_notation(current_row)
+
+    print(f"Column Count = {column_count}. First broken row: {broken_row_1}, Second broken row: {broken_row_2}")
+    print(f"Fixed row: {fixed_row}")
+
+    return fixed_row
+
+
 def initialize_csv(table, columns, limit=50_000):
     """ Creates a CSV from a Python Generator with a select number of rows.
 
@@ -175,30 +207,8 @@ def initialize_csv(table, columns, limit=50_000):
             current_row = next(row)
             current_row = convert_scientific_notation(current_row)
 
-            try:
-                if len(current_row.keys()) < column_count:
-                    broken_row_1 = current_row
-                    broken_row_2 = next(row)
-
-                    values_1 = list(broken_row_1.values())
-                    values_2 = list(broken_row_2.values())
-
-                    values_1[-1] = values_1[-1] + values_2.pop(0)
-
-                    all_values = values_1 + values_2
-                    current_row = {}
-
-                    for index, value in enumerate(all_values):
-                        column = column_names[index]
-                        current_row[column] = value
-
-                    current_row = convert_scientific_notation(current_row)
-
-                    print(f"Column Count = {column_count}. First broken row: {broken_row_1}, Second broken row: {broken_row_2}")
-                    print(f"Fixed row: {current_row}")
-
-            except Exception as err:
-                print(f"Broken row error: {err}")
+            if len(current_row.keys()) < column_count:
+                current_row = merge_split_rows(column_count, column_names, current_row)
 
             batch.append(current_row)
             rows_generated += 1
@@ -237,12 +247,20 @@ def append_to_csv(table, columns, limit=50_000):
     batch = []
     rows_generated = 0
 
+    column_count = len(columns)
+    column_names = [column[0] for column in columns]
+    column_types = [column[1] for column in columns]
+
     print_time("append_start", table)
 
     while (rows_generated < limit) and (row != None):
         try:
             current_row = next(row)
             current_row = convert_scientific_notation(current_row)
+
+            if len(current_row.keys()) < column_count:
+                current_row = merge_split_rows(column_count, column_names, current_row)
+
             batch.append(current_row)
             rows_generated += 1
 
@@ -265,7 +283,7 @@ def append_to_csv(table, columns, limit=50_000):
     print_time("append_complete", table)
 
     if row != None:
-        append_to_csv(table, limit)
+        append_to_csv(table, columns, limit)
 
 
 def main(**kwargs):
