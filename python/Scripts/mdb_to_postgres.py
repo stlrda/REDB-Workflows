@@ -1,7 +1,6 @@
 # Standard library
 import os
 import re
-import csv
 import tempfile
 import subprocess
 from datetime import datetime
@@ -140,37 +139,49 @@ def convert_scientific_notation(current_row):
 
     return converted_row
 
-# TODO Improve "merge_split_rows" function such that it can handle any number of newlines / broken rows.
-def merge_split_rows(column_count, column_names, current_row):
-    """ Will merge to rows that have been broken in two thanks to a newline in one of the fields.
 
-    :param column_count: Number of columns in table.
-    :param column names: A List of column names.
-    :current_row: Current iteration of Generator object
+def merge_split_rows(column_names, broken_row):
+    """ Will merge rows that have been broken into multiple parts thanks to a newline in one of the fields.
+
+    :param column names: A List of column names to be returned in fixed.
+    :current_row: Current iteration of Generator object representing broken row.
     """
 
-    broken_row_1 = current_row
-    broken_row_2 = next(row)
+    # Start with a fresh row.
+    pending_row = {}
 
-    values_1 = list(broken_row_1.values())
-    values_2 = list(broken_row_2.values())
+    # Assign columns to be added to fresh row.
+    pending_columns = column_names
 
-    values_1[-1] = values_1[-1] + values_2.pop(0)
+    # Add all of the columns and values already present in broken row to pending row.
+    for key, value in broken_row.items():
+        pending_column = pending_columns.pop(0)
+        pending_row[pending_column] = value
+        print(f"Current key: {key}, Pending column: {pending_column}.")
 
-    all_values = values_1 + values_2
-    current_row = {}
+    # The last column present in broken row is the row with the newline.
+    column_with_newline = pending_column
+        
+    next_row = next(row)
+    next_row_values = list(next_row.values())
 
-    for index, value in enumerate(all_values):
-        column = column_names[index]
-        current_row[column] = value
+    # The first value in the next row was the row split in two by the newline.
+    # The statement below will concatenate the two split values in the pending row.
+    pending_row[column_with_newline] += next_row_values.pop(0)[0:-1] # Omits trailing quotes.
 
-    fixed_row = convert_scientific_notation(current_row)
-
-    print(f"Column Count = {column_count}. First broken row: {broken_row_1}, Second broken row: {broken_row_2}")
-    print(f"Fixed row: {fixed_row}")
-
-    return fixed_row
-
+    # For the remaining values, add the next pending column and current value to pending row.
+    for value in next_row_values:
+        pending_column = pending_columns.pop(0)
+        pending_row[pending_column] = value
+    
+    # If all columns have not be added to pending row,
+    # execute merge function again with remaining columns and pending row.
+    if len(pending_columns) != 0:
+        merge_split_rows(pending_columns, pending_row)
+    else:
+        fixed_row = pending_row
+        return fixed_row
+    
 
 def initialize_csv(table, columns, limit=50_000):
     """ Creates a CSV from a Python Generator with a select number of rows.
@@ -205,11 +216,11 @@ def initialize_csv(table, columns, limit=50_000):
     while (rows_generated < limit) and (row != None):
         try:
             current_row = next(row)
-            current_row = convert_scientific_notation(current_row)
 
             if len(current_row.keys()) < column_count:
-                current_row = merge_split_rows(column_count, column_names, current_row)
+                current_row = merge_split_rows(column_names, current_row)
 
+            current_row = convert_scientific_notation(current_row)
             batch.append(current_row)
             rows_generated += 1
 
@@ -256,11 +267,11 @@ def append_to_csv(table, columns, limit=50_000):
     while (rows_generated < limit) and (row != None):
         try:
             current_row = next(row)
-            current_row = convert_scientific_notation(current_row)
 
             if len(current_row.keys()) < column_count:
-                current_row = merge_split_rows(column_count, column_names, current_row)
+                current_row = merge_split_rows(column_names, current_row)
 
+            current_row = convert_scientific_notation(current_row)
             batch.append(current_row)
             rows_generated += 1
 
@@ -308,6 +319,7 @@ def main(**kwargs):
     mdb_files_in_s3 = s3.list_objects(extension=".mdb", field="Key")
 
     for mdb in mdb_files_in_s3:
+
         with tempfile.TemporaryDirectory() as tmp:
 
             path_to_database =  os.path.join(tmp, mdb)
