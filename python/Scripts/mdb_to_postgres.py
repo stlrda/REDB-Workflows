@@ -143,7 +143,7 @@ def convert_scientific_notation(current_row):
 def merge_split_rows(column_names, broken_row):
     """ Will merge rows that have been broken into multiple parts thanks to a newline in one of the fields.
 
-    :param column names: A List of column names to be returned in fixed.
+    :param column names: A List of column names to be returned in fixed row.
     :current_row: Current iteration of Generator object representing broken row.
     """
 
@@ -174,7 +174,7 @@ def merge_split_rows(column_names, broken_row):
         pending_column = pending_columns.pop(0)
         pending_row[pending_column] = value
     
-    # If all columns have not be added to pending row,
+    # If all columns have not been added to pending row,
     # execute merge function again with remaining columns and pending row.
     if len(pending_columns) != 0:
         merge_split_rows(pending_columns, pending_row)
@@ -186,7 +186,7 @@ def merge_split_rows(column_names, broken_row):
 def initialize_csv(table, columns, limit=50_000):
     """ Creates a CSV from a Python Generator with a select number of rows.
 
-    :param table: The name of the table nad target CSV.
+    :param table: The name of the table and target CSV.
     :param limit: The amount of rows appended to CSV at a time.
 
     The "batch" list will store @limit number of rows into RAM before
@@ -300,7 +300,7 @@ def append_to_csv(table, columns, limit=50_000):
 def main(**kwargs):
     """ Mainline logic for script. Downloads .mdb files from S3 Bucket,
     creates CSVs for each table within .mdb file, then copies CSV
-    to target database (table/csv at a time).
+    to target database (one table/csv at a time).
 
     :param bucket:
     :param aws_access_key_id:
@@ -330,8 +330,8 @@ def main(**kwargs):
                 
                 columns = get_table_columns(table, path_to_database)
 
-                # "io.read_mdb" returns a Python Generator that is being initialized globally
-                # via the "global" keyword. The Generator (row) can thus be shared throughout the script.
+                # "io.read_mdb" returns a Python Generator that is being initialized globally via the "global" keyword. 
+                # The Generator (row) can thus be shared throughout the script.
                 row = io.read_mdb(path_to_database, table=table, encoding='utf-8')
 
                 initialize_csv(table, columns, limit=100_000)
