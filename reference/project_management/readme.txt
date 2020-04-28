@@ -1,1 +1,0 @@
-This folder contains project management files for REDB :-)

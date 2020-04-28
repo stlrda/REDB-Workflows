@@ -1,9 +1,9 @@
 # Files created upon Dockerization for Airflow testing environment (via Docker volume)
-python/airflow*
-python/unittests*
-python/*.cfg
-python/src
-python/logs/
+airflow*
+unittests*
+*.cfg
+src
+logs/
 __pycache__/
 
 # Compiled source #

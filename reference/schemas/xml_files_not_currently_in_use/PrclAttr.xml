@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?><schema>
-<column comment="" default="" key="true" label="CityBlock" length="255" nullable="true" originalDbColumnName="CityBlock" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
-<column comment="" default="" key="true" label="Parcel" length="255" nullable="true" originalDbColumnName="Parcel" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
-<column comment="" default="" key="true" label="AttrType" length="255" nullable="true" originalDbColumnName="AttrType" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
-<column comment="" default="" key="true" label="AttrNum" length="255" nullable="true" originalDbColumnName="AttrNum" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
-<column comment="" default="" key="false" label="LastUpDate" length="255" nullable="true" originalDbColumnName="LastUpDate" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
-</schema>
-
-
