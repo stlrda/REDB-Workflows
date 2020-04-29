@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?><schema>
-<column comment="" default="" key="false" label="CITYBLOCK" length="255" nullable="true" originalDbColumnName="CITYBLOCK" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
-<column comment="" default="" key="true" label="HANDLE" length="255" nullable="true" originalDbColumnName="HANDLE" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
-<column comment="" default="" key="false" label="PARCEL" length="255" nullable="true" originalDbColumnName="PARCEL" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
-<column comment="" default="" key="false" label="PROPERTYADDRESS" length="255" nullable="true" originalDbColumnName="PROPERTYADDRESS" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
-<column comment="" default="" key="false" label="PROPERTYTYPE" length="255" nullable="true" originalDbColumnName="PROPERTYTYPE" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
-</schema>
-
-

@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?><schema>
-<column comment="" default="" key="true" label="TrBulkRegion" length="255" nullable="true" originalDbColumnName="TrBulkRegion" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
-<column comment="" default="" key="false" label="Name" length="255" nullable="true" originalDbColumnName="Name" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
-<column comment="" default="" key="false" label="ShortName" length="255" nullable="true" originalDbColumnName="ShortName" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
-<column comment="" default="" key="false" label="BulkSched" length="255" nullable="true" originalDbColumnName="BulkSched" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
-<column comment="" default="" key="false" label="BulkSchedShort" length="255" nullable="true" originalDbColumnName="BulkSchedShort" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
-</schema>
-
-

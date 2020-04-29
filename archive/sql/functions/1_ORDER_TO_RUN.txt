@@ -1,6 +1,0 @@
-1. bf_insert_legal_entity_address.sql
-2. bf_insert_legal_entity.sql
-3. bf_insert_specparceltype.sql
-4. jfl_insert_subparceltype.sql
-5. dwp_insert_parcel.sql
-6. bf_insert_building.sql

@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?><schema>
-<column comment="" default="" key="true" label="CityBlock" length="255" nullable="true" originalDbColumnName="CityBlock" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
-<column comment="" default="" key="true" label="Parcel" length="255" nullable="true" originalDbColumnName="Parcel" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
-<column comment="" default="" key="true" label="CensTract10" length="255" nullable="true" originalDbColumnName="CensTract10" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
-<column comment="" default="" key="true" label="CensBlock10" length="255" nullable="true" originalDbColumnName="CensBlock10" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
-<column comment="" default="" key="false" label="IsPrimaryCensBlk10" length="255" nullable="true" originalDbColumnName="IsPrimaryCensBlk10" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
-</schema>
-
-
