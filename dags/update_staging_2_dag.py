@@ -9,7 +9,7 @@ from airflow.hooks.base_hook import BaseHook
 
 # Make python folder a module
 sys.path.append(".")
-from python.staging_2_functions import poulate_dead_parcels_table, copy_data
+from scripts.staging_2_functions import poulate_dead_parcels_table, copy_data
 
 # Connect to Amazon Aurora Postgres database using Airflow
 CONN = BaseHook.get_connection("redb")

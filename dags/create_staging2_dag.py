@@ -10,7 +10,7 @@ from airflow.hooks.base_hook import BaseHook
 
 # Make python folder a module
 sys.path.append(".")
-from python.staging_2_functions import create_schema, create_tables, create_dead_parcels_table, create_dead_parcels_function
+from scripts.staging_2_functions import create_schema, create_tables, create_dead_parcels_table, create_dead_parcels_function
 
 
 # Connect to Amazon Aurora Postgres database using Airflow
