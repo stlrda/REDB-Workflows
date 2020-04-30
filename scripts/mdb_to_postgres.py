@@ -318,6 +318,7 @@ def append_to_csv(table, columns, limit=50_000):
         append_to_csv(table, columns, limit)
 
 
+# TODO The name of the source database needs to be prepended to table names to prevent losing tables.
 def main(**kwargs):
     """ Mainline logic for script. Downloads .mdb files from S3 Bucket,
     creates CSVs for each table within .mdb file, then copies CSV

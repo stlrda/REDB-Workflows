@@ -20,7 +20,7 @@ AWS_ACCESS_KEY_ID = json.loads(BUCKET_CONN.extra)['aws_access_key_id']
 AWS_SECRET_ACCESS_KEY = json.loads(BUCKET_CONN.extra)['aws_secret_access_key']
 
 # Credentials for Database
-DATABASE_CONN = BaseHook.get_connection('redb')
+DATABASE_CONN = BaseHook.get_connection('redb_postgres')
 DATABASE_NAME = DATABASE_CONN.conn_id
 DATABASE_HOST = DATABASE_CONN.host
 DATABASE_USER = DATABASE_CONN.login
