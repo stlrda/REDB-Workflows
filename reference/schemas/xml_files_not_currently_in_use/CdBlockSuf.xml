@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?><schema>
-<column comment="" default="" key="true" label="SufNum" length="255" nullable="true" originalDbColumnName="SufNum" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
-<column comment="" default="" key="true" label="AltNum" length="255" nullable="true" originalDbColumnName="AltNum" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
-<column comment="" default="" key="false" label="SufAlpha" length="255" nullable="true" originalDbColumnName="SufAlpha" originalLength="-1" pattern="" precision="-1" talendType="id_String" type=""/>
-</schema>
-
-
