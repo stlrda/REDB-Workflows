@@ -5,7 +5,7 @@ import csv
 import tempfile
 from io import StringIO
 from datetime import datetime
-from subprocess import check_output, Popen, PIPE
+from subprocess import check_output, Popen, PIPE, CalledProcessError
 
 # Third party
 import pandas as pd
@@ -193,7 +193,6 @@ def convert_scientific_notation(current_row):
 
 
 # TODO Output the location / values of the malformed rows and fields to a log file.
-# TODO Address the fact that fixed rows are ending up at the end of table within database.
 def merge_split_rows(column_names, broken_row):
     """ Will merge rows that have been broken into multiple parts thanks to a newline in one of the fields.
 
@@ -393,9 +392,9 @@ def main(**kwargs):
 
     for mdb in mdb_files_in_s3:
 
-        # ! Uncomment and modify to specify a database.
-        # if mdb != "prmbdo.mdb":
-        #     continue
+        # ! Uncomment / comment and modify to specify a database.
+        if mdb != "prcl.mdb":
+            continue
 
         with tempfile.TemporaryDirectory() as tmp:
 
@@ -406,8 +405,8 @@ def main(**kwargs):
             # Creates CSVs from tables.
             for table in get_tables(path_to_database):
                 
-                # ! Uncomment and modify to specify a table.
-                # if table != "PrmDemo":
+                # ! Uncomment / comment and modify to specify a table.
+                # if table != "Prcl":
                 #     continue
 
                 columns = get_table_columns(table, path_to_database)
