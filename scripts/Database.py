@@ -36,7 +36,7 @@ class Database():
         table = Table(table_name, self.METADATA, schema=schema)
 
         for key in example_row.keys():
-            table.append_column(Column(key, VARCHAR(250)))
+            table.append_column(Column(key, VARCHAR(1000)))
 
         if self.ENGINE.dialect.has_table(self.ENGINE, table_name, schema=schema):
             table.drop()
