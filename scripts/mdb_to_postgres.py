@@ -66,7 +66,7 @@ def initialize_global_IO(kwargs):
 
     s3 = S3(BUCKET_NAME, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
     db = Database(PG_USER, PG_PASSWORD, PG_HOST, PG_PORT, PG_DATABASE)
-    db.replace_schema("staging_1")
+    db.create_schema("staging_1")
 
 
 def get_tables(path_to_database):

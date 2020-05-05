@@ -4,12 +4,12 @@ from sqlalchemy import *
 # Class for target database that overrides default sqlalchemy functionality with custom features.
 class Database():
 
-    def __init__(self, user, password, host, port, database_name):
+    def __init__(self, user, password, host, port, database_name, schema=None):
         self.ENGINE = create_engine(f'postgresql://{user}:{password}@{host}:{port}/{database_name}')
-        self.METADATA = MetaData(self.ENGINE)
+        self.METADATA = MetaData(self.ENGINE) if schema == None else MetaData(self.ENGINE, schema=schema)
 
 
-    def replace_schema(self, schema):
+    def create_schema(self, schema):
         """ Creates a schema within the database if it doesn't exists.
 
         :param schema:  Name of schema to be created.
