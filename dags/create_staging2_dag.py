@@ -14,7 +14,7 @@ from scripts.staging_2_functions import create_schema, create_tables, create_dea
 
 
 # Connect to Amazon Aurora Postgres database using Airflow
-CONN = BaseHook.get_connection("redb")
+CONN = BaseHook.get_connection("redb_postgres")
 BUCKET = CONN.conn_id
 HOST = CONN.host
 LOGIN = CONN.login
@@ -22,7 +22,7 @@ PASSWORD = CONN.password
 PORT = CONN.port
 
 default_args = {
-    "owner": "airflow",
+    "owner": "redb",
     "start_date": datetime(2020, 4, 15, 3, 00, 00),
     "concurrency": 1,
     "retries": 3
