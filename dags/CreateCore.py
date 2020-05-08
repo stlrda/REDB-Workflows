@@ -11,13 +11,8 @@ from airflow.hooks.base_hook import BaseHook
 
 # Custom
 sys.path.append(".")
-from scripts.mdb_to_postgres import main
+from scripts.create_core import main
 
-# Credentials for S3 Bucket
-BUCKET_CONN = BaseHook.get_connection('redb-test')
-BUCKET_NAME = BUCKET_CONN.conn_id
-AWS_ACCESS_KEY_ID = json.loads(BUCKET_CONN.extra)['aws_access_key_id']
-AWS_SECRET_ACCESS_KEY = json.loads(BUCKET_CONN.extra)['aws_secret_access_key']
 
 # Credentials for Database
 DATABASE_CONN = BaseHook.get_connection('redb_postgres')
@@ -36,18 +31,16 @@ default_args = {
     'catchup': False
 }
 
-with DAG('s3ToStaging1',
+with DAG('CreateCore',
          default_args=default_args,
          schedule_interval='@once',
          ) as dag:
-    transfer_mdb = PythonOperator(task_id='TransferMDB',
+    create_tables = PythonOperator(task_id='CreateCore',
                                python_callable=main,
-                               op_kwargs={'bucket': BUCKET_NAME,
-                                        'aws_access_key_id': AWS_ACCESS_KEY_ID,
-                                        'aws_secret_access_key': AWS_SECRET_ACCESS_KEY,
+                               op_kwargs={
                                         'pg_database': DATABASE_NAME,
                                         'pg_host': DATABASE_HOST,
                                         'pg_user': DATABASE_USER,
                                         'pg_port': DATABASE_PORT,
                                         'pg_password': DATABASE_PASSWORD})
-transfer_mdb
+create_tables

@@ -1,14 +1,14 @@
 # Standard library
 import os
 import re
+import csv
 import tempfile
-import subprocess
+from io import StringIO
 from datetime import datetime
+from subprocess import check_output, Popen, PIPE, CalledProcessError
 
 # Third party
-import pprint
 import pandas as pd
-from meza import io
 from colorama import Fore, Style
 
 # Custom
@@ -18,6 +18,7 @@ from .S3 import S3
 pd.set_option('display.max_columns', None)  
 pd.set_option('display.expand_frame_repr', False)
 pd.set_option('max_colwidth', -1)
+
 
 def print_time(phase="Unspecified", table="Unspecified"):
     """
@@ -46,7 +47,9 @@ def print_time(phase="Unspecified", table="Unspecified"):
 
 
 def initialize_global_IO(kwargs):
-    """
+    """Initializes S3 Bucket and Database using the credentials passed in via DAG.
+    The S3 Bucket and Database objects then become global variables.
+    Expecting : {credential_name : credential_value, ...}
     """
     
     global s3, db
@@ -63,7 +66,7 @@ def initialize_global_IO(kwargs):
 
     s3 = S3(BUCKET_NAME, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
     db = Database(PG_USER, PG_PASSWORD, PG_HOST, PG_PORT, PG_DATABASE)
-    db.replace_schema("staging_1")
+    db.create_schema("staging_1")
 
 
 def get_tables(path_to_database):
@@ -74,9 +77,9 @@ def get_tables(path_to_database):
 
     try:
         # Will not work via DAG in Airflow.
-        tables = subprocess.check_output(["mdb-tables", path_to_database])
+        tables = check_output(["mdb-tables", path_to_database])
 
-    except subprocess.CalledProcessError as exc:
+    except CalledProcessError as exc:
         # Will assign the same value as the try block, but DOES work via Airflow.
         tables = exc.output
 
@@ -97,9 +100,9 @@ def get_table_columns(table, path_to_database):
 
     try:
         # Will not work via DAG in Airflow.
-        arr = subprocess.check_output(["mdb-schema", "--table", table, path_to_database])
+        arr = check_output(["mdb-schema", "--table", table, path_to_database])
 
-    except subprocess.CalledProcessError as exc:
+    except CalledProcessError as exc:
         # Will assign the same value as the try block, but DOES work via Airflow.
         arr = exc.output
 
@@ -114,11 +117,59 @@ def get_table_columns(table, path_to_database):
 
     columns.pop(0) # The first column is just the table name and an open bracket.
 
-    print(f'Columns for table: {table} @ {path_to_database}:\n{columns}')
+    print(f'Columns ({len(columns)}) for table: {table} @ {path_to_database}:\n{columns}')
 
     return columns
 
 
+def generate_rows(filepath, table, **kwargs):
+    """Reads an MS Access file
+    Args:
+        filepath (str): The mdb file path.
+        table (str): The table to load.
+        kwargs (dict): Keyword arguments that are passed to the csv reader.
+    Yields:
+        dict: A row of data whose keys are the field names.
+    Examples:
+        >>> filepath = p.join(DATA_DIR, 'test.mdb')
+        >>> records = read_mdb(filepath, sanitize=True)
+        >>> expected = {
+        ...     'surname': 'Aaron',
+        ...     'forenames': 'William',
+        ...     'freedom': '07/03/60 00:00:00',
+        ...     'notes': 'Order of Court',
+        ...     'surname_master_or_father': '',
+        ...     'how_admitted': 'Redn.',
+        ...     'id_no': '1',
+        ...     'forenames_master_or_father': '',
+        ...     'remarks': '',
+        ...     'livery': '',
+        ...     'date_of_order_of_court': '06/05/60 00:00:00',
+        ...     'source_ref': 'MF 324'}
+        >>> first_row = next(records)
+        >>> (expected == first_row) if first_row else True
+        True
+    """
+    pkwargs = {'stdout': PIPE, 'bufsize': 1, 'universal_newlines': True}
+
+    # https://pypi.org/project/meza/
+    # https://github.com/reubano/meza/blob/master/meza/io.py
+
+    # https://stackoverflow.com/a/2813530/408556
+    # https://stackoverflow.com/a/17698359/408556
+    with Popen(['mdb-export', filepath, table, '-d |'], **pkwargs).stdout as pipe:
+        first_line = StringIO(str(pipe.readline()))
+        names = next(csv.reader(first_line, **kwargs))
+        headers = [name.rstrip() for name in names]
+
+        for line in iter(pipe.readline, b''):
+            next_line = StringIO(str(line))
+            values = next(csv.reader(next_line, **kwargs))
+            values = [value.rstrip() for value in values]
+            yield dict(zip(headers, values))
+
+
+# TODO Incorporate column_types into function to make more efficient.
 def convert_scientific_notation(current_row):
     """ Identifies scientific notation values then converts to float.
 
@@ -142,7 +193,6 @@ def convert_scientific_notation(current_row):
 
 
 # TODO Output the location / values of the malformed rows and fields to a log file.
-# TODO Address the fact that fixed rows are ending up at the end of table within database.
 def merge_split_rows(column_names, broken_row):
     """ Will merge rows that have been broken into multiple parts thanks to a newline in one of the fields.
 
@@ -164,7 +214,7 @@ def merge_split_rows(column_names, broken_row):
     # The last column present in broken row is the row with the newline.
     column_with_newline = pending_column
     print(f"Merging fields split by newline. Column with newline: {column_with_newline}\n{pending_row[column_with_newline]}")
-    print(f"Current row data where the newline is currently being handled: {broken_row}")
+    print(f"Current row data where the newline is currently being handled:\n {broken_row}")
         
     next_row = next(row)
 
@@ -198,10 +248,9 @@ def merge_split_rows(column_names, broken_row):
         # Removes trailing double quote from broken field.
         pending_row[column_with_newline] = pending_row[column_with_newline][0:-1]
 
-        fixed_row = pending_row
-        print(f"Fixed row: {fixed_row}")
+        print(f"Fixed row:\n {pending_row}")
 
-        return fixed_row
+        return pending_row
     
 
 def initialize_csv(table, columns, limit=50_000):
@@ -218,13 +267,13 @@ def initialize_csv(table, columns, limit=50_000):
     global row, snapshot_row
 
     batch = []
-
-    # snapshot_row is used to initialize table via "replace_table" method.
-    # snapshot_row is initialized globally as to be available to the "replace_table" method.
-    # "replace_table" is invoked in this script's "main" function.
+    
+    # snapshot_row is used to initialize table via "replace_table" method and to assign columns to "table_dataframe".
+    # snapshot_row is initialized globally as to be available throughout script.
     snapshot_row = next(row)
     snapshot_row = convert_scientific_notation(snapshot_row)
     batch.append(snapshot_row)
+
 
     rows_generated = 1
 
@@ -242,6 +291,7 @@ def initialize_csv(table, columns, limit=50_000):
                 current_row = merge_split_rows(column_names, current_row)
 
             current_row = convert_scientific_notation(current_row)
+            
             batch.append(current_row)
             rows_generated += 1
 
@@ -251,12 +301,13 @@ def initialize_csv(table, columns, limit=50_000):
             print(err)
             break
     
-    table_dataframe = pd.DataFrame(batch)
+    table_dataframe = pd.DataFrame(batch, columns=snapshot_row.keys())
     batch.clear()
 
     table_dataframe.to_csv(f'./resources/{table}.csv',
                            index=False,
                            sep="|",
+                           na_rep="",
                            line_terminator="\r\n",
                            encoding="utf-8")
                            
@@ -302,7 +353,7 @@ def append_to_csv(table, columns, limit=50_000):
             print(err)
             break
     
-    table_dataframe = pd.DataFrame(batch, index=None)
+    table_dataframe = pd.DataFrame(batch, columns=snapshot_row.keys())
     batch.clear()
     table_dataframe.to_csv(f'./resources/{table}.csv',
                             header=False,
@@ -315,7 +366,7 @@ def append_to_csv(table, columns, limit=50_000):
     print_time("append_complete", table)
 
     if row != None:
-        append_to_csv(table, columns, limit)
+        return append_to_csv(table, columns, limit)
 
 
 def main(**kwargs):
@@ -341,34 +392,47 @@ def main(**kwargs):
 
     for mdb in mdb_files_in_s3:
 
+        # ! Uncomment / comment and modify to specify a database.
+        if mdb != "prcl.mdb":
+            continue
+
         with tempfile.TemporaryDirectory() as tmp:
 
+            
             path_to_database =  os.path.join(tmp, mdb)
             s3.download_file(s3.bucket_name, mdb, path_to_database)
 
             # Creates CSVs from tables.
             for table in get_tables(path_to_database):
+                
+                # ! Uncomment / comment and modify to specify a table.
+                # if table != "Prcl":
+                #     continue
 
                 columns = get_table_columns(table, path_to_database)
+                column_names = [column[0] for column in columns]
 
-                # "io.read_mdb" returns a Python Generator that is being initialized globally via the "global" keyword. 
+                # "generate_rows" returns a Python Generator that is being initialized globally via the "global" keyword. 
                 # The Generator (row) can thus be shared throughout the script.
-                row = io.read_mdb(path_to_database, table=table, encoding='utf-8')
+                row = generate_rows(path_to_database, table=table, delimiter="|")
 
-                initialize_csv(table, columns, limit=100_000)
+                mdb_name = mdb[:-4] # name of Access database
+                table = mdb_name + "_" + table # prepends database name to table
+
+                initialize_csv(table, columns, limit=50_000)
 
                 if row != None:
-                    append_to_csv(table, columns, limit=100_000)
+                    append_to_csv(table, columns, limit=50_000)
 
                 # Opens CSV then copies to database.
-                with open(f"./resources/{table}.csv", 'r+') as csv:
+                with open(f"./resources/{table}.csv", 'r+') as csvfile:
 
                     db.replace_table("staging_1", table, snapshot_row) # snapshot_row created upon invoking "initialize_csv" function.
 
                     conn = db.get_raw_connection()
                     cursor = conn.cursor()
                     cmd = f'COPY staging_1."{table}" FROM STDIN WITH (FORMAT CSV, DELIMITER "|", HEADER TRUE, ENCODING "utf-8")'
-                    cursor.copy_expert(cmd, csv)
+                    cursor.copy_expert(cmd, csvfile)
                     conn.commit()
                     print(f"{table} copied into staging_1.")
                 

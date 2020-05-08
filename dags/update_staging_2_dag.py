@@ -12,7 +12,7 @@ sys.path.append(".")
 from scripts.staging_2_functions import poulate_dead_parcels_table, copy_data
 
 # Connect to Amazon Aurora Postgres database using Airflow
-CONN = BaseHook.get_connection("redb")
+CONN = BaseHook.get_connection("redb_postgres")
 BUCKET = CONN.conn_id
 HOST = CONN.host
 LOGIN = CONN.login
