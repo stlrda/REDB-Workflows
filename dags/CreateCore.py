@@ -10,8 +10,8 @@ from airflow.operators.python_operator import PythonOperator
 from airflow.hooks.base_hook import BaseHook
 
 # Custom
-sys.path.append(".")
-from scripts.create_core import main
+sys.path.append("/usr/local/airflow")
+from redb.scripts.create_core import main
 
 
 # Credentials for Database
