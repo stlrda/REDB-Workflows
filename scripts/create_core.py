@@ -1,6 +1,4 @@
 from .Database import Database
-from sqlalchemy import *
-
 
 def main(**kwargs):
     """Connects to database, creates 'core' schema, and adds table defintions.
@@ -15,7 +13,7 @@ def main(**kwargs):
 
     DB.create_schema("core")
 
-    with open("resources/Interrim REDB Schema.sql", "r") as sql:
+    with open("/usr/local/airflow/dags/redb/sql/core-table-definitions/Interrim REDB Schema.sql", "r") as sql:
         query = ""
         for line in sql:
             query += line

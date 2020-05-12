@@ -10,8 +10,8 @@ from airflow.operators.python_operator import PythonOperator
 from airflow.hooks.base_hook import BaseHook
 
 # Custom
-sys.path.append(".")
-from scripts.mdb_to_postgres import main
+sys.path.append("/usr/local/airflow")
+from redb.scripts.mdb_to_postgres import main
 
 # Credentials for S3 Bucket
 BUCKET_CONN = BaseHook.get_connection('redb-test')
