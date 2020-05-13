@@ -11,7 +11,7 @@ from airflow.hooks.base_hook import BaseHook
 
 # Custom
 sys.path.append(".")
-from scripts.create_core import main
+from redb.scripts.create_core import main
 
 
 # Credentials for Database
