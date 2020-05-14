@@ -131,29 +131,17 @@ def generate_rows(filepath, table, **kwargs):
     Yields:
         dict: A row of data whose keys are the field names.
     Examples:
-        >>> filepath = p.join(DATA_DIR, 'test.mdb')
-        >>> records = read_mdb(filepath, sanitize=True)
+        >>> records = generate_rows(filepath, table)
         >>> expected = {
         ...     'surname': 'Aaron',
         ...     'forenames': 'William',
         ...     'freedom': '07/03/60 00:00:00',
-        ...     'notes': 'Order of Court',
-        ...     'surname_master_or_father': '',
-        ...     'how_admitted': 'Redn.',
-        ...     'id_no': '1',
-        ...     'forenames_master_or_father': '',
-        ...     'remarks': '',
-        ...     'livery': '',
-        ...     'date_of_order_of_court': '06/05/60 00:00:00',
-        ...     'source_ref': 'MF 324'}
+        ...     'notes': 'Order of Court'}
         >>> first_row = next(records)
         >>> (expected == first_row) if first_row else True
         True
     """
     pkwargs = {'stdout': PIPE, 'bufsize': 1, 'universal_newlines': True}
-
-    # https://pypi.org/project/meza/
-    # https://github.com/reubano/meza/blob/master/meza/io.py
 
     # https://stackoverflow.com/a/2813530/408556
     # https://stackoverflow.com/a/17698359/408556
