@@ -26,6 +26,4 @@ with DAG('InstallDependencies',
 
     install_mdbtools = BashOperator(task_id='install_mdbtools', bash_command="apt-get install mdbtools -y")
 
-    install_meza = BashOperator(task_id='install_meza', bash_command="pip install meza")
-
-install_wget >> install_boto3 >> update >> install_mdbtools >> install_meza
+install_wget >> install_boto3 >> update >> install_mdbtools
