@@ -12,7 +12,6 @@ from airflow.operators.postgres_operator import PostgresOperator
 
 # Custom
 sys.path.append("/usr/local/airflow")
-from redb.scripts.insert_into_core import main
 
 # Credentials for Database
 DATABASE_CONN = BaseHook.get_connection('redb_postgres')

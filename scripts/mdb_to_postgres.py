@@ -9,7 +9,6 @@ from subprocess import check_output, Popen, PIPE, CalledProcessError
 
 # Third party
 import pandas as pd
-from colorama import Fore, Style
 
 # Custom
 from .Database import Database
@@ -18,32 +17,6 @@ from .S3 import S3
 pd.set_option('display.max_columns', None)  
 pd.set_option('display.expand_frame_repr', False)
 pd.set_option('max_colwidth', -1)
-
-
-def print_time(phase="Unspecified", table="Unspecified"):
-    """
-    Prints time to stdout / console in custom format.
-    """
-
-    now = datetime.now()
-    now = f"{now.hour}:{now.minute}:{now.second}"
-    init_start = f"{Fore.YELLOW}Table: {table} has begun initializing.{Style.RESET_ALL} Time : {now}"
-    init_complete = f"{Fore.GREEN}Table: {table} has initialized.{Style.RESET_ALL} Time : {now}"
-    append_start = f"{Fore.YELLOW}Table: {table} is being appended.{Style.RESET_ALL} Time : {now}"
-    append_complete = f"{Fore.GREEN}Table: {table} successfully appended.{Style.RESET_ALL} Time : {now}"
-
-    if phase == "Unspecified":
-        print(now)
-    elif phase == "init_start":
-        print(init_start)
-    elif phase == "init_complete":
-        print(init_complete)
-    elif phase == "append_start":
-        print(append_start)
-    elif phase == "append_complete":
-        print(append_complete)
-    else:
-        print("Qué?" + " " + now)
 
 
 def initialize_global_IO(kwargs):
@@ -155,6 +128,32 @@ def generate_rows(filepath, table, **kwargs):
             values = next(csv.reader(next_line, **kwargs))
             values = [value.rstrip() for value in values]
             yield dict(zip(headers, values))
+
+
+def print_time(phase="unspecified", table="unspecified"):
+    """
+    Prints time to stdout / console in custom format.
+    """
+
+    now = datetime.now()
+    now = f"{now.hour}:{now.minute}:{now.second}"
+    init_start = f"Table: {table} has begun initializing. Time : {now}"
+    init_complete = f"Table: {table} has initialized. Time : {now}"
+    append_start = f"Table: {table} is being appended. Time : {now}"
+    append_complete = f"Table: {table} successfully appended. Time : {now}"
+
+    if phase == "unspecified":
+        print(now)
+    elif phase == "init_start":
+        print(init_start)
+    elif phase == "init_complete":
+        print(init_complete)
+    elif phase == "append_start":
+        print(append_start)
+    elif phase == "append_complete":
+        print(append_complete)
+    else:
+        print("Qué?" + " " + now)
 
 
 # TODO Incorporate column_types into function to make more efficient.
@@ -354,6 +353,7 @@ def append_to_csv(table, columns, limit=50_000):
     print_time("append_complete", table)
 
     if row != None:
+        # TODO Investigate lowering memory by removing return / recursion.
         return append_to_csv(table, columns, limit)
 
 

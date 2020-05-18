@@ -2,6 +2,7 @@
 CreateConnections.py
 create_connections.py
 connections.json
+InstallDependenciesLocal.py
 
 # Files created upon Dockerization for Airflow testing environment (via Docker volume)
 airflow*
