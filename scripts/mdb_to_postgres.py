@@ -210,6 +210,7 @@ def merge_split_rows(column_names, broken_row):
     if len(next_row.keys()) == 0:
         next_row = {column_names[0] : "\n"}
    
+    # Creates a List of all the values in the next Dictionary.
     next_row_values = list(next_row.values())
     
     # The first value in the next row was the field split in half by the newline.
@@ -353,8 +354,7 @@ def append_to_csv(table, columns, limit=50_000):
     print_time("append_complete", table)
 
     if row != None:
-        # TODO Investigate lowering memory by removing return / recursion.
-        return append_to_csv(table, columns, limit)
+        append_to_csv(table, columns, limit)
 
 
 def main(**kwargs):
