@@ -241,7 +241,7 @@ def merge_split_rows(column_names, broken_row):
         return pending_row
     
 
-def initialize_csv(table, columns, limit=50_000):
+def initialize_csv(table, columns, csv_path, limit=50_000):
     """ Creates a CSV from a Python Generator with a select number of rows.
 
     :param table: The name of the table and target CSV.
@@ -291,8 +291,7 @@ def initialize_csv(table, columns, limit=50_000):
     
     table_dataframe = pd.DataFrame(batch, columns=snapshot_row.keys())
     batch.clear()
-
-    table_dataframe.to_csv(f'./resources/{table}.csv',
+    table_dataframe.to_csv(csv_path,
                            index=False,
                            sep="|",
                            na_rep="",
@@ -302,7 +301,7 @@ def initialize_csv(table, columns, limit=50_000):
     print_time("init_complete", table)
 
 
-def append_to_csv(table, columns, limit=50_000):
+def append_to_csv(table, columns, csv_path, limit=50_000):
     """ Recursively appends table rows from a Python Generator to an existing CSV.
 
     :param table: The name of the table and target CSV.
@@ -343,7 +342,7 @@ def append_to_csv(table, columns, limit=50_000):
     
     table_dataframe = pd.DataFrame(batch, columns=snapshot_row.keys())
     batch.clear()
-    table_dataframe.to_csv(f'./resources/{table}.csv',
+    table_dataframe.to_csv(csv_path,
                             header=False,
                             index=False,
                             mode="a",
@@ -354,7 +353,7 @@ def append_to_csv(table, columns, limit=50_000):
     print_time("append_complete", table)
 
     if row != None:
-        append_to_csv(table, columns, limit)
+        append_to_csv(table, columns, csv_path, limit)
 
 
 def main(**kwargs):
@@ -385,8 +384,6 @@ def main(**kwargs):
             continue
 
         with tempfile.TemporaryDirectory() as tmp:
-
-            
             path_to_database =  os.path.join(tmp, mdb)
             s3.download_file(s3.bucket_name, mdb, path_to_database)
 
@@ -403,20 +400,18 @@ def main(**kwargs):
                 # "generate_rows" returns a Python Generator that is being initialized globally via the "global" keyword. 
                 # The Generator (row) can thus be shared throughout the script.
                 row = generate_rows(path_to_database, table=table, delimiter="|")
-
                 mdb_name = mdb[:-4] # name of Access database
-                table = mdb_name + "_" + table # prepends database name to table
+                table = mdb_name + "_" + table.lower() # prepends database name to table
+                csv_path = f"dags/redb/resources/{table}.csv"
 
-                initialize_csv(table, columns, limit=50_000)
+                initialize_csv(table, columns, csv_path, limit=50_000)
 
                 if row != None:
-                    append_to_csv(table, columns, limit=50_000)
+                    append_to_csv(table, columns, csv_path, limit=50_000)
 
                 # Opens CSV then copies to database.
-                with open(f"./resources/{table}.csv", 'r+') as csvfile:
-
+                with open(csv_path, 'r+') as csvfile:
                     db.replace_table("staging_1", table, snapshot_row) # snapshot_row created upon invoking "initialize_csv" function.
-
                     conn = db.get_raw_connection()
                     cursor = conn.cursor()
                     cmd = f'COPY staging_1."{table}" FROM STDIN WITH (FORMAT CSV, DELIMITER "|", HEADER TRUE, ENCODING "utf-8")'
@@ -424,5 +419,5 @@ def main(**kwargs):
                     conn.commit()
                     print(f"{table} copied into staging_1.")
                 
-                os.remove(f"./resources/{table}.csv")
+                os.remove(csv_path)
             
