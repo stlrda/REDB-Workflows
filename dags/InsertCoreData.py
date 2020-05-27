@@ -32,6 +32,7 @@ default_args = {
 
 # This DAG will execute each of the .sql scripts from the path specified in "template_searchpath"
 with DAG('InsertCoreData',
+
         default_args=default_args,
         template_searchpath="/usr/local/airflow/dags/redb/sql/inserts/",
         schedule_interval='@once',
@@ -40,6 +41,7 @@ with DAG('InsertCoreData',
     address = PostgresOperator(task_id="address", postgres_conn_id="redb_postgres", sql="address.sql", database=DATABASE_NAME)
     county = PostgresOperator(task_id="county", postgres_conn_id="redb_postgres", sql="county.sql", database=DATABASE_NAME)
     neighborhood = PostgresOperator(task_id="neighborhood", postgres_conn_id="redb_postgres", sql="neighborhood.sql", database=DATABASE_NAME)
+
 
 # The "chain" method executes the tasks like normal, but provides a cleaner structure for legibility.
 chain(
