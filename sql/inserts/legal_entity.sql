@@ -10,7 +10,7 @@ GROUP BY "prcl"."OwnerAddr", "prcl"."OwnerName", "prcl"."OwnerName2";
 UPDATE "core"."legal_entity" 
 SET "address_id" = "address"."address_id" 
 FROM "core"."address" 
-WHERE "address"."street_address" = "legal_entity"."legal_entity_address";
+WHERE "address"."street_address" = "legal_entity"."legal_entity_address"; --more detail maybe
 
 ALTER TABLE "core"."legal_entity" 
 DROP COLUMN "legal_entity_address";
