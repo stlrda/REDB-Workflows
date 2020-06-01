@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS core.address (address_id SERIAL PRIMARY KEY, street_a
 
 INSERT INTO core.address(street_address, city, state, country, zip) 
 SELECT "OwnerAddr", "OwnerCity", "OwnerState", "OwnerCountry", "OwnerZIP" 
-FROM "staging_2"."prcl" 
+FROM "staging_2"."prcl_prcl" 
 GROUP BY "OwnerAddr", "OwnerCity", "OwnerState", "OwnerCountry", "OwnerZIP";
 
 UPDATE "core"."address" 
