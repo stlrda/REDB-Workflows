@@ -17,5 +17,5 @@ START 10000001
 OWNED BY core.county_id_mapping_table."county_parcel_id";
 
 INSERT INTO "core"."county_id_mapping_table" ("county_id", "county_parcel_id", "parcel_id", "county_parcel_id_type")
-	SELECT '10001', "ParcelId", nextval('core.id_mapping'), 'parcel_11'
+	SELECT '10001', "ParcelId", CONCAT("county_id", '.', nextval('core.id_mapping'), '.000.0000'), 'parcel_11'
 	FROM "staging_2"."prcl_prcl";

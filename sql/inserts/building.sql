@@ -1,7 +1,6 @@
 CREATE TABLE IF NOT EXISTS "core"."building" (
     "parcel_id" varchar
-	, "building_id" varchar
-	, "parcel_id_new" varchar PRIMARY KEY
+	, "building_id" varchar PRIMARY KEY -- CCCCCC.PPPPPPPP.BBB.0000 (county_id.parcel_number.building_number.unit_number)
 	, "owner_id" varchar
 	, "description" varchar
 	, "apartment_count" int
@@ -32,7 +31,6 @@ WITH BuildingTable AS --Joins BCom & BRes on our inner query to narrow down the 
 	)
 INSERT INTO "core"."building" ("parcel_id"
 	, "building_id"
-	, "parcel_id_new"
 	, "owner_id"
 	, "description"
 	, "apartment_count"
@@ -43,8 +41,7 @@ INSERT INTO "core"."building" ("parcel_id"
 	--, "update_date"
 	)
 	(SELECT "parcel"."parcel_id"
-		, (ROW_NUMBER () OVER(PARTITION BY "parcel"."parcel_id") + 100) --Counts each row associated with a parcel_id starting at 101
-		, CONCAT(SUBSTRING("parcel"."parcel_id" FROM 1 FOR 15),(ROW_NUMBER () OVER(PARTITION BY "parcel"."parcel_id") + 100),'.0000') --incorporates the building_id into the parcel_id
+		, CONCAT(SUBSTRING("parcel"."parcel_id" FROM 1 FOR 15),(ROW_NUMBER () OVER(PARTITION BY "parcel"."parcel_id") + 100),'.0000') -- Counts each row associated with a parcel_id starting at 101 and incorporates the building_id into the parcel_id
 		, "owner_id"
 		, "description"
 		, CAST("NbrOfApts" AS INT)
@@ -52,6 +49,6 @@ INSERT INTO "core"."building" ("parcel_id"
 	JOIN BuildingTable
 	ON BuildingTable."ParcelId" = "county_id_mapping_table"."county_parcel_id"
 	JOIN "core"."parcel"
-	ON "parcel"."parcel_number" = "county_id_mapping_table"."parcel_id"
+	ON CONCAT("parcel"."county_id", '.', "parcel"."parcel_number") = SUBSTRING("county_id_mapping_table"."parcel_id" FROM 1 FOR 14)
 	ORDER BY "parcel"."parcel_id"
-	)
+	);

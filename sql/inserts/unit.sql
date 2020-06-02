@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS "core"."unit" (
-    "unit_id" varchar PRIMARY KEY
+    "unit_id" varchar PRIMARY KEY -- CCCCCC.PPPPPPPP.BBB.UUUU (county_id.parcel_number.building_number.unit_number)
 	, "building_id" varchar
 	, "description" varchar
 	, "condominium" boolean
@@ -47,7 +47,7 @@ WITH UnitQry AS -- joins to our ID Lookup table to relate prcl_11 ID to parcelNu
 		ORDER BY replace(replace(concat(to_char(prcl_bldgsect."CityBlock"::float8,'0000.00'),to_char(prcl_bldgsect."Parcel"::int8,'0000'),prcl_bldgsect."OwnerCode"),'.',''),' ','')
 			, CAST("prcl_bldgsect"."BldgNum" AS INT)
 		)
-	SELECT "county_id_mapping_table"."parcel_id"
+	SELECT  SUBSTRING("county_id_mapping_table"."parcel_id" FROM 7 FOR 8) as parcel_id
 		, "BldgNum"
 		, "Condominium"
 	FROM UnitTable
@@ -65,12 +65,12 @@ INSERT INTO	"core"."unit"(
 	--, "etl_job"
 	--, "update_date"
 	)
-	(SELECT	CONCAT(SUBSTRING("parcel_id_new" FROM 1 FOR 19), (ROW_NUMBER () OVER(PARTITION BY "parcel_id_new") + 1000)) --Counts each row associated with a building_id starting at 1001 and incorporates the Unit_id into the building_id
-		, "building"."parcel_id_new"
+	(SELECT	CONCAT(SUBSTRING("building"."building_id" FROM 1 FOR 19), (ROW_NUMBER () OVER(PARTITION BY "building"."building_id") + 1000)) -- Counts each row associated with a building_id starting at 1001 and incorporates the Unit_id into the building_id
+		, "building"."building_id"
 		, "description" 
 		, UnitQry."Condominium"
 	FROM UnitQry
 	JOIN "core"."building"
-	ON SUBSTRING("building"."parcel_id_new" FROM 7 FOR 8) = UnitQry."parcel_id" AND CAST(SUBSTRING("building"."parcel_id_new" FROM 16 FOR 3) AS INT) = (CAST(UnitQry."BldgNum" AS INT) + 100)
-	ORDER BY "parcel_id_new"
-	)
+	ON SUBSTRING("building"."building_id" FROM 7 FOR 8) = UnitQry."parcel_id" AND CAST(SUBSTRING("building"."building_id" FROM 16 FOR 3) AS INT) = (CAST(UnitQry."BldgNum" AS INT) + 100)
+	ORDER BY "building"."building_id"
+	);

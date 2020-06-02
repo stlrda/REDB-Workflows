@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS "core"."parcel" (
-    "parcel_id" varchar PRIMARY KEY -- CCCCCC.PPPPPPPP.000.0000 (county_id.parcel_number.building_number.unit_number)[Building & unit will always be .000.0000 on this table] 
+    "parcel_id" varchar PRIMARY KEY -- CCCCCC.PPPPPPPP.000.0000 (county_id.parcel_number.building_number.unit_number)
     , "county_id" varchar -- County_Id 10001 because all the data is coming from one county at the moment but this needs to be more sophisticated down the line
     , "city_block_number" varchar -- prcl.CityBlock
     , "parcel_number" varchar -- generated with a sequence starting at 10000001
@@ -30,7 +30,6 @@ CREATE TABLE IF NOT EXISTS "core"."parcel" (
     , "update_date" date -- NYI
 );
 
-----------------------------New Version that uses the lookup table instead of sequence to get the ID------------------------
 WITH ID_Table AS
 	(
 	SELECT "ParcelId", "legal_entity_id"
@@ -85,10 +84,10 @@ INSERT INTO "core"."parcel" ("parcel_id"
     --, "etl_job"
     --, "update_date"
     )
-(SELECT CONCAT('10001.',"county_id_mapping_table"."parcel_id",'.000.0000')
-    , '10001'
+(SELECT "county_id_mapping_table"."parcel_id"
+    , "county_id_mapping_table"."county_id"
     , "CityBlock"
-    , "county_id_mapping_table"."parcel_id"
+    , SUBSTRING("county_id_mapping_table"."parcel_id" FROM 7 FOR 8)
     --, "parcel_taxing_status"
     , ID_Table."legal_entity_id"
     , CONCAT("LegalDesc1",' ',"LegalDesc2",' ',"LegalDesc3",' ',"LegalDesc4",' ',"LegalDesc5")
