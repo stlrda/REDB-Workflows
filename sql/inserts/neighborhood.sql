@@ -9,11 +9,11 @@ CREATE TABLE IF NOT EXISTS core.neighborhood (
     , update_date date
     );
 
-INSERT INTO core.neighborhood(neighborhood_name)  
-SELECT "prcl_prcl"."Nbrhd" 
+-- Selects each unique neighborhood from prcl_prcl and assigns an ID to each one via Serial Primary Key
+-- County ID is hard coded to match Sait Louis City County since there is only one county
+-- admittidly this method was a bit obtuse.  Could have also just selected the value '10001'
+INSERT INTO core.neighborhood(neighborhood_name, county_id)  
+SELECT "prcl_prcl"."Nbrhd", (SELECT "county_id" FROM "core"."county" WHERE "county"."county_name" = 'Saint Louis City County') 
 FROM "staging_2"."prcl_prcl" 
 GROUP BY "Nbrhd" 
 ORDER BY "Nbrhd";
-
-UPDATE "core"."neighborhood"
-SET "county_id" = (SELECT "county_id" FROM "core"."county" WHERE "county"."county_name" = 'Saint Louis City County');

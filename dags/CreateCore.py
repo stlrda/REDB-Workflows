@@ -31,12 +31,12 @@ default_args = {
 }
 
 with DAG('CreateCore',
-         default_args=default_args,
-         schedule_interval='@once',
-         ) as dag:
+        default_args=default_args,
+        schedule_interval='@once',
+        ) as dag:
     create_tables = PythonOperator(task_id='CreateCore',
-                               python_callable=main,
-                               op_kwargs={
+                                python_callable=main,
+                                op_kwargs={
                                         'pg_database': DATABASE_NAME,
                                         'pg_host': DATABASE_HOST,
                                         'pg_user': DATABASE_USER,

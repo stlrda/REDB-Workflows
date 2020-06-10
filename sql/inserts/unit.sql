@@ -47,14 +47,14 @@ WITH UnitQry AS -- joins to our ID Lookup table to relate prcl_11 ID to parcelNu
 		ORDER BY replace(replace(concat(to_char(prcl_bldgsect."CityBlock"::float8,'0000.00'),to_char(prcl_bldgsect."Parcel"::int8,'0000'),prcl_bldgsect."OwnerCode"),'.',''),' ','')
 			, CAST("prcl_bldgsect"."BldgNum" AS INT)
 		)
-	SELECT  SUBSTRING("county_id_mapping_table"."parcel_id" FROM 7 FOR 8) as parcel_id
+	SELECT SUBSTRING("county_id_mapping_table"."parcel_id" FROM 7 FOR 8) as parcel_id
 		, "BldgNum"
 		, "Condominium"
 	FROM UnitTable
 	JOIN "core"."county_id_mapping_table"
 	ON "county_id_mapping_table"."county_parcel_id" = UnitTable."ParcelId"
 	)
-INSERT INTO	"core"."unit"(
+INSERT INTO "core"."unit"(
 	"unit_id"
 	, "building_id"
 	, "description"

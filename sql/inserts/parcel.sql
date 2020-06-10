@@ -30,6 +30,7 @@ CREATE TABLE IF NOT EXISTS "core"."parcel" (
     , "update_date" date -- NYI
 );
 
+-- ID_Table Common Table Expression maps ParclID from prcl_prcl source table to legal_entity_id 
 WITH ID_Table AS
 	(
 	SELECT "ParcelId", "legal_entity_id"

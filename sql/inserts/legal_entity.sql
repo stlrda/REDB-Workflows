@@ -11,9 +11,12 @@ CREATE TABLE IF NOT EXISTS core.legal_entity (
     , update_date date
     );
 
+-- Selects each unique combination of OwnerAddr, OwnerName, OwnerName2 & address_id
 WITH LegalEntity AS
     (
-    WITH Qry AS
+    /* inner query selects Address_ids along with OwnerAddr and Name fields needed to create unique legal_entity_ids    
+    Coalesce is necessary to correctly join on fields that may contain null values */
+    WITH Qry AS 
         (
         SELECT "ParcelId"
             , "OwnerName"
@@ -40,6 +43,7 @@ WITH LegalEntity AS
     GROUP BY "OwnerAddr", "OwnerName", "OwnerName2", "address_id"
     ORDER BY "address_id"
     )
+-- inserts unique group values and assigns a legal_entity_id via Serial Primary Key
 INSERT INTO core.legal_entity(
     legal_entity_address
     , legal_entity_name

@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS "core"."sub_parcel_type" (
     , sub_parcel_type varchar
 );
 
+-- Creates and inserts values into the sub_parcel_type lookup table.
 INSERT INTO "core"."sub_parcel_type" (sub_parcel_type_code, sub_parcel_type) VALUES
 ('A', 'Account Separation')
 , ('B', 'Back Taxes Owed')

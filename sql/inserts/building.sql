@@ -1,3 +1,4 @@
+-- Creates the table for assigning unique Building IDs.
 CREATE TABLE IF NOT EXISTS "core"."building" (
     "parcel_id" varchar
 	, "building_id" varchar PRIMARY KEY -- CCCCCC.PPPPPPPP.BBB.0000 (county_id.parcel_number.building_number.unit_number)
@@ -11,9 +12,11 @@ CREATE TABLE IF NOT EXISTS "core"."building" (
 	, "update_date" date
 );
 
-WITH BuildingTable AS --Joins BCom & BRes on our inner query to narrow down the building list
+-- Joins prcl_bcom & prcl_bres on our inner query to further narrow down the building list
+-- Join criteria is the ParcelId field which is constructed from CityBlock, Parcel and OwnerCode on the bcom & bres tables  
+WITH BuildingTable AS 
 	(
-	WITH BuildingRecord AS --Selects records from prcl that meet our building criteria and returns NbrOfApts along with ParcelId
+	WITH BuildingRecord AS --Selects records from prcl_prcl that meet our building criteria and returns NbrOfApts along with ParcelId
 		(
 		SELECT "prcl_prcl"."ParcelId", "NbrOfApts" 
 		FROM "staging_2"."prcl_prcl"
@@ -29,6 +32,8 @@ WITH BuildingTable AS --Joins BCom & BRes on our inner query to narrow down the 
 	JOIN "staging_2"."prcl_bldgres"
 	ON replace(replace(concat(to_char(prcl_bldgres."CityBlock"::float8,'0000.00'),to_char(prcl_bldgres."Parcel"::int8,'0000'),prcl_bldgres."OwnerCode"),'.',''),' ','') = BuildingRecord."ParcelId"
 	)
+-- Unique Building IDs are constructed via partitioning by parcel_id and concatinating the row_number +100 onto the end of the parcel_id 
+-- EG (CCCCCC.PPPPPPPP.BBB.0000)
 INSERT INTO "core"."building" ("parcel_id"
 	, "building_id"
 	, "owner_id"

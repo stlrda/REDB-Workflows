@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS core.county (
     , update_date date
     );
 
+-- Our county table has a single entry which is hard coded in
 INSERT INTO core.county(county_id
     , county_name
     , county_state) 
