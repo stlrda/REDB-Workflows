@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS "core"."county_id_mapping_table" (
 CREATE SEQUENCE IF NOT EXISTS core.id_mapping
 INCREMENT BY 1 
 START 10000001
-OWNED BY core.county_id_mapping_table."county_parcel_id";
+OWNED BY core.county_id_mapping_table."county_parcel_id"; --Owned By line just causes the sequence to be dropped if the column is dropped 
 
 /*
 For each entry in the prcl_prcl table a New Parcel_Id is generated via a sequence and tied to the unique parcel_11 id this
