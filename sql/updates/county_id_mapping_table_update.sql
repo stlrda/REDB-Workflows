@@ -1,4 +1,4 @@
----------------------insert new parcels--------------------
+---------------------insert new parcels into mapping table--------------------
 WITH NEW_PARCELS AS 
 	(
 	SELECT DISTINCT "prcl_test"."ParcelId"
@@ -26,4 +26,18 @@ SELECT '10001'
     , CURRENT_DATE
 FROM NEW_PARCELS;
 
----------------flag dead parcels is part of a trigger in another file------------
+---------------Flag dead parcels in mapping table------------
+WITH DEAD_PARCELS AS
+	(
+	SELECT staging_2.prcl_prcl."ParcelId"
+	FROM staging_2.prcl_prcl
+	LEFT JOIN staging_1."prcl_test"
+		ON staging_2.prcl_prcl."ParcelId" = staging_1."prcl_test"."ParcelId"
+	WHERE staging_1."prcl_test"."ParcelId" IS NULL
+	)
+UPDATE "core"."county_id_mapping_table" 
+	SET "removed_flag" = TRUE,
+		"current_flag" = FALSE,
+		"update_date" = CURRENT_DATE
+FROM DEAD_PARCELS
+WHERE DEAD_PARCELS."ParcelId" = "county_id_mapping_table"."county_parcel_id";

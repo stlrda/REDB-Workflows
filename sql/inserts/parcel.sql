@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS "core"."parcel" (
     , "county_id" varchar -- County_Id 10001 because all the data is coming from one county at the moment but this needs to be more sophisticated down the line
     , "city_block_number" varchar -- prcl.CityBlock
     , "parcel_number" varchar -- generated with a sequence starting at 10000001
-    , "parcel_taxing_status" varchar -- May be coming from a different table don't know for now.
+    --, "parcel_taxing_status" varchar -- May be coming from a different table don't know for now.
     --, "primary_addresses_count" varchar -- DROP
     , "owner_id" varchar -- core.legal_entity.legal_entity_id
     , "description" varchar -- CONCAT(prcl.LegalDesc1,' ',prcl.LegalDesc2,' ',prcl.LegalDesc3,' ',prcl.LegalDesc4,' ',prcl.LegalDesc5)

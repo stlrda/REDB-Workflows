@@ -86,7 +86,9 @@ WITH DEAD_LEGAL_ENTITIES AS
 	FROM "core"."legal_entity"
 	LEFT JOIN CURRENT_LEGAL_ENTITIES
 	ON CONCAT("OwnerAddr", "OwnerName", "OwnerName2", CURRENT_LEGAL_ENTITIES."address_id") = CONCAT("legal_entity_address", "legal_entity_name", "legal_entity_secondary_name", "legal_entity"."address_id")
-	WHERE CONCAT("OwnerAddr", "OwnerName", "OwnerName2", CURRENT_LEGAL_ENTITIES."address_id") NOT IN (SELECT CONCAT("legal_entity_address", "legal_entity_name", "legal_entity_secondary_name", "legal_entity"."address_id") FROM CURRENT_LEGAL_ENTITIES)
+	WHERE CONCAT("OwnerAddr", "OwnerName", "OwnerName2", CURRENT_LEGAL_ENTITIES."address_id") 
+		NOT IN (SELECT CONCAT("legal_entity_address", "legal_entity_name", "legal_entity_secondary_name", "legal_entity"."address_id") 
+				FROM CURRENT_LEGAL_ENTITIES)
 	)
 UPDATE "core"."legal_entity"
 SET "removed_flag" = TRUE,

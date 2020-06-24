@@ -113,7 +113,7 @@ WITH DEAD_UNITS AS
 			ON replace(replace(concat(to_char(prcl_bldgres."CityBlock"::float8,'0000.00'),to_char(prcl_bldgres."Parcel"::int8,'0000'),prcl_bldgres."OwnerCode"),'.',''),' ','') = BUILDING_RECORD."ParcelId"
 			)
 		SELECT replace(replace(concat(to_char(prcl_bldgsect."CityBlock"::float8,'0000.00'),to_char(prcl_bldgsect."Parcel"::int8,'0000'),prcl_bldgsect."OwnerCode"),'.',''),' ','') AS "ParcelId"
-			, "prcl_bldgsect"."BldgNum", "prcl_bldgsect"."SectNum" -- NectNum = Unit Number
+			, "prcl_bldgsect"."BldgNum", "prcl_bldgsect"."SectNum" -- SectNum = Unit Number
 			, "Condominium"
 		FROM "staging_2"."prcl_bldgsect"
 		JOIN BUILDING_TABLE

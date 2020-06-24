@@ -1,26 +1,3 @@
-----------------------------------FLAG DEAD PARCELS (DEPENDANT ON MAPPING_TABLE BEING UPDATED FIRST)------------------------------------
-WITH REDB_PARCEL_IDS AS
-	(
-	WITH DEAD_PARCEL_IDS AS
-		(
-		SELECT staging_2.prcl_prcl."ParcelId"
-		FROM staging_2.prcl_prcl
-		LEFT JOIN staging_1."prcl_test"
-			ON staging_2.prcl_prcl."ParcelId" = staging_1."prcl_test"."ParcelId"
-		WHERE staging_1."prcl_test"."ParcelId" IS NULL
-		)
-	SELECT DISTINCT SUBSTRING("county_id_mapping_table"."parcel_id" FROM 1 FOR 14) AS redb_county_id
-	FROM "core"."county_id_mapping_table"
-	JOIN DEAD_PARCEL_IDS
-	ON DEAD_PARCEL_IDS."ParcelId" = "county_id_mapping_table"."county_parcel_id"
-	)
-UPDATE "core"."parcel" 
-SET "removed_flag" = TRUE,
-	"current_flag" = FALSE,
-	"update_date" = CURRENT_DATE
-FROM REDB_PARCEL_IDS
-WHERE "redb_county_id" = SUBSTRING("parcel"."parcel_id" FROM 1 FOR 14);
-
 ------------------------------VIEW NECESSARY FOR INSERTING NEW PARCELS (potentially used in more places) --------------------------------
 CREATE VIEW staging_1.ID_TABLE_VIEW AS
 	(
@@ -126,3 +103,26 @@ ON "prcl_test"."ParcelId" = NEW_REDB_IDS."county_parcel_id"
 JOIN "core"."neighborhood"
 ON "prcl_test"."Nbrhd" = "neighborhood"."neighborhood_name"
 )
+
+----------------------------------FLAG DEAD PARCELS (DEPENDANT ON MAPPING_TABLE BEING UPDATED FIRST)------------------------------------
+WITH REDB_PARCEL_IDS AS
+	(
+	WITH DEAD_PARCEL_IDS AS
+		(
+		SELECT staging_2.prcl_prcl."ParcelId"
+		FROM staging_2.prcl_prcl
+		LEFT JOIN staging_1."prcl_test"
+			ON staging_2.prcl_prcl."ParcelId" = staging_1."prcl_test"."ParcelId"
+		WHERE staging_1."prcl_test"."ParcelId" IS NULL
+		)
+	SELECT DISTINCT SUBSTRING("county_id_mapping_table"."parcel_id" FROM 1 FOR 14) AS redb_county_id
+	FROM "core"."county_id_mapping_table"
+	JOIN DEAD_PARCEL_IDS
+	ON DEAD_PARCEL_IDS."ParcelId" = "county_id_mapping_table"."county_parcel_id"
+	)
+UPDATE "core"."parcel" 
+SET "removed_flag" = TRUE,
+	"current_flag" = FALSE,
+	"update_date" = CURRENT_DATE
+FROM REDB_PARCEL_IDS
+WHERE "redb_county_id" = SUBSTRING("parcel"."parcel_id" FROM 1 FOR 14);

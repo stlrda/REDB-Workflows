@@ -98,4 +98,4 @@ SET "removed_flag" = TRUE,
 	"current_flag" = FALSE,
 	"update_date" = CURRENT_DATE
 FROM DEAD_BUILDINGS
-WHERE CONCAT(SUBSTRING(DEAD_BUILDINGS."parcel_id" FROM 1 FOR 15), '.', CAST("BldgNum" AS INT) + 100) = SUBSTRING("building"."parcel_id" FROM 1 FOR 19)
+WHERE CONCAT(SUBSTRING(DEAD_BUILDINGS."parcel_id" FROM 1 FOR 14), '.', CAST("BldgNum" AS INT) + 100) = SUBSTRING("building"."building_id" FROM 1 FOR 18)
