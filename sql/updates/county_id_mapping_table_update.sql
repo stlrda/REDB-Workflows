@@ -1,11 +1,11 @@
 ---------------------insert new parcels into mapping table--------------------
 WITH NEW_PARCELS AS 
 	(
-	SELECT DISTINCT "prcl_test"."ParcelId"
-	FROM staging_1.prcl_test
-	LEFT JOIN core."county_id_mapping_table"
-		ON "prcl_test"."ParcelId" = "county_id_mapping_table"."county_parcel_id"
-	WHERE "county_id_mapping_table"."county_parcel_id" IS NULL
+	SELECT DISTINCT staging_1.prcl_prcl."ParcelId"
+	FROM staging_1.prcl_prcl
+	LEFT JOIN staging_2."prcl_prcl"
+	ON staging_1.prcl_prcl."ParcelId" = staging_2."prcl_prcl"."ParcelId"
+	WHERE staging_2."prcl_prcl"."ParcelId" IS NULL
 	)
 INSERT INTO "core"."county_id_mapping_table"("county_id"
 	, "county_parcel_id"
@@ -31,9 +31,9 @@ WITH DEAD_PARCELS AS
 	(
 	SELECT staging_2.prcl_prcl."ParcelId"
 	FROM staging_2.prcl_prcl
-	LEFT JOIN staging_1."prcl_test"
-		ON staging_2.prcl_prcl."ParcelId" = staging_1."prcl_test"."ParcelId"
-	WHERE staging_1."prcl_test"."ParcelId" IS NULL
+	LEFT JOIN staging_1."prcl_prcl"
+	ON staging_2.prcl_prcl."ParcelId" = staging_1."prcl_prcl"."ParcelId"
+	WHERE staging_1."prcl_prcl"."ParcelId" IS NULL
 	)
 UPDATE "core"."county_id_mapping_table" 
 	SET "removed_flag" = TRUE,

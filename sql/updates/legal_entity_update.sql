@@ -17,7 +17,7 @@ WITH NEW_LEGAL_ENTITIES AS
 				, "OwnerCountry"
 				, "OwnerZIP" 
 			FROM "core"."address"
-			JOIN "staging_1"."prcl_test" 
+			JOIN "staging_1"."prcl_prcl" 
 			ON COALESCE("OwnerAddr", ' ') = COALESCE("street_address", ' ')
 			AND COALESCE("OwnerCity", ' ') = COALESCE("city", ' ') 
 			AND COALESCE("OwnerState", ' ') = COALESCE("state", ' ')
@@ -32,8 +32,8 @@ WITH NEW_LEGAL_ENTITIES AS
 		GROUP BY "OwnerAddr", "OwnerName", "OwnerName2", "address_id"
 		ORDER BY "address_id"
 		)
-	SELECT DISTINCT "legal_entity"."legal_entity_id", "OwnerAddr", "OwnerName", "OwnerName2", LEGAL_ENTITY_CTE."address_id" FROM LEGAL_ENTITY_CTE --Current 
-	LEFT JOIN "core"."legal_entity" --Core Historical
+	SELECT DISTINCT "legal_entity"."legal_entity_id", "OwnerAddr", "OwnerName", "OwnerName2", LEGAL_ENTITY_CTE."address_id" FROM LEGAL_ENTITY_CTE
+	LEFT JOIN "core"."legal_entity"
 	ON COALESCE(LEGAL_ENTITY_CTE."OwnerAddr", ' ') = COALESCE("legal_entity"."legal_entity_address", ' ') 
 		AND COALESCE(LEGAL_ENTITY_CTE."OwnerName", ' ') = COALESCE("legal_entity"."legal_entity_name", ' ')
 		AND COALESCE(LEGAL_ENTITY_CTE."OwnerName2", ' ') = COALESCE("legal_entity"."legal_entity_secondary_name", ' ')
@@ -75,7 +75,7 @@ WITH DEAD_LEGAL_ENTITIES AS
 			, "OwnerCountry"
 			, "OwnerZIP" 
 		FROM "core"."address"
-		JOIN "staging_1"."prcl_test" 
+		JOIN "staging_1"."prcl_prcl" 
 		ON COALESCE("OwnerAddr", ' ') = COALESCE("street_address", ' ')
 		AND COALESCE("OwnerCity", ' ') = COALESCE("city", ' ') 
 		AND COALESCE("OwnerState", ' ') = COALESCE("state", ' ')

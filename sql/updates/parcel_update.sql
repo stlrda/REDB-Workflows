@@ -12,7 +12,7 @@ CREATE VIEW staging_1.ID_TABLE_VIEW AS
             , "OwnerState"
             , "OwnerCountry"
             , "OwnerZIP" 
-		FROM "staging_1"."prcl_test" AS P --TODO this table will need to be changed for prod
+		FROM "staging_1"."prcl_prcl" AS P --TODO this table will need to be changed for prod
 		LEFT JOIN "core"."address" AS A
 			ON COALESCE("OwnerAddr", ' ') = COALESCE("street_address", ' ')
 			AND COALESCE("OwnerCity", ' ') = COALESCE("city", ' ') 
@@ -26,16 +26,15 @@ CREATE VIEW staging_1.ID_TABLE_VIEW AS
         AND ("legal_entity"."address_id" = "qry"."address_id")
 	)
 ---------------NEW PARCELS (DEPENDANT ON THE ABOVE ID_TABLE_VIEW, COUNTY_ID_MAPPING_TABLE, LEGAL_ENTITY, ADDRESS, & NEIGHBORHOOD BEING UPDATED FIRST)-------------
---TODO references to parcel_test will need to be updated for production
 WITH NEW_REDB_IDS AS
 	(
 	WITH NEW_PARCEL_IDS AS
 		(
-		SELECT staging_1.prcl_test."ParcelId"
-		FROM staging_1.prcl_test
-		LEFT JOIN staging_2."prcl_prcl"
-			ON staging_1.prcl_test."ParcelId" = staging_2."prcl_prcl"."ParcelId"
-		WHERE staging_2."prcl_prcl"."ParcelId" IS NULL
+		SELECT "staging_1"."prcl_prcl"."ParcelId"
+		FROM "staging_1"."prcl_prcl"
+		LEFT JOIN "staging_2"."prcl_prcl"
+		ON "staging_1"."prcl_prcl"."ParcelId" = "staging_2"."prcl_prcl"."ParcelId"
+		WHERE "staging_2"."prcl_prcl"."ParcelId" IS NULL
 		)
 	SELECT DISTINCT "county_id", "parcel_id", "county_parcel_id", "create_date", "current_flag", "removed_flag", "etl_job", "update_date"
 	FROM "core"."county_id_mapping_table"
@@ -95,13 +94,13 @@ INSERT INTO "core"."parcel" ("parcel_id"
     , NEW_REDB_IDS."removed_flag"
     , NEW_REDB_IDS."etl_job"
     , NEW_REDB_IDS."update_date"
-FROM "staging_1"."prcl_test"
+FROM "staging_1"."prcl_prcl"
 JOIN staging_1.ID_TABLE_VIEW
-ON "prcl_test"."ParcelId" = staging_1.ID_TABLE_VIEW."ParcelId"
+ON "prcl_prcl"."ParcelId" = staging_1.ID_TABLE_VIEW."ParcelId"
 JOIN NEW_REDB_IDS
-ON "prcl_test"."ParcelId" = NEW_REDB_IDS."county_parcel_id"
+ON "prcl_prcl"."ParcelId" = NEW_REDB_IDS."county_parcel_id"
 JOIN "core"."neighborhood"
-ON "prcl_test"."Nbrhd" = "neighborhood"."neighborhood_name"
+ON "prcl_prcl"."Nbrhd" = "neighborhood"."neighborhood_name"
 )
 
 ----------------------------------FLAG DEAD PARCELS (DEPENDANT ON MAPPING_TABLE BEING UPDATED FIRST)------------------------------------
@@ -111,9 +110,9 @@ WITH REDB_PARCEL_IDS AS
 		(
 		SELECT staging_2.prcl_prcl."ParcelId"
 		FROM staging_2.prcl_prcl
-		LEFT JOIN staging_1."prcl_test"
-			ON staging_2.prcl_prcl."ParcelId" = staging_1."prcl_test"."ParcelId"
-		WHERE staging_1."prcl_test"."ParcelId" IS NULL
+		LEFT JOIN staging_1."prcl_prcl"
+		ON staging_2.prcl_prcl."ParcelId" = staging_1."prcl_prcl"."ParcelId"
+		WHERE staging_1."prcl_prcl"."ParcelId" IS NULL
 		)
 	SELECT DISTINCT SUBSTRING("county_id_mapping_table"."parcel_id" FROM 1 FOR 14) AS redb_county_id
 	FROM "core"."county_id_mapping_table"

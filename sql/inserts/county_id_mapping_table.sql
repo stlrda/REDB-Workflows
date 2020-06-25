@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS "core"."county_id_mapping_table" (
 	, removed_flag boolean
 	, etl_job varchar
 	, update_date date
-)
+);
 
 -- sequence for creating a unique REDB identifier based on county identifier
 CREATE SEQUENCE IF NOT EXISTS core.id_mapping

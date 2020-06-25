@@ -1,12 +1,12 @@
 -------------------------Insert new Neighborhoods-------------------------
 WITH NEW_NEIGHBORHOODS AS
 	(
-	SELECT DISTINCT "prcl_test"."Nbrhd"
-	FROM "staging_1"."prcl_test"
+	SELECT DISTINCT "staging_1"."prcl_prcl"."Nbrhd"
+	FROM "staging_1"."prcl_prcl"
 	LEFT JOIN "staging_2"."prcl_prcl"
-		ON "prcl_test"."Nbrhd" = "prcl_prcl"."Nbrhd"
-	WHERE "prcl_prcl"."Nbrhd" IS NULL
-	ORDER BY "prcl_test"."Nbrhd"
+	ON "staging_1"."prcl_prcl"."Nbrhd" = "staging_2"."prcl_prcl"."Nbrhd"
+	WHERE "staging_2"."prcl_prcl"."Nbrhd" IS NULL
+	ORDER BY "staging_1"."prcl_prcl"."Nbrhd"
 	)
 INSERT INTO "core"."neighborhood"("neighborhood_name"
 	, "county_id"
@@ -27,11 +27,11 @@ FROM NEW_NEIGHBORHOODS
 -------------------------Flag Dead Neighborhoods-------------------------
 WITH DEAD_NEIGHBORHOODS AS
 	(
-	SELECT DISTINCT "prcl_prcl"."Nbrhd"
+	SELECT DISTINCT "staging_2"."prcl_prcl"."Nbrhd"
 	FROM "staging_2"."prcl_prcl"
-	LEFT JOIN "staging_1"."prcl_test"
-		ON "prcl_test"."Nbrhd" = "prcl_prcl"."Nbrhd"
-	WHERE "prcl_test"."Nbrhd" IS NULL
+	LEFT JOIN "staging_1"."prcl_prcl"
+	ON "staging_1"."prcl_prcl"."Nbrhd" = "staging_2"."prcl_prcl"."Nbrhd"
+	WHERE "staging_1"."prcl_prcl"."Nbrhd" IS NULL
 	)
 UPDATE "core"."neighborhood"
 SET  "current_flag" = FALSE

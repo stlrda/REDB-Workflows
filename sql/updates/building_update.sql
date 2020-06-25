@@ -8,26 +8,26 @@ WITH NEW_BUILDINGS AS --Compares Current(staging_1) to past(staging_2) and selec
 		(
 		WITH BUILDING_RECORD AS --Selects records from prcl_prcl that meet our building criteria and returns NbrOfApts along with ParcelId
 			(
-			SELECT "prcl_test"."ParcelId", "NbrOfApts" 
-			FROM "staging_1"."prcl_test"
+			SELECT "prcl_prcl"."ParcelId", "NbrOfApts" 
+			FROM "staging_1"."prcl_prcl"
 			WHERE "Parcel" != "GisParcel" AND "OwnerCode" != '8'
 			)
 		SELECT "ParcelId", "BldgNum", "NbrOfApts"
 		FROM BUILDING_RECORD
 		JOIN "staging_1"."prcl_bldgcom"
-		ON replace(replace(concat(to_char(prcl_bldgcom."CityBlock"::float8,'0000.00'),to_char(prcl_bldgcom."Parcel"::int8,'0000'),prcl_bldgcom."OwnerCode"),'.',''),' ','') = BUILDING_RECORD."ParcelId"
+		ON (SELECT core.format_parcelId(prcl_bldgcom."CityBlock", prcl_bldgcom."Parcel", prcl_bldgcom."OwnerCode")) = BUILDING_RECORD."ParcelId"
 		UNION ALL
 		SELECT "ParcelId", "BldgNum", "NbrOfApts" 
 		FROM BUILDING_RECORD
 		JOIN "staging_1"."prcl_bldgres"
-		ON replace(replace(concat(to_char(prcl_bldgres."CityBlock"::float8,'0000.00'),to_char(prcl_bldgres."Parcel"::int8,'0000'),prcl_bldgres."OwnerCode"),'.',''),' ','') = BUILDING_RECORD."ParcelId"
+		ON (SELECT core.format_parcelId(prcl_bldgres."CityBlock", prcl_bldgres."Parcel", prcl_bldgres."OwnerCode")) = BUILDING_RECORD."ParcelId"
 		)
 	SELECT BUILDING_TABLE."ParcelId", "BldgNum", "NbrOfApts"
 	FROM BUILDING_TABLE
-	LEFT JOIN (SELECT replace(replace(concat(to_char(prcl_bldgcom."CityBlock"::float8,'0000.00'),to_char(prcl_bldgcom."Parcel"::int8,'0000'),prcl_bldgcom."OwnerCode"),'.',''),' ','') AS "ParcelId"
+	LEFT JOIN (SELECT (SELECT core.format_parcelId(prcl_bldgcom."CityBlock", prcl_bldgcom."Parcel", prcl_bldgcom."OwnerCode")) AS "ParcelId"
 				FROM "staging_2"."prcl_bldgcom"
 				UNION ALL
-				SELECT replace(replace(concat(to_char(prcl_bldgres."CityBlock"::float8,'0000.00'),to_char(prcl_bldgres."Parcel"::int8,'0000'),prcl_bldgres."OwnerCode"),'.',''),' ','') AS "ParcelID"
+				SELECT (SELECT core.format_parcelId(prcl_bldgres."CityBlock", prcl_bldgres."Parcel", prcl_bldgres."OwnerCode")) AS "ParcelID"
                 FROM "staging_2"."prcl_bldgres") UNION_BLDGS
 	ON UNION_BLDGS."ParcelId" = BUILDING_TABLE."ParcelId"
 	WHERE UNION_BLDGS."ParcelId" IS NULL
@@ -74,19 +74,19 @@ WITH DEAD_BUILDINGS AS --Compares Current(staging_1) to past(staging_2) and sele
 		SELECT "ParcelId", "BldgNum", "NbrOfApts"
 		FROM BUILDING_RECORD
 		JOIN "staging_2"."prcl_bldgcom"
-		ON replace(replace(concat(to_char(prcl_bldgcom."CityBlock"::float8,'0000.00'),to_char(prcl_bldgcom."Parcel"::int8,'0000'),prcl_bldgcom."OwnerCode"),'.',''),' ','') = BUILDING_RECORD."ParcelId"
+		ON (SELECT core.format_parcelId(prcl_bldgcom."CityBlock", prcl_bldgcom."Parcel", prcl_bldgcom."OwnerCode")) = BUILDING_RECORD."ParcelId"
 		UNION ALL
 		SELECT "ParcelId", "BldgNum", "NbrOfApts" 
 		FROM BUILDING_RECORD
 		JOIN "staging_2"."prcl_bldgres"
-		ON replace(replace(concat(to_char(prcl_bldgres."CityBlock"::float8,'0000.00'),to_char(prcl_bldgres."Parcel"::int8,'0000'),prcl_bldgres."OwnerCode"),'.',''),' ','') = BUILDING_RECORD."ParcelId"
+		ON (SELECT core.format_parcelId(prcl_bldgres."CityBlock", prcl_bldgres."Parcel", prcl_bldgres."OwnerCode")) = BUILDING_RECORD."ParcelId"
 		)		
 	SELECT "county_id_mapping_table"."parcel_id", BUILDING_TABLE."ParcelId", BUILDING_TABLE."BldgNum", BUILDING_TABLE."NbrOfApts"
 	FROM BUILDING_TABLE
-	LEFT JOIN (SELECT replace(replace(concat(to_char(prcl_bldgcom."CityBlock"::float8,'0000.00'),to_char(prcl_bldgcom."Parcel"::int8,'0000'),prcl_bldgcom."OwnerCode"),'.',''),' ','') AS "ParcelId"
+	LEFT JOIN (SELECT (SELECT core.format_parcelId(prcl_bldgcom."CityBlock", prcl_bldgcom."Parcel", prcl_bldgcom."OwnerCode")) AS "ParcelId"
 				FROM "staging_1"."prcl_bldgcom"
 				UNION ALL
-				SELECT replace(replace(concat(to_char(prcl_bldgres."CityBlock"::float8,'0000.00'),to_char(prcl_bldgres."Parcel"::int8,'0000'),prcl_bldgres."OwnerCode"),'.',''),' ','') AS "ParcelID"
+				SELECT (SELECT core.format_parcelId(prcl_bldgres."CityBlock", prcl_bldgres."Parcel", prcl_bldgres."OwnerCode")) AS "ParcelID"
                 FROM "staging_1"."prcl_bldgres") UNION_BLDGS
 	ON UNION_BLDGS."ParcelId" = BUILDING_TABLE."ParcelId"
 	JOIN "core"."county_id_mapping_table"

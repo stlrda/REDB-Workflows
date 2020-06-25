@@ -1,22 +1,4 @@
-UPDATE "core"."BTest"
-SET "owner_id" = '100039'
-WHERE "parcel_id" = '10001.10082923.000.0000'
-
-SELECT * FROM "core"."BTest";
-SELECT * FROM "core"."BHistory";
-
-SELECT * FROM "core"."county" LIMIT 1000
-SELECT * FROM "core"."address" LIMIT 1000
-SELECT * FROM "core"."neighborhood" LIMIT 1000
-SELECT * FROM "core"."legal_entity" LIMIT 1000
-SELECT * FROM "core"."county_id_mapping_table" LIMIT 1000
-SELECT * FROM "core"."parcel" LIMIT 1000
-SELECT * FROM "core"."building" LIMIT 1000
-SELECT * FROM "core"."unit" LIMIT 1000
-SELECT * FROM "core"."special_parcel_type" LIMIT 1000
-SELECT * FROM "core"."sub_parcel_type" LIMIT 1000
-
-------------------dead parcels function---------------
+-----------------dead parcels function---------------
 SELECT find_dead_parcels()
 
 CREATE OR REPLACE FUNCTION find_dead_parcels()
@@ -169,41 +151,99 @@ ON "staging_2"."dead_parcels"
 FOR EACH ROW
 EXECUTE PROCEDURE removed_flag_unit();
 
----------Check Values-----------
-SELECT * FROM "staging_2"."dead_parcels"
+-------------------------------------------------------------------------------------------------------
+SELECT * FROM "core"."neighborhood" WHERE "removed_flag" IS NOT FALSE
+SELECT * FROM "core"."address" WHERE "removed_flag" IS NOT FALSE
+SELECT * FROM "core"."county_id_mapping_table" WHERE "removed_flag" IS NOT FALSE
+SELECT * FROM "core"."legal_entity" WHERE "removed_flag" IS NOT FALSE
+SELECT * FROM "core"."parcel" WHERE "removed_flag" IS NOT FALSE
+SELECT * FROM "core"."building" WHERE "removed_flag" IS NOT FALSE
+SELECT * FROM "core"."unit" WHERE "removed_flag" IS NOT FALSE
 
-SELECT * FROM "core"."county_id_mapping_table" --LIMIT 10
-WHERE "parcel_id" = '10001.10000818.000.0000'
-WHERE "removed_flag" IS NOT NULL
-ORDER BY "county_parcel_id"
+INSERT INTO "staging_2"."prcl_prcl"
+SELECT * FROM "staging_1"."prcl_prcl"
 
-SELECT * FROM "core"."parcel" --LIMIT 10
---WHERE "parcel_number" = '55200002122'
-WHERE "removed_flag" IS NOT NULL
-ORDER BY "parcel_number"
+INSERT INTO "staging_2"."prcl_bldgcom"
+SELECT * FROM "staging_1"."prcl_bldgcom"
 
-SELECT * FROM "core"."building" -- LIMIT 10
-WHERE "removed_flag" IS NOT NULL
+INSERT INTO "staging_2"."prcl_bldgres"
+SELECT * FROM "staging_1"."prcl_bldgres"
 
-SELECT * FROM "core"."unit" --LIMIT 10
-WHERE "removed_flag" IS NOT NULL
+INSERT INTO "staging_2"."prcl_bldgsect"
+SELECT * FROM "staging_1"."prcl_bldgsect"
 
---------RESET STUFF---------------
-UPDATE "core"."county_id_mapping_table"
-SET "removed_flag" = NULL
-WHERE "removed_flag" IS NOT NULL
+SELECT * FROM core.unit WHERE SUBSTRING(unit_id FROM 16 FOR 3) != '101'
+SELECT * FROM core.county_id_mapping_table WHERE SUBSTRING(parcel_id FROM 7 FOR 8) = '10082904'
 
-UPDATE "core"."parcel"
-SET "removed_flag" = NULL
-WHERE "removed_flag" IS NOT NULL
+DELETE FROM "staging_1"."prcl_bldgcom" AS com
+WHERE core.format_parcelId(com."CityBlock", com."Parcel", com."OwnerCode") = '39290000152'
 
-UPDATE "core"."building"
-SET "removed_flag" = NULL
-WHERE "removed_flag" IS NOT NULL
+DELETE FROM "staging_1"."prcl_bldgres" AS res
+WHERE core.format_parcelId(res."CityBlock", res."Parcel", res."OwnerCode") = '39290000152'
 
-UPDATE "core"."unit"
-SET "removed_flag" = NULL
-WHERE "removed_flag" IS NOT NULL
+DELETE FROM "staging_1"."prcl_bldgsect" as sect
+WHERE core.format_parcelId(sect."CityBlock", sect."Parcel", sect."OwnerCode") = '39290000152'
 
-DELETE FROM "staging_2"."dead_parcels"
-WHERE "ParcelId" IS NOT NULL
+DELETE FROM "staging_1"."prcl_prcl"
+WHERE "ParcelId" = '39290000152'
+
+SELECT * FROM "staging_1"."prcl_bldgsect" AS sect
+WHERE sect."CityBlock" = '101.0' AND sect."Parcel" = '10' AND sect."OwnerCode" = '0'
+
+SELECT * FROM "staging_1"."prcl_bldgsect" AS sect
+WHERE core.format_parcelId(sect."CityBlock", sect."Parcel", sect."OwnerCode") = '01230000100'
+
+INSERT INTO "staging_1"."prcl_bldgcom"
+SELECT '123.0', "Parcel", "OwnerCode", "BldgNum", "BldgCategory", "BldgType", "GroundFloorArea", "ComExtWallType", "ComStoriesCode", "YearBuilt", "ComConstType", "TotApts", "NbrOfAptsEff", "NbrOfApts1Br", "NbrOfApts2Br", "NbrOfApts3Br", "NbrOfAptsOther", "FirstDate", "LastDate", "LastUpDate"
+FROM "staging_1"."prcl_bldgcom" AS com
+WHERE com."CityBlock" = '101.0' AND com."Parcel" = '10' AND com."OwnerCode" = '0'
+
+INSERT INTO "staging_1"."prcl_bldgres"
+SELECT '123.0', "Parcel", "OwnerCode", "BldgNum", "ResOccType", "BsmtType", "BsmtFinishType", "BsmtAreaFinished", "BsmtAreaPartial", "ResExtWallType", "LivingAreaTotal", "LivingAreaAtGrade", "LivingAreaUpDown", "RoomArea", "ResStoriesCode", "FullBaths", "HalfBaths", "AirCondCentral", "AirCondWindow", "CentralHeating", "Attic", "Garage1", "Garage2", "Carport1", "Carport2", "YearBuilt", "ResModelCode", "ResModelAdjCode", "EffectiveYearBuilt", "FunctionalDep", "LocationalDep", "FirstDate", "LastDate", "LastUpDate"
+FROM "staging_1"."prcl_bldgres" AS res
+WHERE res."CityBlock" = '101.0' AND res."Parcel" = '10' AND res."OwnerCode" = '0'
+
+INSERT INTO "staging_1"."prcl_bldgsect"
+SELECT '123.0', "Parcel", "OwnerCode", "BldgNum", "SectNum", "SectCategory", "SectType", "FramingType", "ExcavType", "ExtWallType", "LevelFrom", "LevelTo", "StoryHeight", "Area", "FoundationType", "RoofType", "RoofConst1", "RoofConst2", "RoofConst3", "RoofConst4", "Heating", "AirCondCentral", "AirCondWindow", "Electricity", "FireProtection", "Elevator", "BsmtStoryHeight", "BsmtNbrOfStories", "BsmtAreaFinished", "BsmtAreaUnfin", "BsmtGarageArea", "FirstDate", "LastDate", "LastUpDate"
+FROM "staging_1"."prcl_bldgsect" AS sect
+WHERE sect."CityBlock" = '101.0' AND sect."Parcel" = '10' AND sect."OwnerCode" = '0'
+
+INSERT INTO "staging_1"."prcl_prcl"
+SELECT '123.0', "Parcel", "OwnerCode", "ParcelId", "PrimAddrRecNum", "AddrType", "LowAddrNum", "LowAddrSuf", "HighAddrNum", "HighAddrSuf", "NLC", "Parity", "StPreDir", "StName", "StType", "StSufDir", "StdUnitNum", "OwnerName", "OwnerName2", "OwnerAddr", "OwnerCity", "OwnerState", "OwnerCountry", "OwnerZIP", "OwnerRank", "LegalDesc1", "LegalDesc2", "LegalDesc3", "LegalDesc4", "LegalDesc5", "AsrClassCode", "AsrLandUse1", "AsrLanduse2", "RedevPhase", "RedevYearEnd", "RedevPhase2", "RedevYearEnd2", "VacantLot", "SpecBusDist", "SpecBusDist2", "TIFDist", "LendingAgcy", "Condominium", "NbrOfUnits", "NbrOfApts", "Frontage", "LandArea", "RecDailyDate", "RecDailyNum", "RecBookNum", "RecPageNum", "AsdLand", "AsdImprove", "AsdTotal", "BillLand", "BillImprove", "BillTotal", "AprLand", "CostAprImprove", "AsmtAppealYear", "AsmtAppealNum", "AsmtAppealType", "PriorAsdDate", "PriorAsdLand", "PriorAsdImprove", "PriorAsdTotal", "PriorTaxAmt", "CDALandUse1", "CDALandUse2", "LRMSUnitNum", "Zoning", "NbrOfBldgsRes", "NbrOfBldgsCom", "FirstYearBuilt", "LastYearBuilt", "ResSalePrice", "ResSaleDate", "VacBldgYear", "GeoCityBlockPart", "Ward10", "Precinct10", "InspArea10", "Ward00", "Precinct02", "Precinct04", "Nbrhd", "CDADist", "CDASubDist", "PoliceDist", "CensTract10", "CensBlock10", "CensBlock00", "Ward90", "Precinct90", "CensBlock90", "HouseConsDist", "AsrNbrhd", "EntZone", "ImpactArea", "CTDArea", "LeafArea", "ZIP", "OnFloodBlock", "SpecParcelType", "SubParcelType", "NbrOfSubAccts", "NbrOfCondos", "LRMSParcel", "AcctPrimary", "GisPrimary", "GisCityBLock", "GisParcel", "GisOwnerCode", "Handle", "Parcel9", "OwnerOcc", "FirstDate", "LastDate", "OwnerUpdate"
+FROM "staging_1"."prcl_prcl" 
+WHERE "ParcelId" = '01010000100'
+
+INSERT INTO "staging_1"."prcl_prcl"("CityBlock", "Parcel", "OwnerCode", "ParcelId", "PrimAddrRecNum", "AddrType", "LowAddrNum", "LowAddrSuf", "HighAddrNum", "HighAddrSuf", "NLC", "Parity", "StPreDir", "StName", "StType", "StSufDir", "StdUnitNum", "OwnerName", "OwnerName2", "OwnerAddr", "OwnerCity", "OwnerState", "OwnerCountry", "OwnerZIP", "OwnerRank", "LegalDesc1", "LegalDesc2", "LegalDesc3", "LegalDesc4", "LegalDesc5", "AsrClassCode", "AsrLandUse1", "AsrLanduse2", "RedevPhase", "RedevYearEnd", "RedevPhase2", "RedevYearEnd2", "VacantLot", "SpecBusDist", "SpecBusDist2", "TIFDist", "LendingAgcy", "Condominium", "NbrOfUnits", "NbrOfApts", "Frontage", "LandArea", "RecDailyDate", "RecDailyNum", "RecBookNum", "RecPageNum", "AsdLand", "AsdImprove", "AsdTotal", "BillLand", "BillImprove", "BillTotal", "AprLand", "CostAprImprove", "AsmtAppealYear", "AsmtAppealNum", "AsmtAppealType", "PriorAsdDate", "PriorAsdLand", "PriorAsdImprove", "PriorAsdTotal", "PriorTaxAmt", "CDALandUse1", "CDALandUse2", "LRMSUnitNum", "Zoning", "NbrOfBldgsRes", "NbrOfBldgsCom", "FirstYearBuilt", "LastYearBuilt", "ResSalePrice", "ResSaleDate", "VacBldgYear", "GeoCityBlockPart", "Ward10", "Precinct10", "InspArea10", "Ward00", "Precinct02", "Precinct04", "Nbrhd", "CDADist", "CDASubDist", "PoliceDist", "CensTract10", "CensBlock10", "CensBlock00", "Ward90", "Precinct90", "CensBlock90", "HouseConsDist", "AsrNbrhd", "EntZone", "ImpactArea", "CTDArea", "LeafArea", "ZIP", "OnFloodBlock", "SpecParcelType", "SubParcelType", "NbrOfSubAccts", "NbrOfCondos", "LRMSParcel", "AcctPrimary", "GisPrimary", "GisCityBLock", "GisParcel", "GisOwnerCode", "Handle", "Parcel9", "OwnerOcc", "FirstDate", "LastDate", "OwnerUpdate")
+SELECT '7700.0', '77', '7', '77000000777', "PrimAddrRecNum", "AddrType", "LowAddrNum", "LowAddrSuf", "HighAddrNum", "HighAddrSuf", "NLC", "Parity", "StPreDir", "StName", "StType", "StSufDir", "StdUnitNum", "OwnerName", "OwnerName2", "OwnerAddr", "OwnerCity", "OwnerState", "OwnerCountry", "OwnerZIP", "OwnerRank", "LegalDesc1", "LegalDesc2", "LegalDesc3", "LegalDesc4", "LegalDesc5", "AsrClassCode", "AsrLandUse1", "AsrLanduse2", "RedevPhase", "RedevYearEnd", "RedevPhase2", "RedevYearEnd2", "VacantLot", "SpecBusDist", "SpecBusDist2", "TIFDist", "LendingAgcy", "Condominium", "NbrOfUnits", "NbrOfApts", "Frontage", "LandArea", "RecDailyDate", "RecDailyNum", "RecBookNum", "RecPageNum", "AsdLand", "AsdImprove", "AsdTotal", "BillLand", "BillImprove", "BillTotal", "AprLand", "CostAprImprove", "AsmtAppealYear", "AsmtAppealNum", "AsmtAppealType", "PriorAsdDate", "PriorAsdLand", "PriorAsdImprove", "PriorAsdTotal", "PriorTaxAmt", "CDALandUse1", "CDALandUse2", "LRMSUnitNum", "Zoning", "NbrOfBldgsRes", "NbrOfBldgsCom", "FirstYearBuilt", "LastYearBuilt", "ResSalePrice", "ResSaleDate", "VacBldgYear", "GeoCityBlockPart", "Ward10", "Precinct10", "InspArea10", "Ward00", "Precinct02", "Precinct04", '777', "CDADist", "CDASubDist", "PoliceDist", "CensTract10", "CensBlock10", "CensBlock00", "Ward90", "Precinct90", "CensBlock90", "HouseConsDist", "AsrNbrhd", "EntZone", "ImpactArea", "CTDArea", "LeafArea", "ZIP", "OnFloodBlock", "SpecParcelType", "SubParcelType", "NbrOfSubAccts", "NbrOfCondos", "LRMSParcel", "AcctPrimary", "GisPrimary", "GisCityBLock", "GisParcel", "GisOwnerCode", "Handle", "Parcel9", "OwnerOcc", "FirstDate", "LastDate", "OwnerUpdate"
+FROM "staging_1"."prcl_prcl"
+WHERE "ParcelId" = '33000000100'
+
+------------START WITH EVERYTHING EMPTY---------------
+----INSERT NEWEST DATA FROM CITY INTO STAGING_1------(1)
+
+-------------COMPARE STAGING_1 TO STAGING_2----------(2)
+--insert new stuff into core
+--mark dead stuff in core 
+--------------WIPE STAGING 2 ------------------------(3)
+DELETE FROM "staging_2"."prcl_bldgcom"
+DELETE FROM "staging_2"."prcl_bldgres"
+DELETE FROM "staging_2"."prcl_bldgsect"
+DELETE FROM "staging_2"."prcl_prcl"
+--------------COPY STAGING 1 INTO STAGING 2----------(4)
+INSERT INTO "staging_2"."prcl_prcl"
+SELECT * FROM "staging_1"."prcl_prcl"
+
+INSERT INTO "staging_2"."prcl_bldgcom"
+SELECT * FROM "staging_1"."prcl_bldgcom"
+
+INSERT INTO "staging_2"."prcl_bldgres"
+SELECT * FROM "staging_1"."prcl_bldgres"
+
+INSERT INTO "staging_2"."prcl_bldgsect"
+SELECT * FROM "staging_1"."prcl_bldgsect"
+----------------WIPE STAGING 1-------------------------(5)
+DELETE FROM "staging_1"."prcl_bldgcom"
+DELETE FROM "staging_1"."prcl_bldgres"
+DELETE FROM "staging_1"."prcl_bldgsect"
+DELETE FROM "staging_1"."prcl_prcl"
+----------------GO BACK TO STEP (1)!----------------------
