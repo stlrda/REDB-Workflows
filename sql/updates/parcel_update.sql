@@ -1,5 +1,9 @@
 ------------------------------VIEW NECESSARY FOR INSERTING NEW PARCELS (potentially used in more places) --------------------------------
-CREATE VIEW staging_1.ID_TABLE_VIEW AS
+CREATE OR REPLACE FUNCTION core.new_parcel()
+RETURNS void AS $$
+BEGIN
+
+CREATE OR REPLACE VIEW staging_1.ID_TABLE_VIEW AS
 	(
 	SELECT "ParcelId", "legal_entity_id"
 	FROM (
@@ -24,17 +28,18 @@ CREATE VIEW staging_1.ID_TABLE_VIEW AS
         ON COALESCE("OwnerName", ' ') = COALESCE("legal_entity_name", ' ')
         AND COALESCE("OwnerName2", ' ') = COALESCE("legal_entity_secondary_name", ' ')
         AND ("legal_entity"."address_id" = "qry"."address_id")
-	)
+	);
+	
 ---------------NEW PARCELS (DEPENDANT ON THE ABOVE ID_TABLE_VIEW, COUNTY_ID_MAPPING_TABLE, LEGAL_ENTITY, ADDRESS, & NEIGHBORHOOD BEING UPDATED FIRST)-------------
 WITH NEW_REDB_IDS AS
 	(
 	WITH NEW_PARCEL_IDS AS
 		(
-		SELECT "staging_1"."prcl_prcl"."ParcelId"
-		FROM "staging_1"."prcl_prcl"
-		LEFT JOIN "staging_2"."prcl_prcl"
-		ON "staging_1"."prcl_prcl"."ParcelId" = "staging_2"."prcl_prcl"."ParcelId"
-		WHERE "staging_2"."prcl_prcl"."ParcelId" IS NULL
+		SELECT CURRENT_WEEK."ParcelId"
+		FROM "staging_1"."prcl_prcl" AS CURRENT_WEEK
+		LEFT JOIN "staging_2"."prcl_prcl" AS PREVIOUS_WEEK
+		ON CURRENT_WEEK."ParcelId" = PREVIOUS_WEEK."ParcelId"
+		WHERE PREVIOUS_WEEK."ParcelId" IS NULL
 		)
 	SELECT DISTINCT "county_id", "parcel_id", "county_parcel_id", "create_date", "current_flag", "removed_flag", "etl_job", "update_date"
 	FROM "core"."county_id_mapping_table"
@@ -101,18 +106,25 @@ JOIN NEW_REDB_IDS
 ON "prcl_prcl"."ParcelId" = NEW_REDB_IDS."county_parcel_id"
 JOIN "core"."neighborhood"
 ON "prcl_prcl"."Nbrhd" = "neighborhood"."neighborhood_name"
-)
+);
 
+END;
+$$
+LANGUAGE plpgsql;
 ----------------------------------FLAG DEAD PARCELS (DEPENDANT ON MAPPING_TABLE BEING UPDATED FIRST)------------------------------------
+CREATE OR REPLACE FUNCTION core.dead_parcel()
+RETURNS void AS $$
+BEGIN
+
 WITH REDB_PARCEL_IDS AS
 	(
 	WITH DEAD_PARCEL_IDS AS
 		(
-		SELECT staging_2.prcl_prcl."ParcelId"
-		FROM staging_2.prcl_prcl
-		LEFT JOIN staging_1."prcl_prcl"
-		ON staging_2.prcl_prcl."ParcelId" = staging_1."prcl_prcl"."ParcelId"
-		WHERE staging_1."prcl_prcl"."ParcelId" IS NULL
+		SELECT PREVIOUS_WEEK."ParcelId"
+		FROM "staging_2"."prcl_prcl" AS PREVIOUS_WEEK
+		LEFT JOIN "staging_1"."prcl_prcl" AS CURRENT_WEEK
+		ON PREVIOUS_WEEK."ParcelId" = CURRENT_WEEK."ParcelId"
+		WHERE CURRENT_WEEK."ParcelId" IS NULL
 		)
 	SELECT DISTINCT SUBSTRING("county_id_mapping_table"."parcel_id" FROM 1 FOR 14) AS redb_county_id
 	FROM "core"."county_id_mapping_table"
@@ -125,3 +137,7 @@ SET "removed_flag" = TRUE,
 	"update_date" = CURRENT_DATE
 FROM REDB_PARCEL_IDS
 WHERE "redb_county_id" = SUBSTRING("parcel"."parcel_id" FROM 1 FOR 14);
+
+END;
+$$
+LANGUAGE plpgsql;

@@ -1,4 +1,8 @@
 ----------------------------insert new legal entities----------------------------
+CREATE OR REPLACE FUNCTION core.new_legal_entity()
+RETURNS void AS $$
+BEGIN
+
 WITH NEW_LEGAL_ENTITIES AS
 	(
 	WITH LEGAL_ENTITY_CTE AS
@@ -59,8 +63,16 @@ SELECT "OwnerAddr"
 	, TRUE
 	, FALSE
 	, CURRENT_DATE
-FROM NEW_LEGAL_ENTITIES
+FROM NEW_LEGAL_ENTITIES;
+
+END;
+$$
+LANGUAGE plpgsql;
 --------------------------------------flag dead legal entities-------------------------------
+CREATE OR REPLACE FUNCTION core.dead_legal_entity()
+RETURNS void AS $$
+BEGIN
+
 WITH DEAD_LEGAL_ENTITIES AS
 	(
 	WITH CURRENT_LEGAL_ENTITIES AS
@@ -95,4 +107,8 @@ SET "removed_flag" = TRUE,
 	"current_flag" = FALSE,
 	"update_date" = CURRENT_DATE
 FROM DEAD_LEGAL_ENTITIES
-WHERE "legal_entity"."legal_entity_id" = DEAD_LEGAL_ENTITIES."legal_entity_id"
+WHERE "legal_entity"."legal_entity_id" = DEAD_LEGAL_ENTITIES."legal_entity_id";
+
+END;
+$$
+LANGUAGE plpgsql;

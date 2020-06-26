@@ -1,4 +1,8 @@
 --------------------------------------INSERT NEW UNITS INTO CORE-------------------------------------------------
+CREATE OR REPLACE FUNCTION core.new_unit()
+RETURNS void AS $$
+BEGIN
+
 WITH NEW_UNITS AS -- joins to our ID Lookup table to relate prcl_11 ID to parcelNumber found within the REDB unique ID 
 	(
 	WITH UNIT_TABLE AS -- joins on constructed prcl_11 ID to further narrow down to matching records from BldgSect table
@@ -88,7 +92,15 @@ JOIN "core"."building"
 ON "building"."building_id" = CONCAT(SUBSTRING(NEW_UNITS."parcel_id" FROM 1 FOR 15), (CAST (NEW_UNITS."BldgNum" AS INT) + 100), '.0000')
 );
 
+END;
+$$
+LANGUAGE plpgsql;
+
 ----------------------------------------MARK DEAD UNITS AS SUCH------------------------------------------------------------
+CREATE OR REPLACE FUNCTION core.dead_unit()
+RETURNS void AS $$
+BEGIN
+
 WITH DEAD_UNITS AS
 	(
 	WITH UNIT_TABLE AS -- joins on constructed prcl_11 ID to further narrow down to matching records from BldgSect table
@@ -156,4 +168,8 @@ SET "current_flag" = FALSE,
 	"removed_flag" = TRUE,
 	"update_date" = CURRENT_DATE
 FROM DEAD_UNITS
-WHERE "unit_id" = CONCAT(SUBSTRING(DEAD_UNITS."parcel_id" FROM 1 FOR 15), (CAST(DEAD_UNITS."BldgNum" AS INT) + 100), '.' , (CAST(DEAD_UNITS."SectNum" AS INT) + 1000))
+WHERE "unit_id" = CONCAT(SUBSTRING(DEAD_UNITS."parcel_id" FROM 1 FOR 15), (CAST(DEAD_UNITS."BldgNum" AS INT) + 100), '.' , (CAST(DEAD_UNITS."SectNum" AS INT) + 1000));
+
+END;
+$$
+LANGUAGE plpgsql;

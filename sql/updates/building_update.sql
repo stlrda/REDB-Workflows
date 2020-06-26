@@ -2,13 +2,17 @@
 -- Joins prcl_bcom & prcl_bres on our inner query to further narrow down the building list
 -- Join criteria is the ParcelId field which is constructed from CityBlock, Parcel and OwnerCode on the bcom & bres tables  
 ---------INSERT NEW BUILDINGS INTO BUILDING TABLE----------------------
+CREATE OR REPLACE FUNCTION core.new_building()
+RETURNS void AS $$
+BEGIN
+
 WITH NEW_BUILDINGS AS --Compares Current(staging_1) to past(staging_2) and selects returns the ParcelID of NEW building records.
 	(
 	WITH BUILDING_TABLE AS --joins results of BUILDING_RECORD on the bldgcom and bldgres tables further limiting scope
 		(
 		WITH BUILDING_RECORD AS --Selects records from prcl_prcl that meet our building criteria and returns NbrOfApts along with ParcelId
 			(
-			SELECT "prcl_prcl"."ParcelId", "NbrOfApts" 
+			SELECT "ParcelId", "NbrOfApts" 
 			FROM "staging_1"."prcl_prcl"
 			WHERE "Parcel" != "GisParcel" AND "OwnerCode" != '8'
 			)
@@ -60,7 +64,15 @@ INSERT INTO "core"."building" ("parcel_id"
 	ORDER BY 1, 2
 	);
 
+END;
+$$
+LANGUAGE plpgsql;
+
 -----------------DEAD BUILDINGS WITH BldgNum INCLUDED-------------------
+CREATE OR REPLACE FUNCTION core.dead_building()
+RETURNS void AS $$
+BEGIN
+
 WITH DEAD_BUILDINGS AS --Compares Current(staging_1) to past(staging_2) and selects returns the ParcelID of NEW building records.
 	(
 	WITH BUILDING_TABLE AS --joins results of BUILDING_RECORD on the bldgcom and bldgres tables further limiting scope
@@ -98,4 +110,8 @@ SET "removed_flag" = TRUE,
 	"current_flag" = FALSE,
 	"update_date" = CURRENT_DATE
 FROM DEAD_BUILDINGS
-WHERE CONCAT(SUBSTRING(DEAD_BUILDINGS."parcel_id" FROM 1 FOR 14), '.', CAST("BldgNum" AS INT) + 100) = SUBSTRING("building"."building_id" FROM 1 FOR 18)
+WHERE CONCAT(SUBSTRING(DEAD_BUILDINGS."parcel_id" FROM 1 FOR 14), '.', CAST("BldgNum" AS INT) + 100) = SUBSTRING("building"."building_id" FROM 1 FOR 18);
+
+END;
+$$
+LANGUAGE plpgsql;
