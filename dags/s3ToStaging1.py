@@ -10,7 +10,7 @@ from airflow.operators.python_operator import PythonOperator
 from airflow.hooks.base_hook import BaseHook
 
 # Custom
-sys.path.append("/usr/local/airflow")
+sys.path.append("/usr/local/airflow/dags/efs")
 from redb.scripts.mdb_to_postgres import main
 
 # Credentials for S3 Bucket

@@ -33,7 +33,7 @@ default_args = {
 # This DAG will execute each of the .sql scripts from the path specified in "template_searchpath"
 with DAG('InsertParcelTbl',
         default_args=default_args,
-        template_searchpath="/usr/local/airflow/dags/redb/sql/inserts/",
+        template_searchpath="/usr/local/airflow/dags/efs/redb/sql/inserts/",
         schedule_interval='@once',
         ) as dag:
     parcel = PostgresOperator(task_id="InsertParcelTbl", postgres_conn_id="redb_postgres", sql="parcel.sql", database=DATABASE_NAME)

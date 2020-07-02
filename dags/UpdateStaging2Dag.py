@@ -8,7 +8,7 @@ from airflow.operators.python_operator import PythonOperator
 from airflow.hooks.base_hook import BaseHook
 
 # Make python folder a module
-sys.path.append("/usr/local/airflow")
+sys.path.append("/usr/local/airflow/dags/efs")
 from redb.scripts.staging_2_functions import poulate_dead_parcels_table, copy_data
 
 # Connect to Amazon Aurora Postgres database using Airflow
@@ -57,3 +57,5 @@ copy_data = PythonOperator(
     },
     dag=dag
 )
+
+populate_dead_parcels_table >> copy_data
