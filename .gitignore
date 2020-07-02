@@ -2,7 +2,18 @@
 CreateConnections.py
 create_connections.py
 connections.json
+
+## Theo Local(?) ##
 InstallDependenciesLocal.py
+dags/CreateAddressTbl.py
+dags/CreateCountyTbl.py
+dags/CreateLegalEntityTbl.py
+dags/CreateNeighborhoodTbl.py
+scripts/Create_Address_Tbl.py
+scripts/Create_County_Tbl.py
+scripts/Create_LegalEntity_Tbl.py
+scripts/Create_Neighborhood_Tbl.py
+great_expectations
 
 # Files created upon Dockerization for Airflow testing environment (via Docker volume)
 airflow*
