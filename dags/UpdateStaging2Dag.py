@@ -27,7 +27,7 @@ default_args = {
 }
 
 dag = DAG(
-    "update_staging_2",
+    "UpdateStaging2",
     default_args=default_args,
     schedule_interval=timedelta(days=1)
 )
