@@ -40,7 +40,16 @@ SELECT "OwnerAddr"
 	, TRUE
 	, FALSE
 	, CURRENT_DATE
-FROM NEW_ADDRESS;
+FROM NEW_ADDRESS
+ON CONFLICT (COALESCE("street_address", 'NULL_ADDRESS')
+	, COALESCE("city", 'NULL_CITY')
+	, COALESCE("state", 'NULL_STATE')
+	, COALESCE("country", 'NULL_COUNTRY')
+	, COALESCE("zip", 'NULL_ZIP'))
+	DO UPDATE
+SET "current_flag" = TRUE
+	, "removed_flag" = FALSE
+	, "update_date" = CURRENT_DATE;
 
 END;
 $$
@@ -72,7 +81,8 @@ SET "current_flag" = FALSE
 	, "removed_flag" = TRUE
 	, "update_date" = CURRENT_DATE
 FROM DEAD_ADDRESS
-WHERE CONCAT(DEAD_ADDRESS."OwnerAddr", DEAD_ADDRESS."OwnerCity", DEAD_ADDRESS."OwnerState", DEAD_ADDRESS."OwnerCountry", DEAD_ADDRESS."OwnerZIP") = CONCAT("address"."street_address", "address"."city", "address"."state", "address"."country", "address"."zip");
+WHERE CONCAT(DEAD_ADDRESS."OwnerAddr", DEAD_ADDRESS."OwnerCity", DEAD_ADDRESS."OwnerState", DEAD_ADDRESS."OwnerCountry", DEAD_ADDRESS."OwnerZIP") 
+	= CONCAT("address"."street_address", "address"."city", "address"."state", "address"."country", "address"."zip");
 
 END;
 $$

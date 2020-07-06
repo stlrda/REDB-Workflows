@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS core.county (
 
 CREATE TABLE IF NOT EXISTS core.neighborhood (
     neighborhood_id SERIAL PRIMARY KEY
-    , neighborhood_name varchar
+    , neighborhood_name varchar UNIQUE
     , county_id varchar
     , create_date date
     , current_flag boolean
@@ -33,8 +33,8 @@ CREATE TABLE IF NOT EXISTS core.address (
 
 CREATE TABLE IF NOT EXISTS "core"."county_id_mapping_table" (
 	county_id varchar -- county_id
-	, parcel_id varchar -- REDB identifier
-	, county_parcel_id varchar -- The identifier the county uses
+	, parcel_id varchar PRIMARY KEY -- REDB identifier
+	, county_parcel_id varchar unique -- The identifier the county uses
 	, county_parcel_id_type varchar -- The name the county uses to refer to their identifier EG:'parcel_11'
 	, create_date date
 	, current_flag boolean
@@ -92,7 +92,6 @@ CREATE TABLE IF NOT EXISTS "core"."parcel" (
     , "etl_job" varchar -- NYI
     , "update_date" date -- NYI
 );
-
 
 -- Creates the table for assigning unique Building IDs.
 CREATE TABLE IF NOT EXISTS "core"."building" (

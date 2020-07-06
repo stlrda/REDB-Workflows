@@ -28,7 +28,11 @@ SELECT '10001'
     , TRUE
     , FALSE
     , CURRENT_DATE
-FROM NEW_PARCELS;
+FROM NEW_PARCELS
+ON CONFLICT ON CONSTRAINT UC_Mapping DO UPDATE
+SET "current_flag" = TRUE
+	, "removed_flag" = FALSE
+	, "update_date" = CURRENT_DATE;
 
 END;
 $$

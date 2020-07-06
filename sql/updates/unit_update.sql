@@ -41,7 +41,7 @@ WITH NEW_UNITS AS -- joins to our ID Lookup table to relate prcl_11 ID to parcel
 		ORDER BY (SELECT core.format_parcelId(prcl_bldgsect."CityBlock", prcl_bldgsect."Parcel", prcl_bldgsect."OwnerCode"))
 			, CAST("prcl_bldgsect"."BldgNum" AS INT)
 		)
-	SELECT "county_id_mapping_table"."parcel_id"
+	SELECT DISTINCT "county_id_mapping_table"."parcel_id"
 		, UNIT_TABLE."BldgNum"
 		, UNIT_TABLE."SectNum"
 		, UNIT_TABLE."Condominium"
@@ -90,7 +90,11 @@ INSERT INTO "core"."unit"(
 FROM NEW_UNITS
 JOIN "core"."building"
 ON "building"."building_id" = CONCAT(SUBSTRING(NEW_UNITS."parcel_id" FROM 1 FOR 15), (CAST (NEW_UNITS."BldgNum" AS INT) + 100), '.0000')
-);
+)
+ON CONFLICT ON CONSTRAINT unit_pkey DO UPDATE
+SET "current_flag" = TRUE
+, "removed_flag" = FALSE
+, "update_date" = CURRENT_DATE;
 
 END;
 $$
@@ -139,7 +143,7 @@ WITH DEAD_UNITS AS
 		ORDER BY (SELECT core.format_parcelId(prcl_bldgsect."CityBlock", prcl_bldgsect."Parcel", prcl_bldgsect."OwnerCode"))
 			, CAST("prcl_bldgsect"."BldgNum" AS INT)
 		)
-	SELECT "county_id_mapping_table"."parcel_id", UNIT_TABLE."BldgNum", UNIT_TABLE."SectNum", UNIT_TABLE."Condominium"
+	SELECT DISTINCT "county_id_mapping_table"."parcel_id", UNIT_TABLE."BldgNum", UNIT_TABLE."SectNum", UNIT_TABLE."Condominium"
 	FROM UNIT_TABLE
 	LEFT JOIN (SELECT UNION_BLDGS."ParcelId"
 					, UNION_BLDGS."BldgNum"

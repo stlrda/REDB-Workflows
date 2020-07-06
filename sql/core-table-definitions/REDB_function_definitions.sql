@@ -54,17 +54,20 @@ DELETE FROM "staging_1"."prcl_prcl";
 END;
 $$
 LANGUAGE plpgsql;
----------------------------------------------------------
+
+----Function for creating all the tables used in core and any constraints/indexes/sequences necessary for them to work------------
 CREATE OR REPLACE FUNCTION core.create_core_tables()
 RETURNS void AS $$
 BEGIN
 
+--Creates table for county IDs----------------------------------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS core.county (
     county_id varchar PRIMARY KEY
     , county_name varchar
     , county_state varchar
     );
 
+--Creates table for neighborhood IDs----------------------------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS core.neighborhood (
     neighborhood_id SERIAL PRIMARY KEY
     , neighborhood_name varchar
@@ -76,7 +79,11 @@ CREATE TABLE IF NOT EXISTS core.neighborhood (
     , update_date date
     );
 
--- Creates table for address ids which are uniquely assigned via the serial Primary Key "address_id"
+-- Neighborhood name should NEVER be null.  So a unique constraint should work.
+ALTER TABLE "core"."neighborhood"
+    ADD CONSTRAINT UC_Neighborhood UNIQUE ("neighborhood_name");
+
+--Creates table for address ids which are uniquely assigned via the serial Primary Key "address_id"-------------------------------
 CREATE TABLE IF NOT EXISTS core.address (
     address_id SERIAL PRIMARY KEY
     , street_address varchar
@@ -92,9 +99,17 @@ CREATE TABLE IF NOT EXISTS core.address (
     , update_date date
     );
 
+-- Unique Index is necessary to account for potential nulls in address fields.
+CREATE UNIQUE INDEX UI_Address ON "core"."address" (COALESCE("street_address", 'NULL_ADDRESS')
+, COALESCE("city", 'NULL_CITY')
+, COALESCE("state", 'NULL_STATE')
+, COALESCE("country", 'NULL_COUNTRY')
+, COALESCE("zip", 'NULL_ZIP'));
+
+--Creates the table and constraint for Mapping Parcel11 IDs to REDb IDs-----------------------------------------------------------
 CREATE TABLE IF NOT EXISTS "core"."county_id_mapping_table" (
 	county_id varchar -- county_id
-	, parcel_id varchar -- REDB identifier
+	, parcel_id varchar PRIMARY KEY -- REDB identifier
 	, county_parcel_id varchar -- The identifier the county uses
 	, county_parcel_id_type varchar -- The name the county uses to refer to their identifier EG:'parcel_11'
 	, create_date date
@@ -103,12 +118,17 @@ CREATE TABLE IF NOT EXISTS "core"."county_id_mapping_table" (
 	, etl_job varchar
 	, update_date date
 	);
-	
+
+-- county_parcel_id should NEVER be null so a constraint should work well enough
+ALTER TABLE "core"."county_id_mapping_table" 
+    ADD CONSTRAINT UC_Mapping UNIQUE (county_parcel_id);
+
 CREATE SEQUENCE IF NOT EXISTS core.id_mapping
 INCREMENT BY 1 
 START 10000001
-OWNED BY core.county_id_mapping_table."county_parcel_id"; --Owned By line just causes the sequence to be dropped if the column is dropped 
+OWNED BY core.county_id_mapping_table."county_parcel_id";
 
+--Creates the table and index for assigning unique Legal_Entity IDs.-------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS core.legal_entity (
     legal_entity_id SERIAL PRIMARY KEY
     , legal_entity_address varchar
@@ -122,6 +142,13 @@ CREATE TABLE IF NOT EXISTS core.legal_entity (
     , update_date date
     );
 
+--index necessary to account for potential nulls in fields needed to create legal entity
+CREATE UNIQUE INDEX UI_Legal_Entity ON "core"."legal_entity" (COALESCE("legal_entity_address", 'NULL_ADDRESS')
+, COALESCE("legal_entity_name", 'NULL_NAME_1')
+, COALESCE("legal_entity_secondary_name", 'NULL_NAME_2')
+, "address_id");
+
+--Creates the table for assigning unique Parcel IDs.----------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS "core"."parcel" (
     "parcel_id" varchar PRIMARY KEY -- CCCCCC.PPPPPPPP.000.0000 (county_id.parcel_number.building_number.unit_number)
     , "county_id" varchar -- County_Id 10001 because all the data is coming from one county at the moment but this needs to be more sophisticated down the line
@@ -154,8 +181,7 @@ CREATE TABLE IF NOT EXISTS "core"."parcel" (
     , "update_date" date -- NYI
 );
 
-
--- Creates the table for assigning unique Building IDs.
+--Creates the table for assigning unique Building IDs.--------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS "core"."building" (
     "parcel_id" varchar
 	, "building_id" varchar PRIMARY KEY -- CCCCCC.PPPPPPPP.BBB.0000 (county_id.parcel_number.building_number.unit_number)
@@ -169,6 +195,7 @@ CREATE TABLE IF NOT EXISTS "core"."building" (
 	, "update_date" date
 );
 
+--Creates the table for assigning unique Unit IDs.------------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS "core"."unit" (
     "unit_id" varchar PRIMARY KEY -- CCCCCC.PPPPPPPP.BBB.UUUU (county_id.parcel_number.building_number.unit_number)
 	, "building_id" varchar
@@ -180,6 +207,7 @@ CREATE TABLE IF NOT EXISTS "core"."unit" (
 	, "etl_job" varchar
 	, "update_date" date
 );
+
 END;
 $$
 LANGUAGE plpgsql;

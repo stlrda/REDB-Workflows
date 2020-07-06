@@ -16,7 +16,7 @@ CREATE OR REPLACE VIEW staging_1.ID_TABLE_VIEW AS
             , "OwnerState"
             , "OwnerCountry"
             , "OwnerZIP" 
-		FROM "staging_1"."prcl_prcl" AS P --TODO this table will need to be changed for prod
+		FROM "staging_1"."prcl_prcl" AS P
 		LEFT JOIN "core"."address" AS A
 			ON COALESCE("OwnerAddr", ' ') = COALESCE("street_address", ' ')
 			AND COALESCE("OwnerCity", ' ') = COALESCE("city", ' ') 
@@ -73,7 +73,7 @@ INSERT INTO "core"."parcel" ("parcel_id"
     , "etl_job"
     , "update_date"
     )
-(SELECT NEW_REDB_IDS."parcel_id"
+(SELECT DISTINCT NEW_REDB_IDS."parcel_id"
     , NEW_REDB_IDS."county_id"
     , "CityBlock"
     , SUBSTRING(NEW_REDB_IDS."parcel_id" FROM 7 FOR 8)
@@ -106,7 +106,11 @@ JOIN NEW_REDB_IDS
 ON "prcl_prcl"."ParcelId" = NEW_REDB_IDS."county_parcel_id"
 JOIN "core"."neighborhood"
 ON "prcl_prcl"."Nbrhd" = "neighborhood"."neighborhood_name"
-);
+)
+ON CONFLICT ON CONSTRAINT parcel_pkey DO UPDATE
+SET "current_flag" = TRUE
+	, "removed_flag" = FALSE
+	, "update_date" = CURRENT_DATE;
 
 END;
 $$

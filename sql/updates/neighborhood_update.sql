@@ -27,6 +27,10 @@ SELECT "Nbrhd"
 	, FALSE
 	, CURRENT_DATE
 FROM NEW_NEIGHBORHOODS
+ON CONFLICT ON CONSTRAINT UC_Neighborhood DO UPDATE
+SET "current_flag" = TRUE
+	, "removed_flag" = FALSE
+	, "update_date" = CURRENT_DATE;
 
 END;
 $$
