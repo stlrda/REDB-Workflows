@@ -1,19 +1,39 @@
-CREATE TABLE IF NOT EXISTS core.neighborhood (
-    neighborhood_id SERIAL PRIMARY KEY
-    , neighborhood_name varchar
-    , county_id varchar
-    , create_date date
-    , current_flag boolean
-    , removed_flag boolean
-    , etl_job varchar
-    , update_date date
-    );
+-------------------------Insert new Neighborhoods-------------------------
+CREATE OR REPLACE FUNCTION core.new_neighborhoods()
+RETURNS void AS $$
+BEGIN
 
--- Selects each unique neighborhood from prcl_prcl and assigns an ID to each one via Serial Primary Key
--- County ID is hard coded to match Sait Louis City County since there is only one county
--- admittidly this method was a bit obtuse.  Could have also just selected the value '10001'
-INSERT INTO core.neighborhood(neighborhood_name, county_id)  
-SELECT "prcl_prcl"."Nbrhd", (SELECT "county_id" FROM "core"."county" WHERE "county"."county_name" = 'Saint Louis City County') 
-FROM "staging_2"."prcl_prcl" 
-GROUP BY "Nbrhd" 
-ORDER BY "Nbrhd";
+WITH NEW_NEIGHBORHOODS AS
+	(
+	SELECT DISTINCT CURRENT_WEEK."Nbrhd"
+	FROM "staging_1"."prcl_prcl" AS CURRENT_WEEK
+	LEFT JOIN "staging_2"."prcl_prcl" AS PREVIOUS_WEEK
+	ON CURRENT_WEEK."Nbrhd" = PREVIOUS_WEEK."Nbrhd"
+	WHERE PREVIOUS_WEEK."Nbrhd" IS NULL
+	ORDER BY CURRENT_WEEK."Nbrhd"
+	)
+INSERT INTO "core"."neighborhood"("neighborhood_name"
+	, "county_id"
+	, "create_date"
+	, "current_flag"
+	, "removed_flag"
+	--, "etl_job"
+	, "update_date"
+	)
+SELECT "Nbrhd"
+	, '10001'
+	, CURRENT_DATE
+	, TRUE
+	, FALSE
+	, CURRENT_DATE
+FROM NEW_NEIGHBORHOODS
+ON CONFLICT ON CONSTRAINT UC_Neighborhood DO UPDATE
+SET "current_flag" = TRUE
+	, "removed_flag" = FALSE
+	, "update_date" = CURRENT_DATE;
+
+END;
+$$
+LANGUAGE plpgsql;
+-------------------------
+SELECT core.new_neighborhoods();
