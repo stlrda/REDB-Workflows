@@ -1,13 +1,1 @@
-CREATE TABLE IF NOT EXISTS core.county (
-    county_id varchar PRIMARY KEY
-    , county_name varchar
-    , county_state varchar
-    );
-
--- Our county table has a single entry which is hard coded in
-INSERT INTO core.county(county_id
-    , county_name
-    , county_state) 
-VALUES(10001
-    , 'Saint Louis City County'
-    , 'MO');
+SELECT history.add_county('Saint Louis City County', 'MO');
