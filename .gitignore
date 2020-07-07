@@ -11,6 +11,7 @@ scripts/Create_County_Tbl.py
 scripts/Create_LegalEntity_Tbl.py
 scripts/Create_Neighborhood_Tbl.py
 great_expectations
+sql/updates/test_environment_code.sql
 
 # Files created upon Dockerization for Airflow testing environment (via Docker volume)
 airflow*
