@@ -1,3 +1,14 @@
-DROP TABLE IF EXISTS core.countytest;
-CREATE TABLE IF NOT EXISTS core.countytest (county_id varchar PRIMARY KEY, county_name varchar, county_state varchar, create_date date, current_flag boolean, removed_flag boolean, etl_job varchar, update_date date);
-INSERT INTO core.countytest(county_id, county_name, county_state) VALUES(10001, 'Saint Louis City County', 'MO');
+CREATE TABLE IF NOT EXISTS "core"."special_parcel_type" (
+    special_parcel_type_code varchar
+    , special_parcel_type varchar
+);
+
+-- Creates and inserts values into the special_parcel_type lookup table.
+INSERT INTO "core"."special_parcel_type" (special_parcel_type_code, special_parcel_type) VALUES
+('C', 'Condo Master - Res/Mixed')
+, ('H', 'Highway ROW')
+, ('K', 'Condo Master - Non-Res')
+, ('R', 'Other ROW')
+, ('S', 'Special Account')
+, ('W', 'Water')
+, ('X', 'Non-parcel Area')

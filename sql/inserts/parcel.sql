@@ -1,52 +1,122 @@
 CREATE TABLE IF NOT EXISTS "core"."parcel" (
-    "parcel_id" PRIMARY KEY,
-    "county_id" varchar,
-    "city_block_number" varchar,
-    "parcel_number" varchar,
-    "parcel_taxing_status" varchar,
-    "primary_addresses_count" varchar,
-    "owner_id" varchar,
-    "description" varchar,
-    "frontage_to_street" int,
-    "land_area" int,
-    "zoning_class" varchar,
-    "ward" varchar,
-    "voting_precinct" varchar,
-    "inspection_area" varchar,
-    "neighborhood_id" varchar,
-    "police_district" varchar,
-    "census_tract" varchar,
-    "census_block" varchar,
-    "asr_neighborhood" varchar,
-    "special_parcel_type_code" varchar,
-    "sub_parcel_type_code" varchar,
-    "gis_city_block" varchar,
-    "gis_parcel" varchar,
-    "gis_owner_code" varchar,
-    "create_date" date,
-    "current_flag" boolean,
-    "removed_flag" boolean,
-    "etl_job" varchar,
-    "update_date" date
+    "parcel_id" varchar PRIMARY KEY -- CCCCCC.PPPPPPPP.000.0000 (county_id.parcel_number.building_number.unit_number)
+    , "county_id" varchar -- County_Id 10001 because all the data is coming from one county at the moment but this needs to be more sophisticated down the line
+    , "city_block_number" varchar -- prcl.CityBlock
+    , "parcel_number" varchar -- generated with a sequence starting at 10000001
+    --, "parcel_taxing_status" varchar -- May be coming from a different table don't know for now.
+    --, "primary_addresses_count" varchar -- DROP
+    , "owner_id" varchar -- core.legal_entity.legal_entity_id
+    , "description" varchar -- CONCAT(prcl.LegalDesc1,' ',prcl.LegalDesc2,' ',prcl.LegalDesc3,' ',prcl.LegalDesc4,' ',prcl.LegalDesc5)
+    , "frontage_to_street" int -- prcl.Frontage
+    , "land_area" int -- prcl.LandArea
+    , "zoning_class" varchar -- prcl.Zoning
+    , "ward" varchar -- prcl.Ward10
+    , "voting_precinct" varchar -- prcl.Precinct10
+    , "inspection_area" varchar -- prcl.InspArea10
+    , "neighborhood_id" varchar -- core.neighborhood.neighborhood_id
+    , "police_district" varchar -- prcl.PoliceDist
+    , "census_tract" varchar -- prcl.CensTract10
+    --, "census_block" varchar -- DROP
+    , "asr_neighborhood" varchar -- prcl.AsrNbrhd
+    , "special_parcel_type_code" varchar -- prcl.SpecParcelType
+    , "sub_parcel_type_code" varchar -- prcl.SubParcelType
+    , "gis_city_block" varchar -- prcl.GisCityBLock (That's Capital BL in BLock because the city data sucks)
+    , "gis_parcel" varchar --prcl.GisParcel
+    , "gis_owner_code" varchar --prcl.GisOwnerCode
+    , "create_date" date  -- NYI
+    , "current_flag" boolean -- NYI
+    , "removed_flag" boolean -- NYI
+    , "etl_job" varchar -- NYI
+    , "update_date" date -- NYI
 );
 
-CREATE SEQUENCE IF NOT EXISTS core.parcelID 
-INCREMENT BY 1 
-START 10000001
-OWNED BY core.parceltest.parcel_id;
-
-ALTER SEQUENCE core.parcelid RESTART;
-
-INSERT INTO "core"."parceltest" ("parcel_id", "county_id", "parcel_number") 
-SELECT (nextval('core.parcelid')), '10001', "prcl_Prcl"."Parcel" 
-FROM "staging_1"."prcl_Prcl";
-
-SELECT "CityBlock", "Parcel", "OwnerCode", "ParcelId", "OwnerName", "OwnerName2", "address_id", "OwnerAddr", "OwnerCity", "OwnerState", "OwnerCountry", "OwnerZIP" 
-FROM "staging_1"."prcl_Prcl" AS P
-LEFT JOIN "core"."addresstest" AS A
-	ON COALESCE("OwnerAddr", ' ') = COALESCE("street_address",' ')
-	AND COALESCE("OwnerCity", ' ') = COALESCE("city",' ') 
-	AND COALESCE("OwnerState", ' ') = COALESCE("state",' ')
-	AND COALESCE("OwnerCountry", ' ') = COALESCE("country",' ') 
-	AND COALESCE("OwnerZIP", ' ') = COALESCE("zip",' ')
-	ORDER BY address_id;
+-- ID_Table Common Table Expression maps ParclID from prcl_prcl source table to legal_entity_id 
+WITH ID_Table AS
+	(
+	SELECT "ParcelId", "legal_entity_id"
+	FROM (
+		SELECT "ParcelId"
+            , "OwnerName"
+            , "OwnerName2"
+            , "address_id"
+            , "OwnerAddr"
+            , "OwnerCity"
+            , "OwnerState"
+            , "OwnerCountry"
+            , "OwnerZIP" 
+		FROM "staging_2"."prcl_prcl" AS P
+		LEFT JOIN "core"."address" AS A
+			ON COALESCE("OwnerAddr", ' ') = COALESCE("street_address", ' ')
+			AND COALESCE("OwnerCity", ' ') = COALESCE("city", ' ') 
+			AND COALESCE("OwnerState", ' ') = COALESCE("state", ' ')
+			AND COALESCE("OwnerCountry", ' ') = COALESCE("country", ' ') 
+			AND COALESCE("OwnerZIP", ' ') = COALESCE("zip", ' ')
+		) qry
+	LEFT JOIN "core"."legal_entity"
+        ON COALESCE("OwnerName", ' ') = COALESCE("legal_entity_name", ' ')
+        AND COALESCE("OwnerName2", ' ') = COALESCE("legal_entity_secondary_name", ' ')
+        AND ("legal_entity"."address_id" = "qry"."address_id")
+	)
+INSERT INTO "core"."parcel" ("parcel_id"
+    , "county_id"
+    , "city_block_number"
+    , "parcel_number"
+    --, "parcel_taxing_status"
+    , "owner_id"
+    , "description"
+    , "frontage_to_street"
+    , "land_area"
+    , "zoning_class"
+    , "ward"
+    , "voting_precinct"
+    , "inspection_area"
+    , "neighborhood_id"
+    , "police_district"
+    , "census_tract"
+    , "asr_neighborhood"
+    , "special_parcel_type_code"
+    , "sub_parcel_type_code"
+    , "gis_city_block"
+    , "gis_parcel"
+    , "gis_owner_code"
+    --, "create_date"
+    --, "create_flag"
+    --, "removed_flag"
+    --, "etl_job"
+    --, "update_date"
+    )
+(SELECT "county_id_mapping_table"."parcel_id"
+    , "county_id_mapping_table"."county_id"
+    , "CityBlock"
+    , SUBSTRING("county_id_mapping_table"."parcel_id" FROM 7 FOR 8)
+    --, "parcel_taxing_status"
+    , ID_Table."legal_entity_id"
+    , CONCAT("LegalDesc1",' ',"LegalDesc2",' ',"LegalDesc3",' ',"LegalDesc4",' ',"LegalDesc5")
+    , CAST("Frontage" AS FLOAT)
+    , CAST("LandArea" AS INT)
+    , "Zoning"
+    , "Ward10"
+    , "Precinct10"
+    , "InspArea10"
+    , "neighborhood"."neighborhood_id"
+    , "PoliceDist"
+    , "CensTract10"
+    , "AsrNbrhd"
+    , "SpecParcelType"
+    , "SubParcelType"
+    , "GisCityBLock"
+    , "GisParcel"
+    , "GisOwnerCode"
+    --, "create_date"
+    --, "create_flag"
+    --, "removed_flag"
+    --, "etl_job"
+    --, "update_date"
+FROM "staging_2"."prcl_prcl"
+JOIN ID_Table 
+ON "prcl_prcl"."ParcelId" = ID_Table."ParcelId"
+JOIN "core"."county_id_mapping_table"
+ON "prcl_prcl"."ParcelId" = "county_id_mapping_table"."county_parcel_id"
+JOIN "core"."neighborhood"
+ON "prcl_prcl"."Nbrhd" = "neighborhood"."neighborhood_name"
+);

@@ -37,12 +37,12 @@ default_args = {
 }
 
 with DAG('s3ToStaging1',
-         default_args=default_args,
-         schedule_interval='@once',
-         ) as dag:
+        default_args=default_args,
+        schedule_interval='@once',
+        ) as dag:
     transfer_mdb = PythonOperator(task_id='TransferMDB',
-                               python_callable=main,
-                               op_kwargs={'bucket': BUCKET_NAME,
+                                    python_callable=main,
+                                    op_kwargs={'bucket': BUCKET_NAME,
                                         'aws_access_key_id': AWS_ACCESS_KEY_ID,
                                         'aws_secret_access_key': AWS_SECRET_ACCESS_KEY,
                                         'pg_database': DATABASE_NAME,
