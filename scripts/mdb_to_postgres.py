@@ -379,20 +379,12 @@ def main(**kwargs):
 
     for mdb in mdb_files_in_s3:
 
-        # ! Uncomment / comment and modify to specify a database.
-        if mdb != "prcl.mdb":
-            continue
-
         with tempfile.TemporaryDirectory() as tmp:
             path_to_database =  os.path.join(tmp, mdb)
             s3.download_file(s3.bucket_name, mdb, path_to_database)
 
             # Creates CSVs from tables.
             for table in get_tables(path_to_database):
-                
-                # ! Uncomment / comment and modify to specify a table.
-                # if table != "Prcl":
-                #     continue
 
                 columns = get_table_columns(table, path_to_database)
                 column_names = [column[0] for column in columns]
@@ -402,7 +394,7 @@ def main(**kwargs):
                 row = generate_rows(path_to_database, table=table, delimiter="|")
                 mdb_name = mdb[:-4] # name of Access database
                 table = mdb_name + "_" + table.lower() # prepends database name to table
-                csv_path = f"dags/redb/resources/{table}.csv"
+                csv_path = f"dags/efs/redb/resources/{table}.csv"
 
                 initialize_csv(table, columns, csv_path, limit=50_000)
 

@@ -8,7 +8,7 @@ import zipfile
 import boto3
 from botocore.exceptions import ClientError
 
-def unzip(bucket='redb-test'):
+def unzip(bucket='redb-workbucket'):
     
     s3_resource = boto3.resource('s3')
     s3_client = boto3.client('s3', aws_access_key_id=os.environ["AWS_ACCESS_KEY_ID"],
