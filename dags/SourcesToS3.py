@@ -19,7 +19,7 @@ AWS_SECRET_ACCESS_KEY = CONN.password
 
 default_args = {
     'owner': 'redb',
-    'start_date': datetime(2020, 4, 15, 3, 00, 00),
+    'start_date': dt.datetime(2020, 4, 15, 3, 00, 00),
     'concurrency': 1,
     'retries': 0,
     'catchup': False
