@@ -150,7 +150,7 @@ CREATE UNIQUE INDEX UI_Legal_Entity ON "core"."legal_entity" (COALESCE("legal_en
 
 --Creates the table for assigning unique Parcel IDs.----------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS "core"."parcel" (
-    "parcel_id" varchar PRIMARY KEY -- CCCCCC.PPPPPPPP.000.0000 (county_id.parcel_number.building_number.unit_number)
+    "parcel_id" varchar -- CCCCCC.PPPPPPPP.000.0000 (county_id.parcel_number.building_number.unit_number)
     , "county_id" varchar -- County_Id 10001 because all the data is coming from one county at the moment but this needs to be more sophisticated down the line
     , "city_block_number" varchar -- prcl.CityBlock
     , "parcel_number" varchar -- generated with a sequence starting at 10000001
@@ -180,6 +180,31 @@ CREATE TABLE IF NOT EXISTS "core"."parcel" (
     , "etl_job" varchar -- NYI
     , "update_date" date -- NYI
 );
+
+CREATE UNIQUE INDEX UI_Active_Parcel ON "core"."parcel"(parcel_id, current_flag) WHERE current_flag = TRUE;
+
+CREATE UNIQUE INDEX UI_Parcel ON "core"."parcel"(COALESCE("parcel_id", 'NULL')
+    , COALESCE("county_id", 'NULL')
+    , COALESCE("city_block_number", 'NULL')
+    , COALESCE("parcel_number", 'NULL')
+    , COALESCE("owner_id", 'NULL')
+    , COALESCE("description", 'NULL')
+    , COALESCE("frontage_to_street", 666)
+    , COALESCE("land_area", 666)
+    , COALESCE("zoning_class", 'NULL')
+    , COALESCE("ward", 'NULL')
+    , COALESCE("voting_precinct", 'NULL')
+    , COALESCE("inspection_area", 'NULL')
+    , COALESCE("neighborhood_id", 'NULL')
+    , COALESCE("police_district", 'NULL')
+    , COALESCE("census_tract", 'NULL')
+    , COALESCE("asr_neighborhood", 'NULL')
+    , COALESCE("special_parcel_type_code", 'NULL')
+    , COALESCE("sub_parcel_type_code", 'NULL')
+    , COALESCE("gis_city_block", 'NULL')
+    , COALESCE("gis_parcel", 'NULL')
+    , COALESCE("gis_owner_code", 'NULL')
+    );
 
 --Creates the table for assigning unique Building IDs.--------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS "core"."building" (
