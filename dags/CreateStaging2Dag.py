@@ -9,7 +9,7 @@ from airflow.operators.python_operator import PythonOperator
 from airflow.hooks.base_hook import BaseHook
 
 # Make python folder a module
-sys.path.append("/usr/local/airflow")
+sys.path.append("/usr/local/airflow/dags/efs")
 from redb.scripts.staging_2_functions import create_schema, create_tables, create_dead_parcels_table, create_dead_parcels_function
 
 
@@ -30,7 +30,7 @@ default_args = {
 
 
 dag = DAG(
-    "create_staging_2",
+    "CreateStaging2",
     default_args=default_args,
     schedule_interval=timedelta(days=1)
 )

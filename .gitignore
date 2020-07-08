@@ -2,6 +2,13 @@
 CreateConnections.py
 create_connections.py
 connections.json
+
+## Theo Local(?) ##
+InstallDependenciesLocal.py
+
+## Kevin Local ##
+sql/updates/test_environment_code.sql
+great_expectations
 dags/CreateAddressTbl.py
 dags/CreateCountyTbl.py
 dags/CreateLegalEntityTbl.py
@@ -10,8 +17,7 @@ scripts/Create_Address_Tbl.py
 scripts/Create_County_Tbl.py
 scripts/Create_LegalEntity_Tbl.py
 scripts/Create_Neighborhood_Tbl.py
-great_expectations
-sql/updates/test_environment_code.sql
+
 
 # Files created upon Dockerization for Airflow testing environment (via Docker volume)
 airflow*
