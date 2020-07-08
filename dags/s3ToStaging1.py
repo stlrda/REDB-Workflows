@@ -16,8 +16,8 @@ from redb.scripts.mdb_to_postgres import main
 # Credentials for S3 Bucket
 BUCKET_CONN = BaseHook.get_connection('redb-workbucket')
 BUCKET_NAME = BUCKET_CONN.conn_id
-AWS_ACCESS_KEY_ID = json.loads(BUCKET_CONN.extra)['aws_access_key_id']
-AWS_SECRET_ACCESS_KEY = json.loads(BUCKET_CONN.extra)['aws_secret_access_key']
+AWS_ACCESS_KEY_ID = CONN.login
+AWS_SECRET_ACCESS_KEY = CONN.password
 
 # Credentials for Database
 DATABASE_CONN = BaseHook.get_connection('redb_postgres')
