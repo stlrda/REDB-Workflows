@@ -1,7 +1,6 @@
 import os
 import sys
-from datetime import datetime, timedelta, date
-
+from datetime import datetime
 # Third Party
 from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
@@ -21,7 +20,7 @@ PORT = CONN.port
 
 default_args = {
     "owner": "airflow",
-    "start_date": date.today(),
+    "start_date": datetime(2020, 4, 15, 3, 00, 00),
     "concurrency": 1,
     "retries": 3
 }
@@ -29,7 +28,7 @@ default_args = {
 dag = DAG(
     "UpdateStaging2",
     default_args=default_args,
-    schedule_interval=timedelta(days=1)
+    schedule_interval='@once'
 )
 
 populate_dead_parcels_table = PythonOperator(

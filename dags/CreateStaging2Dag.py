@@ -1,7 +1,7 @@
 # Standard Library
 import os
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime
 
 # Third Party
 from airflow import DAG
@@ -39,7 +39,7 @@ op_kwargs = {
 dag = DAG(
     "CreateStaging2",
     default_args=default_args,
-    schedule_interval=timedelta(days=1)
+    schedule_interval='@once'
 )
 
 create_schema = PythonOperator(
