@@ -1,7 +1,6 @@
 # Standard Library
 import os
 import sys
-import json
 import datetime as dt
 
 # Third Party
@@ -15,8 +14,8 @@ from scripts.transfer_to_s3 import main
 
 CONN = BaseHook.get_connection('redb-workbucket')
 BUCKET = CONN.conn_id
-AWS_ACCESS_KEY_ID = json.loads(CONN.extra)['aws_access_key_id']
-AWS_SECRET_ACCESS_KEY = json.loads(CONN.extra)['aws_secret_access_key']
+AWS_ACCESS_KEY_ID = CONN.login
+AWS_SECRET_ACCESS_KEY = CONN.password
 
 default_args = {
     'owner': 'redb',
