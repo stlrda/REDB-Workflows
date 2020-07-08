@@ -11,7 +11,8 @@ from airflow.hooks.base_hook import BaseHook
 from airflow.operators.postgres_operator import PostgresOperator
 
 # Custom
-sys.path.append("/usr/local/airflow")
+#sys.path.append("/usr/local/airflow")
+# Unused?
 
 # Credentials for Database
 DATABASE_CONN = BaseHook.get_connection('redb_postgres')

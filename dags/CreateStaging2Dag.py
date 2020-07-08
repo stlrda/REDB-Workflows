@@ -9,8 +9,8 @@ from airflow.operators.python_operator import PythonOperator
 from airflow.hooks.base_hook import BaseHook
 
 # Make python folder a module
-sys.path.append("/usr/local/airflow/dags/efs")
-from redb.scripts.staging_2_functions import create_schema, create_tables, create_dead_parcels_table, create_dead_parcels_function
+sys.path.append("/usr/local/airflow/dags/efs/redb")
+from scripts.staging_2_functions import create_schema, create_tables, create_dead_parcels_table, create_dead_parcels_function
 
 
 # Connect to Amazon Aurora Postgres database using Airflow
@@ -28,6 +28,13 @@ default_args = {
     "retries": 3
 }
 
+op_kwargs = {
+    "database": BUCKET,
+    "host": HOST,
+    "username": LOGIN,
+    "password": PASSWORD,
+    "port": PORT
+}
 
 dag = DAG(
     "CreateStaging2",
@@ -38,52 +45,28 @@ dag = DAG(
 create_schema = PythonOperator(
     task_id="create_schema",
     python_callable=create_schema,
-    op_kwargs={
-        "database": BUCKET,
-        "host": HOST,
-        "username": LOGIN,
-        "password": PASSWORD,
-        "port": PORT
-    },
+    op_kwargs=op_kwargs,
     dag=dag
 )
 
 create_tables = PythonOperator(
     task_id="create_tables",
     python_callable=create_tables,
-    op_kwargs={
-        "database": BUCKET,
-        "host": HOST,
-        "username": LOGIN,
-        "password": PASSWORD,
-        "port": PORT
-    },
+    op_kwargs=op_kwargs,
     dag=dag
 )
 
 create_dead_parcels_table = PythonOperator(
     task_id="create_dead_parcels_table",
     python_callable=create_dead_parcels_table,
-    op_kwargs={
-        "database": BUCKET,
-        "host": HOST,
-        "username": LOGIN,
-        "password": PASSWORD,
-        "port": PORT
-    },
+    op_kwargs=op_kwargs,
     dag=dag
 )
 
 create_dead_parcels_function = PythonOperator(
     task_id="create_dead_parcels_function",
     python_callable=create_dead_parcels_function,
-    op_kwargs={
-        "database": BUCKET,
-        "host": HOST,
-        "username": LOGIN,
-        "password": PASSWORD,
-        "port": PORT
-    },
+    op_kwargs=op_kwargs,
     dag=dag
 )
 

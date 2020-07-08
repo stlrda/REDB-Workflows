@@ -11,7 +11,8 @@ from airflow.hooks.base_hook import BaseHook
 from airflow.operators.postgres_operator import PostgresOperator
 
 # Custom
-sys.path.append("/usr/local/airflow")
+# sys.path.append("/usr/local/airflow/dags/efs")
+# Nothing is being imported here?
 
 # Credentials for Database
 DATABASE_CONN = BaseHook.get_connection('redb_postgres')
@@ -32,9 +33,8 @@ default_args = {
 
 # This DAG will execute each of the .sql scripts from the path specified in "template_searchpath"
 with DAG('InsertCoreData',
-
         default_args=default_args,
-        template_searchpath="/usr/local/airflow/dags/redb/sql/inserts/",
+        template_searchpath="/usr/local/airflow/dags/efs/redb/sql/inserts/",
         schedule_interval='@once',
         ) as dag:
     address = PostgresOperator(task_id="address", postgres_conn_id="redb_postgres", sql="address.sql", database=DATABASE_NAME)
