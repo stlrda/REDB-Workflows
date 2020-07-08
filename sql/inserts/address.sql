@@ -58,5 +58,5 @@ INSERT INTO history.address
         WHERE CONCAT(ha.street_address, ha.city, ha.state, ha.country, ha.zip, ha.county_id) = CONCAT(oa.street_address, oa.city, oa.state, oa.country, oa.zip, oa.county_id)
         )
     RETURNING *;
-
+	
 COMMIT;
