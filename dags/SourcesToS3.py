@@ -29,9 +29,5 @@ with DAG('SourcesToS3',
         default_args=default_args,
         schedule_interval='@once',
         ) as dag:
-    transfer = PythonOperator(task_id='Transfer',
-                                python_callable=main,
-                                op_kwargs={'bucket': BUCKET,
-                                        'aws_access_key_id': AWS_ACCESS_KEY_ID,
-                                        'aws_secret_access_key': AWS_SECRET_ACCESS_KEY})
+    transfer = PythonOperator(task_id='Transfer', python_callable=main, op_kwargs={'bucket': BUCKET,'aws_access_key_id': AWS_ACCESS_KEY_ID,'aws_secret_access_key': AWS_SECRET_ACCESS_KEY})
 transfer
