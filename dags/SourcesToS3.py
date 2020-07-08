@@ -9,8 +9,8 @@ from airflow.operators.python_operator import PythonOperator
 from airflow.hooks.base_hook import BaseHook
 
 # Custom
-sys.path.append("/usr/local/airflow/dags/efs/redb")
-from scripts.transfer_to_s3 import main
+sys.path.append("/usr/local/airflow/dags/efs")
+from redb.scripts.transfer_to_s3 import main
 
 CONN = BaseHook.get_connection('redb-workbucket')
 BUCKET = CONN.conn_id
