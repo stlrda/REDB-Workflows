@@ -13,7 +13,7 @@ def main(**kwargs):
 
     DB.create_schema("core")
 
-    with open("/usr/local/airflow/dags/redb/sql/core-table-definitions/Interrim REDB Schema.sql", "r") as sql:
+    with open("/usr/local/airflow/dags/efs/redb/sql/core-table-definitions/Interrim REDB Schema.sql", "r") as sql:
         query = ""
         for line in sql:
             query += line

@@ -55,67 +55,62 @@ CREATE TABLE "unit" (
   "update_date" date
 );
 
-CREATE TABLE "legal_entity" (
-  "legal_entity_id" varchar PRIMARY KEY,
+CREATE TABLE history.legal_entity (
+  "legal_entity_id" SERIAL PRIMARY KEY,
   "legal_entity_name" varchar,
   "legal_entity_secondary_name" varchar,
   "address_id" varchar,
-  "create_date" date,
-  "current_flag" boolean,
-  "removed_flag" boolean,
+  "create_date" date DEFAULT NOW(),
+  "current_flag" boolean DEFAULT True,
+  "removed_flag" boolean DEFAULT False,
   "etl_job" varchar,
   "update_date" date
 );
 
-CREATE TABLE "address" (
-  "address_id" varchar PRIMARY KEY,
-  "street_number" varchar,
-  "street_name_prefix" varchar,
-  "street_name" varchar,
-  "street_name_suffix" varchar,
-  "secondary_designator" varchar,
+CREATE TABLE history.address (
+  "address_id" SERIAL PRIMARY KEY,
+  "street_address" varchar,
   "county_id" varchar,
   "city" varchar,
   "state" varchar,
   "country" varchar,
   "zip" varchar,
-  "create_date" date,
-  "current_flag" boolean,
-  "removed_flag" boolean,
+  "create_date" date DEFAULT NOW(),
+  "current_flag" boolean DEFAULT TRUE,
+  "removed_flag" boolean DEFAULT FALSE,
   "etl_job" varchar,
   "update_date" date
 );
 
-CREATE TABLE "county_id_mapping_table" (
-  "county_id" varchar,
+CREATE TABLE IF NOT EXISTS "county_id_mapping" (
+  "county_id" varchar NOT NULL,
   "parcel_id" varchar PRIMARY KEY,
   "county_parcel_id" varchar,
   "county_parcel_id_type" varchar,
-  "create_date" date,
-  "current_flag" boolean,
-  "removed_flag" boolean,
+  "create_date" date DEFAULT NOW(),
+  "current_flag" boolean DEFAULT TRUE,
+  "removed_flag" boolean DEFAULT FALSE,
   "etl_job" varchar,
   "update_date" date
 );
 
-CREATE TABLE "county" (
+CREATE TABLE IF NOT EXISTS history.county (
   "county_id" varchar PRIMARY KEY,
-  "county_name" varchar,
-  "county_state" varchar,
-  "create_date" date,
-  "current_flag" boolean,
-  "removed_flag" boolean,
+  "county_name" varchar NOT NULL,
+  "county_state" varchar NOT NULL,
+  "create_date" date DEFAULT NOW(),
   "etl_job" varchar,
-  "update_date" date
+  "update_date" date,
+  UNIQUE (county_name, county_state)
 );
 
-CREATE TABLE "neighborhood" (
-  "neighborhood_id" varchar PRIMARY KEY,
-  "neighborhood_name" varchar,
+CREATE TABLE IF NOT EXISTS history.neighborhood (
+  "neighborhood_id" SERIAL PRIMARY KEY,
+  "neighborhood_name" varchar UNIQUE,
   "county_id" varchar,
-  "create_date" date,
-  "current_flag" boolean,
-  "removed_flag" boolean,
+  "create_date" date DEFAULT NOW(),
+  "current_flag" boolean DEFAULT True,
+  "removed_flag" boolean DEFAULT False,
   "etl_job" varchar,
   "update_date" date
 );
