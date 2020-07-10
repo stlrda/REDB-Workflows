@@ -209,7 +209,7 @@ CREATE UNIQUE INDEX UI_Parcel ON "core"."parcel"(COALESCE("parcel_id", 'NULL')
 --Creates the table for assigning unique Building IDs.--------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS "core"."building" (
     "parcel_id" varchar
-	, "building_id" varchar PRIMARY KEY -- CCCCCC.PPPPPPPP.BBB.0000 (county_id.parcel_number.building_number.unit_number)
+	, "building_id" varchar -- CCCCCC.PPPPPPPP.BBB.0000 (county_id.parcel_number.building_number.unit_number)
 	, "owner_id" varchar
 	, "description" varchar
 	, "apartment_count" int
@@ -220,6 +220,13 @@ CREATE TABLE IF NOT EXISTS "core"."building" (
 	, "update_date" date
 );
 
+CREATE UNIQUE INDEX UI_Building ON "core"."building"(COALESCE("parcel_id", 'NULL')
+	, COALESCE("building_id", 'NULL')
+	, COALESCE("owner_id", 'NULL')
+	, COALESCE("description", 'NULL')
+	, COALESCE("apartment_count", '777')
+	);
+	
 --Creates the table for assigning unique Unit IDs.------------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS "core"."unit" (
     "unit_id" varchar PRIMARY KEY -- CCCCCC.PPPPPPPP.BBB.UUUU (county_id.parcel_number.building_number.unit_number)
