@@ -1,7 +1,8 @@
 CREATE TABLE IF NOT EXISTS core.county (
     county_id varchar PRIMARY KEY
-    , county_name varchar
-    , county_state varchar
+    , county_name varchar NOT NULL
+    , county_state varchar NOT NULL
+    , UNIQUE (county_name, county_state)
     );
 
 CREATE TABLE IF NOT EXISTS core.neighborhood (
@@ -17,19 +18,20 @@ CREATE TABLE IF NOT EXISTS core.neighborhood (
 
 -- Creates table for address ids which are uniquely assigned via the serial Primary Key "address_id"
 CREATE TABLE IF NOT EXISTS core.address (
-    address_id SERIAL PRIMARY KEY
-    , street_address varchar
-    , county_id varchar
-    , city varchar
-    , state varchar
-    , country varchar
-    , zip varchar
-    , create_date date
-    , current_flag boolean
-    , removed_flag boolean
-    , etl_job varchar
-    , update_date date
-    );
+  "address_id" SERIAL PRIMARY KEY,
+  "street_address" varchar DEFAULT '',
+  "county_id" varchar NOT NULL,
+  "city" varchar DEFAULT '',
+  "state" varchar DEFAULT '',
+  "country" varchar DEFAULT '',
+  "zip" varchar DEFAULT '',
+  "create_date" date DEFAULT NOW(),
+  "current_flag" boolean DEFAULT TRUE,
+  "removed_flag" boolean DEFAULT FALSE,
+  "etl_job" varchar,
+  "update_date" date,
+  UNIQUE ("street_address", "county_id", "city", "state", "country", "zip")
+);
 
 CREATE TABLE IF NOT EXISTS "core"."county_id_mapping_table" (
 	county_id varchar -- county_id
@@ -61,9 +63,11 @@ CREATE TABLE IF NOT EXISTS core.legal_entity (
     , update_date date
     );
 
+
 CREATE TABLE IF NOT EXISTS "core"."parcel" (
     "parcel_id" varchar PRIMARY KEY -- CCCCCC.PPPPPPPP.000.0000 (county_id.parcel_number.building_number.unit_number)
     , "county_id" varchar -- County_Id 10001 because all the data is coming from one county at the moment but this needs to be more sophisticated down the line
+    , "address_id" bigint
     , "city_block_number" varchar -- prcl.CityBlock
     , "parcel_number" varchar -- generated with a sequence starting at 10000001
     --, "parcel_taxing_status" varchar -- May be coming from a different table don't know for now.
@@ -86,9 +90,9 @@ CREATE TABLE IF NOT EXISTS "core"."parcel" (
     , "gis_city_block" varchar -- prcl.GisCityBLock (That's Capital BL in BLock because the city data sucks)
     , "gis_parcel" varchar --prcl.GisParcel
     , "gis_owner_code" varchar --prcl.GisOwnerCode
-    , "create_date" date  -- NYI
-    , "current_flag" boolean -- NYI
-    , "removed_flag" boolean -- NYI
+    , "create_date" date DEFAULT NOW()-- NYI
+    , "current_flag" boolean DEFAULT TRUE-- NYI
+    , "removed_flag" boolean DEFAULT FALSE-- NYI
     , "etl_job" varchar -- NYI
     , "update_date" date -- NYI
 );

@@ -34,7 +34,7 @@ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION history.format_parcel_address
 (
-	IN _row staging_1_2.prcl_prcl
+	IN _row staging_1.prcl_prcl
 )
 RETURNS text AS
 $BODY$
