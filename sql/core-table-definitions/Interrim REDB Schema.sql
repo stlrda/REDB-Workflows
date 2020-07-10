@@ -57,9 +57,9 @@ CREATE TABLE "unit" (
 
 CREATE TABLE history.legal_entity (
   "legal_entity_id" SERIAL PRIMARY KEY,
-  "legal_entity_name" varchar,
-  "legal_entity_secondary_name" varchar,
-  "address_id" varchar,
+  "legal_entity_name" varchar NOT NULL,
+  "legal_entity_secondary_name" varchar DEFAULT '',
+  "address_id" varchar NOT NULL,
   "create_date" date DEFAULT NOW(),
   "current_flag" boolean DEFAULT True,
   "removed_flag" boolean DEFAULT False,
@@ -67,22 +67,23 @@ CREATE TABLE history.legal_entity (
   "update_date" date
 );
 
-CREATE TABLE history.address (
+CREATE TABLE IF NOT EXISTS history.address (
   "address_id" SERIAL PRIMARY KEY,
-  "street_address" varchar,
-  "county_id" varchar,
-  "city" varchar,
-  "state" varchar,
-  "country" varchar,
-  "zip" varchar,
+  "street_address" varchar DEFAULT '',
+  "county_id" varchar NOT NULL,
+  "city" varchar DEFAULT '',
+  "state" varchar DEFAULT '',
+  "country" varchar DEFAULT '',
+  "zip" varchar DEFAULT '',
   "create_date" date DEFAULT NOW(),
   "current_flag" boolean DEFAULT TRUE,
   "removed_flag" boolean DEFAULT FALSE,
   "etl_job" varchar,
-  "update_date" date
+  "update_date" date,
+  UNIQUE ("street_address", "county_id", "city", "state", "country", "zip")
 );
 
-CREATE TABLE IF NOT EXISTS "county_id_mapping" (
+CREATE TABLE IF NOT EXISTS history."county_id_mapping" (
   "county_id" varchar NOT NULL,
   "parcel_id" varchar PRIMARY KEY,
   "county_parcel_id" varchar,
@@ -106,13 +107,14 @@ CREATE TABLE IF NOT EXISTS history.county (
 
 CREATE TABLE IF NOT EXISTS history.neighborhood (
   "neighborhood_id" SERIAL PRIMARY KEY,
-  "neighborhood_name" varchar UNIQUE,
+  "neighborhood_name" varchar,
   "county_id" varchar,
   "create_date" date DEFAULT NOW(),
   "current_flag" boolean DEFAULT True,
   "removed_flag" boolean DEFAULT False,
   "etl_job" varchar,
-  "update_date" date
+  "update_date" date,
+  UNIQUE ("neighborhood_name", "current_flag")
 );
 
 CREATE TABLE "sub_parcel_type" (
