@@ -62,11 +62,7 @@ INSERT INTO "core"."building" ("parcel_id"
 	JOIN "core"."parcel"
 	ON CONCAT("parcel"."county_id", '.', "parcel"."parcel_number") = SUBSTRING("county_id_mapping_table"."parcel_id" FROM 1 FOR 14)
 	ORDER BY 1, 2
-	)
-ON CONFLICT ON CONSTRAINT building_pkey DO UPDATE
-SET "current_flag" = TRUE
-, "removed_flag" = FALSE
-, "update_date" = CURRENT_DATE;
+	);
 
 END;
 $$

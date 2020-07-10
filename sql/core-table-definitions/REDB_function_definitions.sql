@@ -1,60 +1,3 @@
-CREATE OR REPLACE FUNCTION core.format_parcelId
-	(
-		IN CityBlock varchar(1000)
-		,IN Parcel varchar(1000)
-		,IN OwnerCode varchar(1000)
-	)
-RETURNS text AS
-$BODY$
-DECLARE
-	ParcelId varchar;
-BEGIN
-
---ParcelId := replace(replace(concat(to_char(CityBlock::float8,'0000.00'),to_char(Parcel::int8,'0000'),OwnerCode),'.',''),' ','');
-ParcelId := (concat(to_char(CityBlock::float8,'0000.00'),to_char(Parcel::int8,'0000'),OwnerCode));
-ParcelId := replace((ParcelId), '.', '');
-ParcelId := replace((ParcelId), ' ', '');
-
-RETURN ParcelId;
-
-END
-$BODY$
-LANGUAGE plpgsql;
-
----------------------------------------------------------
-CREATE OR REPLACE FUNCTION core.staging1_to_staging2()
-RETURNS void AS $$
-BEGIN
-
---Clear staging_2
-DELETE FROM "staging_2"."prcl_bldgcom";
-DELETE FROM "staging_2"."prcl_bldgres";
-DELETE FROM "staging_2"."prcl_bldgsect";
-DELETE FROM "staging_2"."prcl_prcl";
-
---Move data from staging_1 to staging_2
-INSERT INTO "staging_2"."prcl_prcl"
-SELECT * FROM "staging_1"."prcl_prcl";
-
-INSERT INTO "staging_2"."prcl_bldgcom"
-SELECT * FROM "staging_1"."prcl_bldgcom";
-
-INSERT INTO "staging_2"."prcl_bldgres"
-SELECT * FROM "staging_1"."prcl_bldgres";
-
-INSERT INTO "staging_2"."prcl_bldgsect"
-SELECT * FROM "staging_1"."prcl_bldgsect";
-
---Clear staging_1
-DELETE FROM "staging_1"."prcl_bldgcom";
-DELETE FROM "staging_1"."prcl_bldgres";
-DELETE FROM "staging_1"."prcl_bldgsect";
-DELETE FROM "staging_1"."prcl_prcl";
-
-END;
-$$
-LANGUAGE plpgsql;
-
 ----Function for creating all the tables used in core and any constraints/indexes/sequences necessary for them to work------------
 CREATE OR REPLACE FUNCTION core.create_core_tables()
 RETURNS void AS $$
@@ -100,11 +43,8 @@ CREATE TABLE IF NOT EXISTS core.address (
     );
 
 -- Unique Index is necessary to account for potential nulls in address fields.
-CREATE UNIQUE INDEX UI_Address ON "core"."address" (COALESCE("street_address", 'NULL_ADDRESS')
-, COALESCE("city", 'NULL_CITY')
-, COALESCE("state", 'NULL_STATE')
-, COALESCE("country", 'NULL_COUNTRY')
-, COALESCE("zip", 'NULL_ZIP'));
+ALTER TABLE "core"."address" 
+    ADD CONSTRAINT UC_Address UNIQUE ("street_address", "city", "state", "country", "zip");
 
 --Creates the table and constraint for Mapping Parcel11 IDs to REDb IDs-----------------------------------------------------------
 CREATE TABLE IF NOT EXISTS "core"."county_id_mapping_table" (
@@ -244,6 +184,64 @@ END;
 $$
 LANGUAGE plpgsql;
 
+---------------------------------------------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION core.format_parcelId
+	(
+		IN CityBlock varchar(1000)
+		,IN Parcel varchar(1000)
+		,IN OwnerCode varchar(1000)
+	)
+RETURNS text AS
+$BODY$
+DECLARE
+	ParcelId varchar;
+BEGIN
+
+--ParcelId := replace(replace(concat(to_char(CityBlock::float8,'0000.00'),to_char(Parcel::int8,'0000'),OwnerCode),'.',''),' ','');
+ParcelId := (concat(to_char(CityBlock::float8,'0000.00'),to_char(Parcel::int8,'0000'),OwnerCode));
+ParcelId := replace((ParcelId), '.', '');
+ParcelId := replace((ParcelId), ' ', '');
+
+RETURN ParcelId;
+
+END
+$BODY$
+LANGUAGE plpgsql;
+
+---------------------------------------------------------
+CREATE OR REPLACE FUNCTION core.staging1_to_staging2()
+RETURNS void AS $$
+BEGIN
+
+--Clear staging_2
+DELETE FROM "staging_2"."prcl_bldgcom";
+DELETE FROM "staging_2"."prcl_bldgres";
+DELETE FROM "staging_2"."prcl_bldgsect";
+DELETE FROM "staging_2"."prcl_prcl";
+
+--Move data from staging_1 to staging_2
+INSERT INTO "staging_2"."prcl_prcl"
+SELECT * FROM "staging_1"."prcl_prcl";
+
+INSERT INTO "staging_2"."prcl_bldgcom"
+SELECT * FROM "staging_1"."prcl_bldgcom";
+
+INSERT INTO "staging_2"."prcl_bldgres"
+SELECT * FROM "staging_1"."prcl_bldgres";
+
+INSERT INTO "staging_2"."prcl_bldgsect"
+SELECT * FROM "staging_1"."prcl_bldgsect";
+
+--Clear staging_1
+DELETE FROM "staging_1"."prcl_bldgcom";
+DELETE FROM "staging_1"."prcl_bldgres";
+DELETE FROM "staging_1"."prcl_bldgsect";
+DELETE FROM "staging_1"."prcl_prcl";
+
+END;
+$$
+LANGUAGE plpgsql;
+
 -------------------------------------------------------------------
 CREATE OR REPLACE FUNCTION core.insert_week1_to_staging1()
 RETURNS void AS $$
@@ -342,16 +340,16 @@ BEGIN
     RETURN QUERY
         INSERT INTO "core"."county"
 		(
-		    "county_id"
+            "county_id"
 			,"county_name"
 			,"county_state"
 		)
         VALUES
-             (
+            (
                 aCounty_id
                 ,name
                 ,state
-             )
+            )
 	    RETURNING *;
 END
 $BODY$
