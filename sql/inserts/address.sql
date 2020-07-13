@@ -33,7 +33,12 @@ BEGIN
             WHERE ca.street_address = fa.street_address
                 AND ca.current_flag = True
             )
-            ON CONFLICT ON CONSTRAINT UC_Address DO UPDATE
+            ON CONFLICT (COALESCE("street_address", 'NULL')
+                , COALESCE("city", 'NULL')
+                , COALESCE("state", 'NULL')
+                , COALESCE("country", 'NULL')
+                , COALESCE("zip", 'NULL'))
+                DO UPDATE
                 SET "current_flag" = TRUE
                     , "removed_flag" = FALSE
                     , "update_date" = CURRENT_DATE;
@@ -69,7 +74,12 @@ BEGIN
             WHERE CONCAT(ca.street_address, ca.city, ca.state, ca.country, ca.zip, ca.county_id) = CONCAT(oa.street_address, oa.city, oa.state, oa.country, oa.zip, oa.county_id)
                 AND ca.current_flag = True
             )
-            ON CONFLICT ON CONSTRAINT UC_Address DO UPDATE
+            ON CONFLICT (COALESCE("street_address", 'NULL')
+                , COALESCE("city", 'NULL')
+                , COALESCE("state", 'NULL')
+                , COALESCE("country", 'NULL')
+                , COALESCE("zip", 'NULL'))
+                DO UPDATE
                 SET "current_flag" = TRUE
                     , "removed_flag" = FALSE
                     , "update_date" = CURRENT_DATE;

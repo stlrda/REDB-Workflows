@@ -62,4 +62,4 @@ END;
 $$
 LANGUAGE plpgsql;
 -------------------------
-SELECT new_legal_entity();
+SELECT core.new_legal_entity();

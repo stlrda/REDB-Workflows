@@ -43,8 +43,12 @@ CREATE TABLE IF NOT EXISTS core.address (
     );
 
 -- Unique Index is necessary to account for potential nulls in address fields.
-ALTER TABLE "core"."address" 
-    ADD CONSTRAINT UC_Address UNIQUE ("street_address", "city", "state", "country", "zip");
+CREATE UNIQUE INDEX UI_Address ON "core"."address"(COALESCE("street_address", 'NULL')
+	, COALESCE("city", 'NULL')
+    , COALESCE("state", 'NULL')
+    , COALESCE("country", 'NULL')
+    , COALESCE("zip", 'NULL')
+	);
 
 --Creates the table and constraint for Mapping Parcel11 IDs to REDb IDs-----------------------------------------------------------
 CREATE TABLE IF NOT EXISTS "core"."county_id_mapping_table" (
@@ -92,6 +96,7 @@ CREATE UNIQUE INDEX UI_Legal_Entity ON "core"."legal_entity" (COALESCE("legal_en
 CREATE TABLE IF NOT EXISTS "core"."parcel" (
     "parcel_id" varchar -- CCCCCC.PPPPPPPP.000.0000 (county_id.parcel_number.building_number.unit_number)
     , "county_id" varchar -- County_Id 10001 because all the data is coming from one county at the moment but this needs to be more sophisticated down the line
+	, "address_id" BIGINT
     , "city_block_number" varchar -- prcl.CityBlock
     , "parcel_number" varchar -- generated with a sequence starting at 10000001
     --, "parcel_taxing_status" varchar -- May be coming from a different table don't know for now.
@@ -159,6 +164,8 @@ CREATE TABLE IF NOT EXISTS "core"."building" (
 	, "etl_job" varchar
 	, "update_date" date
 );
+
+CREATE UNIQUE INDEX UI_Active_Building ON "core"."building"(building_id, current_flag) WHERE current_flag = TRUE;
 
 CREATE UNIQUE INDEX UI_Building ON "core"."building"(COALESCE("parcel_id", 'NULL')
 	, COALESCE("building_id", 'NULL')
@@ -339,18 +346,18 @@ BEGIN
 
     RETURN QUERY
         INSERT INTO "core"."county"
-		(
+        (
             "county_id"
-			,"county_name"
-			,"county_state"
-		)
+            ,"county_name"
+            ,"county_state"
+        )
         VALUES
             (
                 aCounty_id
                 ,name
                 ,state
             )
-	    RETURNING *;
+        RETURNING *;
 END
 $BODY$
 LANGUAGE plpgsql;
