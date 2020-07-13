@@ -22,7 +22,7 @@ CREATE OR REPLACE VIEW staging_1.ID_TABLE_VIEW AS
 			AND COALESCE("OwnerCity", ' ') = COALESCE("city", ' ') 
 			AND COALESCE("OwnerState", ' ') = COALESCE("state", ' ')
 			AND COALESCE("OwnerCountry", ' ') = COALESCE("country", ' ') 
-			AND COALESCE("OwnerZIP", ' ') = COALESCE("zip", ' ')
+			AND COALESCE("OwnerZIP", ' ') = COALESCE(A."zip", ' ')
 		) qry
 	LEFT JOIN "core"."legal_entity"
         ON COALESCE("OwnerName", ' ') = COALESCE("legal_entity_name", ' ')
@@ -50,6 +50,15 @@ CREATE OR REPLACE VIEW staging_1.NEW_REDB_IDS AS
                 AND COALESCE(CURRENT_WEEK."OwnerState", 'NULL') = COALESCE(PREVIOUS_WEEK."OwnerState", 'NULL')
                 AND COALESCE(CURRENT_WEEK."OwnerCountry", 'NULL') = COALESCE(PREVIOUS_WEEK."OwnerCountry", 'NULL')
                 AND COALESCE(CURRENT_WEEK."OwnerZIP", 'NULL') = COALESCE(PREVIOUS_WEEK."OwnerZIP", 'NULL')
+			    ---- Parcel Addresses
+                AND COALESCE(CURRENT_WEEK."LowAddrNum", 'NULL') = COALESCE(PREVIOUS_WEEK."LowAddrNum", 'NULL')
+			    AND COALESCE(CURRENT_WEEK."HighAddrNum", 'NULL') = COALESCE(PREVIOUS_WEEK."HighAddrNum", 'NULL')
+			    AND COALESCE(CURRENT_WEEK."StPreDir", 'NULL') = COALESCE(PREVIOUS_WEEK."StPreDir", 'NULL')
+			    AND COALESCE(CURRENT_WEEK."StName", 'NULL') = COALESCE(PREVIOUS_WEEK."StName", 'NULL')
+			    AND COALESCE(CURRENT_WEEK."StType", 'NULL') = COALESCE(PREVIOUS_WEEK."StType", 'NULL')
+                AND COALESCE(CURRENT_WEEK."LowAddrSuf", 'NULL') = COALESCE(PREVIOUS_WEEK."LowAddrSuf", 'NULL')
+                AND COALESCE(CURRENT_WEEK."HighAddrSuf", 'NULL') = COALESCE(PREVIOUS_WEEK."HighAddrSuf", 'NULL')
+                AND COALESCE(CURRENT_WEEK."ZIP", 'NULL') = COALESCE(PREVIOUS_WEEK."ZIP", 'NULL')
                 --Used for parcel Table
 				AND COALESCE(CURRENT_WEEK."CityBlock", 'NULL') = COALESCE(PREVIOUS_WEEK."CityBlock", 'NULL')
                 AND COALESCE(CURRENT_WEEK."LegalDesc1", 'NULL') = COALESCE(PREVIOUS_WEEK."LegalDesc1", 'NULL')
@@ -79,6 +88,33 @@ CREATE OR REPLACE VIEW staging_1.NEW_REDB_IDS AS
 	JOIN NEW_PARCEL_IDS
 	ON NEW_PARCEL_IDS."ParcelId" = "county_id_mapping_table"."county_parcel_id"
 	);
+
+CREATE OR REPLACE VIEW staging_1.parcel_addresses AS
+	(
+	SELECT "ParcelId", "legal_entity_id"
+	FROM (
+		SELECT "ParcelId"
+            , "OwnerName"
+            , "OwnerName2"
+            , "address_id"
+            , "OwnerAddr"
+            , "OwnerCity"
+            , "OwnerState"
+            , "OwnerCountry"
+            , "OwnerZIP"
+		FROM "staging_1"."prcl_prcl" AS P
+		LEFT JOIN "core"."address" AS A
+			ON COALESCE("OwnerAddr", ' ') = COALESCE("street_address", ' ')
+			AND COALESCE("OwnerCity", ' ') = COALESCE("city", ' ')
+			AND COALESCE("OwnerState", ' ') = COALESCE("state", ' ')
+			AND COALESCE("OwnerCountry", ' ') = COALESCE("country", ' ')
+			AND COALESCE("OwnerZIP", ' ') = COALESCE("zip", ' ')
+		) qry
+	LEFT JOIN "core"."legal_entity"
+        ON COALESCE("OwnerName", ' ') = COALESCE("legal_entity_name", ' ')
+        AND COALESCE("OwnerName2", ' ') = COALESCE("legal_entity_secondary_name", ' ')
+        AND ("legal_entity"."address_id" = "qry"."address_id")
+	);
 	
 --Update Current_flag & Update date on existing parcels if a new version is detected------------
 UPDATE "core"."parcel"
@@ -94,6 +130,7 @@ WHERE "parcel"."parcel_id" = NEW_REDB_IDS."parcel_id";
 --Insert New parcels and Updated versions of existing parcels-----------------------------------
 INSERT INTO "core"."parcel" ("parcel_id"
     , "county_id"
+    , "address_id"
     , "city_block_number"
     , "parcel_number"
     , "owner_id"
@@ -121,6 +158,7 @@ INSERT INTO "core"."parcel" ("parcel_id"
     )
 (SELECT DISTINCT NEW_REDB_IDS."parcel_id"
     , NEW_REDB_IDS."county_id"
+    , ca."address_id"
     , "CityBlock"
     , SUBSTRING(NEW_REDB_IDS."parcel_id" FROM 7 FOR 8)
     , ID_TABLE_VIEW."legal_entity_id"
@@ -145,13 +183,19 @@ INSERT INTO "core"."parcel" ("parcel_id"
     , NEW_REDB_IDS."removed_flag"
     , NEW_REDB_IDS."etl_job"
     , NEW_REDB_IDS."update_date"
-FROM "staging_1"."prcl_prcl"
+FROM "staging_1"."prcl_prcl" pp
 JOIN staging_1.ID_TABLE_VIEW
-ON "prcl_prcl"."ParcelId" = staging_1.ID_TABLE_VIEW."ParcelId"
+ON pp."ParcelId" = staging_1.ID_TABLE_VIEW."ParcelId"
 JOIN staging_1.NEW_REDB_IDS
-ON "prcl_prcl"."ParcelId" = staging_1.NEW_REDB_IDS."county_parcel_id"
+ON pp."ParcelId" = staging_1.NEW_REDB_IDS."county_parcel_id"
 JOIN "core"."neighborhood"
-ON "prcl_prcl"."Nbrhd" = "neighborhood"."neighborhood_name"
+ON pp."Nbrhd" = "neighborhood"."neighborhood_name"
+JOIN "core"."address" ca
+ON (SELECT  * FROM core.format_parcel_address(pp)) = ca."street_address"
+    AND ca.zip  = pp."ZIP"
+    AND ca.city = ''
+    AND ca.state = 'MO'
+    AND ca.country = 'USA'
 )
 ON CONFLICT (COALESCE("parcel_id", 'NULL')
     , COALESCE("county_id", 'NULL')
@@ -183,4 +227,4 @@ END;
 $$
 LANGUAGE plpgsql;
 -------------------------
-SELECT new_parcel();
+SELECT core.new_parcel();

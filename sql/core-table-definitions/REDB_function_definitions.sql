@@ -92,6 +92,7 @@ CREATE UNIQUE INDEX UI_Legal_Entity ON "core"."legal_entity" (COALESCE("legal_en
 CREATE TABLE IF NOT EXISTS "core"."parcel" (
     "parcel_id" varchar -- CCCCCC.PPPPPPPP.000.0000 (county_id.parcel_number.building_number.unit_number)
     , "county_id" varchar -- County_Id 10001 because all the data is coming from one county at the moment but this needs to be more sophisticated down the line
+    , "address_id" BIGINT
     , "city_block_number" varchar -- prcl.CityBlock
     , "parcel_number" varchar -- generated with a sequence starting at 10000001
     --, "parcel_taxing_status" varchar -- May be coming from a different table don't know for now.
