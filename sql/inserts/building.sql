@@ -73,7 +73,7 @@ INSERT INTO "core"."building" ("parcel_id"
 	, "removed_flag"
 	--, "etl_job"
 	, "update_date")
-(SELECT "county_id_mapping_table"."parcel_id"
+(SELECT DISTINCT "county_id_mapping_table"."parcel_id"
 	, CONCAT(SUBSTRING("county_id_mapping_table"."parcel_id" FROM 1 FOR 15), (CAST(NEW_OR_CHANGED_BUILDINGS."BldgNum" AS INT) + 100),'.0000') AS building_id
 	, "parcel"."owner_id"
 	, NEW_OR_CHANGED_BUILDINGS."description"
@@ -86,7 +86,7 @@ FROM staging_1.NEW_OR_CHANGED_BUILDINGS
 JOIN "core"."county_id_mapping_table" 
 ON "county_id_mapping_table"."county_parcel_id" = NEW_OR_CHANGED_BUILDINGS."ParcelId"
 JOIN "core"."parcel"
-ON "parcel"."description" = NEW_OR_CHANGED_BUILDINGS."description"
+ON "parcel"."parcel_id" = "county_id_mapping_table"."parcel_id" 
 WHERE "parcel"."current_flag" = True
 )
 ON CONFLICT (COALESCE("parcel_id", 'NULL')

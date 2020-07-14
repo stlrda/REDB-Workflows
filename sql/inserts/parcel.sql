@@ -88,33 +88,6 @@ CREATE OR REPLACE VIEW staging_1.NEW_REDB_IDS AS
     ON NEW_PARCEL_IDS."ParcelId" = "county_id_mapping_table"."county_parcel_id"
     );
 
-CREATE OR REPLACE VIEW staging_1.parcel_addresses AS
-    (
-    SELECT "ParcelId", "legal_entity_id"
-    FROM (
-        SELECT "ParcelId"
-            , "OwnerName"
-            , "OwnerName2"
-            , "address_id"
-            , "OwnerAddr"
-            , "OwnerCity"
-            , "OwnerState"
-            , "OwnerCountry"
-            , "OwnerZIP"
-        FROM "staging_1"."prcl_prcl" AS P
-        LEFT JOIN "core"."address" AS A
-            ON COALESCE("OwnerAddr", ' ') = COALESCE("street_address", ' ')
-            AND COALESCE("OwnerCity", ' ') = COALESCE("city", ' ')
-            AND COALESCE("OwnerState", ' ') = COALESCE("state", ' ')
-            AND COALESCE("OwnerCountry", ' ') = COALESCE("country", ' ')
-            AND COALESCE("OwnerZIP", ' ') = COALESCE("zip", ' ')
-        ) qry
-    LEFT JOIN "core"."legal_entity"
-        ON COALESCE("OwnerName", ' ') = COALESCE("legal_entity_name", ' ')
-        AND COALESCE("OwnerName2", ' ') = COALESCE("legal_entity_secondary_name", ' ')
-        AND ("legal_entity"."address_id" = "qry"."address_id")
-    );
-
 --Update Current_flag & Update date on existing parcels if a new version is detected------------
 UPDATE "core"."parcel"
 SET "update_date" = (CASE
@@ -178,7 +151,7 @@ INSERT INTO "core"."parcel" ("parcel_id"
     , "GisParcel"
     , "GisOwnerCode"
     , NEW_REDB_IDS."create_date"
-    , TRUE
+    , NEW_REDB_IDS."current_flag"
     , NEW_REDB_IDS."removed_flag"
     , NEW_REDB_IDS."etl_job"
     , NEW_REDB_IDS."update_date"

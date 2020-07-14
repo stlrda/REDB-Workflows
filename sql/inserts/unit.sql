@@ -100,4 +100,4 @@ END;
 $$
 LANGUAGE plpgsql;
 -------------------------
-SELECT new_unit();
+SELECT core.new_unit();
