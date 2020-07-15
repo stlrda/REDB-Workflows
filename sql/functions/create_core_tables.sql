@@ -43,8 +43,12 @@ CREATE TABLE IF NOT EXISTS core.address (
     );
 
 -- Unique Index is necessary to account for potential nulls in address fields.
-ALTER TABLE "core"."address" 
-    ADD CONSTRAINT UC_Address UNIQUE ("street_address", "city", "state", "country", "zip");
+CREATE UNIQUE INDEX UI_Address ON "core"."address"(COALESCE("street_address", 'NULL')
+	, COALESCE("city", 'NULL')
+    , COALESCE("state", 'NULL')
+    , COALESCE("country", 'NULL')
+    , COALESCE("zip", 'NULL')
+	);
 
 --Creates the table and constraint for Mapping Parcel11 IDs to REDb IDs-----------------------------------------------------------
 CREATE TABLE IF NOT EXISTS "core"."county_id_mapping_table" (
@@ -92,7 +96,7 @@ CREATE UNIQUE INDEX UI_Legal_Entity ON "core"."legal_entity" (COALESCE("legal_en
 CREATE TABLE IF NOT EXISTS "core"."parcel" (
     "parcel_id" varchar -- CCCCCC.PPPPPPPP.000.0000 (county_id.parcel_number.building_number.unit_number)
     , "county_id" varchar -- County_Id 10001 because all the data is coming from one county at the moment but this needs to be more sophisticated down the line
-    , "address_id" BIGINT
+	, "address_id" BIGINT
     , "city_block_number" varchar -- prcl.CityBlock
     , "parcel_number" varchar -- generated with a sequence starting at 10000001
     --, "parcel_taxing_status" varchar -- May be coming from a different table don't know for now.
@@ -161,6 +165,8 @@ CREATE TABLE IF NOT EXISTS "core"."building" (
 	, "update_date" date
 );
 
+CREATE UNIQUE INDEX UI_Active_Building ON "core"."building"(building_id, current_flag) WHERE current_flag = TRUE;
+
 CREATE UNIQUE INDEX UI_Building ON "core"."building"(COALESCE("parcel_id", 'NULL')
 	, COALESCE("building_id", 'NULL')
 	, COALESCE("owner_id", 'NULL')
@@ -185,173 +191,6 @@ END;
 $$
 LANGUAGE plpgsql;
 
----------------------------------------------------------------------------------------------------------
-CREATE OR REPLACE FUNCTION core.format_parcelId
-	(
-		IN CityBlock varchar(1000)
-		,IN Parcel varchar(1000)
-		,IN OwnerCode varchar(1000)
-	)
-RETURNS text AS
-$BODY$
-DECLARE
-	ParcelId varchar;
-BEGIN
+--------------------------
 
---ParcelId := replace(replace(concat(to_char(CityBlock::float8,'0000.00'),to_char(Parcel::int8,'0000'),OwnerCode),'.',''),' ','');
-ParcelId := (concat(to_char(CityBlock::float8,'0000.00'),to_char(Parcel::int8,'0000'),OwnerCode));
-ParcelId := replace((ParcelId), '.', '');
-ParcelId := replace((ParcelId), ' ', '');
-
-RETURN ParcelId;
-
-END
-$BODY$
-LANGUAGE plpgsql;
-
----------------------------------------------------------
-CREATE OR REPLACE FUNCTION core.staging1_to_staging2()
-RETURNS void AS $$
-BEGIN
-
---Clear staging_2
-DELETE FROM "staging_2"."prcl_bldgcom";
-DELETE FROM "staging_2"."prcl_bldgres";
-DELETE FROM "staging_2"."prcl_bldgsect";
-DELETE FROM "staging_2"."prcl_prcl";
-
---Move data from staging_1 to staging_2
-INSERT INTO "staging_2"."prcl_prcl"
-SELECT * FROM "staging_1"."prcl_prcl";
-
-INSERT INTO "staging_2"."prcl_bldgcom"
-SELECT * FROM "staging_1"."prcl_bldgcom";
-
-INSERT INTO "staging_2"."prcl_bldgres"
-SELECT * FROM "staging_1"."prcl_bldgres";
-
-INSERT INTO "staging_2"."prcl_bldgsect"
-SELECT * FROM "staging_1"."prcl_bldgsect";
-
---Clear staging_1
-DELETE FROM "staging_1"."prcl_bldgcom";
-DELETE FROM "staging_1"."prcl_bldgres";
-DELETE FROM "staging_1"."prcl_bldgsect";
-DELETE FROM "staging_1"."prcl_prcl";
-
-END;
-$$
-LANGUAGE plpgsql;
-
--------------------------------------------------------------------
-CREATE OR REPLACE FUNCTION core.insert_week1_to_staging1()
-RETURNS void AS $$
-BEGIN
-
-INSERT INTO "staging_1"."prcl_prcl"
-SELECT * FROM "staging_1"."week_1_prcl";
-
-INSERT INTO "staging_1"."prcl_bldgcom"
-SELECT * FROM "staging_1"."week_1_bldgcom";
-
-INSERT INTO "staging_1"."prcl_bldgres"
-SELECT * FROM "staging_1"."week_1_bldgres";
-
-INSERT INTO "staging_1"."prcl_bldgsect"
-SELECT * FROM "staging_1"."week_1_bldgsect";
-
-END;
-$$
-LANGUAGE plpgsql;
----------------------------------------------------------------------
-CREATE OR REPLACE FUNCTION core.insert_week2_to_staging1()
-RETURNS void AS $$
-BEGIN
-
-INSERT INTO "staging_1"."prcl_prcl"
-SELECT * FROM "staging_1"."week_2_prcl";
-
-INSERT INTO "staging_1"."prcl_bldgcom"
-SELECT * FROM "staging_1"."week_2_bldgcom";
-
-INSERT INTO "staging_1"."prcl_bldgres"
-SELECT * FROM "staging_1"."week_2_bldgres";
-
-INSERT INTO "staging_1"."prcl_bldgsect"
-SELECT * FROM "staging_1"."week_2_bldgsect";
-
-END;
-$$
-LANGUAGE plpgsql;
-
-
-CREATE OR REPLACE FUNCTION core.format_parcel_address
-(
-	IN _row staging_1.prcl_prcl
-)
-RETURNS text AS
-$BODY$
-DECLARE
-	val varchar;
-	Low varchar = _row."LowAddrNum";
-	High varchar = _row."HighAddrNum";
-	StPreDir varchar = COALESCE(_row."StPreDir", '');
-	StName varchar = _row."StName";
-	StType varchar = _row."StType";
-	AddrSuf varchar = COALESCE(_row."LowAddrSuf", _row."HighAddrSuf", '');
-	address varchar;
-BEGIN
-	IF Low = High THEN
-		val := Low;
-	ELSE
-		val := CONCAT(Low, '-', High);
-	END IF;
-	
-	IF StPreDir = '' THEN
-		address := CONCAT(val, ' ', StName, ' ', StType);
-	ELSE
-		address := CONCAT(val, ' ', StPreDir, ' ', StName, ' ', StType);
-	END IF;
-	
-	IF AddrSuf != '' THEN
-		address := CONCAT(address, ' ', '#', AddrSuf);
-	END IF;
-	
-	RETURN address;
-END
-$BODY$
-LANGUAGE plpgsql;
-
-
-CREATE OR REPLACE FUNCTION core.add_county
-(
-    IN name VARCHAR(50)
-    ,IN state VARCHAR(3)
-)
-RETURNS SETOF "core"."county" AS
-$BODY$
-DECLARE
-    aCounty_id varchar;
-BEGIN
-    CREATE SEQUENCE IF NOT EXISTS core.county_id_seq START 10001;
-
-    aCounty_id := NEXTVAL('core.county_id_seq');
-    aCounty_id = CONCAT(aCounty_id::text, '.00000000.000.0000');
-
-    RETURN QUERY
-        INSERT INTO "core"."county"
-		(
-            "county_id"
-			,"county_name"
-			,"county_state"
-		)
-        VALUES
-            (
-                aCounty_id
-                ,name
-                ,state
-            )
-	    RETURNING *;
-END
-$BODY$
-LANGUAGE plpgsql;
+core.create_core_tables()
