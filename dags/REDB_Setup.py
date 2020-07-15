@@ -15,7 +15,7 @@ sys.path.append("/usr/local/airflow")
 
 # Credentials for Database
 DATABASE_CONN = BaseHook.get_connection('redb_postgres')
-DATABASE_NAME = DATABASE_CONN.conn_id
+DATABASE_NAME = DATABASE_CONN.schema
 DATABASE_HOST = DATABASE_CONN.host
 DATABASE_USER = DATABASE_CONN.login
 DATABASE_PORT = DATABASE_CONN.port
