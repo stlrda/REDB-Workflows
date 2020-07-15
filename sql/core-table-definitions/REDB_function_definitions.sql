@@ -176,7 +176,7 @@ CREATE UNIQUE INDEX UI_Building ON "core"."building"(COALESCE("parcel_id", 'NULL
 	
 --Creates the table for assigning unique Unit IDs.------------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS "core"."unit" (
-    "unit_id" varchar PRIMARY KEY -- CCCCCC.PPPPPPPP.BBB.UUUU (county_id.parcel_number.building_number.unit_number)
+    "unit_id" varchar -- CCCCCC.PPPPPPPP.BBB.UUUU (county_id.parcel_number.building_number.unit_number)
 	, "building_id" varchar
 	, "description" varchar
 	, "condominium" boolean
@@ -187,6 +187,14 @@ CREATE TABLE IF NOT EXISTS "core"."unit" (
 	, "update_date" date
 );
 
+CREATE UNIQUE INDEX UI_Active_Unit ON "core"."unit"(unit_id, current_flag) WHERE current_flag = TRUE;
+
+CREATE UNIQUE INDEX UI_Unit ON "core"."unit"(COALESCE("unit_id", 'NULL')
+	, COALESCE("building_id", 'NULL')
+	, COALESCE("description", 'NULL')
+	, "condominium"
+	);
+	
 END;
 $$
 LANGUAGE plpgsql;
@@ -339,7 +347,7 @@ $BODY$
 DECLARE
     aCounty_id varchar;
 BEGIN
-    CREATE SEQUENCE IF NOT EXISTS core.county_id_seq START 10001;
+    CREATE SEQUENCE IF NOT EXISTS core.county_id_seq START 10001 OWNED BY core.county."county_id";
 
     aCounty_id := NEXTVAL('core.county_id_seq');
     aCounty_id = CONCAT(aCounty_id::text, '.00000000.000.0000');
