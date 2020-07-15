@@ -13,14 +13,14 @@ from airflow.operators.postgres_operator import PostgresOperator
 
 # Custom
 sys.path.append("/usr/local/airflow/dags/efs")
-import redb.scripts.transfer_to_s3
-import redb.scripts.mdb_to_postgres 
+import redb.scripts.transfer_to_s3 as toS3
+import redb.scripts.mdb_to_postgres as mdbToREDB
 
 # Credentials for S3 Bucket
 BUCKET_CONN = BaseHook.get_connection('redb-workbucket')
 BUCKET_NAME = BUCKET_CONN.conn_id
-AWS_ACCESS_KEY_ID = json.loads(BUCKET_CONN.extra)['aws_access_key_id']
-AWS_SECRET_ACCESS_KEY = json.loads(BUCKET_CONN.extra)['aws_secret_access_key']
+AWS_ACCESS_KEY_ID = BUCKET_CONN.login
+AWS_SECRET_ACCESS_KEY = BUCKET_CONN.password
 
 # Credentials for Database
 DATABASE_CONN = BaseHook.get_connection('redb_postgres')
@@ -47,14 +47,14 @@ with DAG('REDB_ELT',
 
     # Download and unzip, then upload files to S3.
     SourcesToS3 = PythonOperator(task_id='SourcesToS3',
-                            python_callable=transfer_to_s3.main,
-                            op_kwargs={'bucket': BUCKET,
+                            python_callable=toS3.main,
+                            op_kwargs={'bucket': BUCKET_NAME,
                                     'aws_access_key_id': AWS_ACCESS_KEY_ID,
                                     'aws_secret_access_key': AWS_SECRET_ACCESS_KEY})
                                     
     # Copy data from mdb files (in S3) to REDB (staging_1).
     MDBtoREDB = PythonOperator(task_id='MDBtoREDB',
-                                    python_callable=mdb_to_postgres.main,
+                                    python_callable=mdbToREDB.main,
                                     op_kwargs={'bucket': BUCKET_NAME,
                                         'aws_access_key_id': AWS_ACCESS_KEY_ID,
                                         'aws_secret_access_key': AWS_SECRET_ACCESS_KEY,
