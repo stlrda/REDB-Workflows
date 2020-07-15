@@ -37,10 +37,10 @@ with DAG('REDB_Setup',
         ) as dag:
 
     # Create schemas (once) (sql/functions)
-    create_schemas = PostgresOperator(task_id="create_schemas", postgres_conn_id="redb_postgres", sql="functions/create_core_tables.sql", database=DATABASE_NAME)
+    create_schemas = PostgresOperator(task_id="create_schemas", postgres_conn_id="redb_postgres", sql="functions/create_REDB_schemas.sql", database=DATABASE_NAME)
 
     # Create tables (once) (sql/functions)
-    create_tables = PostgresOperator(task_id="create_tables", postgres_conn_id="redb_postgres", sql="functions/create_REDB_schemas.sql", database=DATABASE_NAME)
+    create_tables = PostgresOperator(task_id="create_tables", postgres_conn_id="redb_postgres", sql="functions/create_core_tables.sql", database=DATABASE_NAME)
 
     # Define functions (once) (sql/functions)
     define_add_county = PostgresOperator(task_id="define_add_county", postgres_conn_id="redb_postgres", sql="functions/add_county.sql", database=DATABASE_NAME)
