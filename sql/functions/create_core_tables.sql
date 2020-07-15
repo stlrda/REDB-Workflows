@@ -193,4 +193,4 @@ LANGUAGE plpgsql;
 
 --------------------------
 
-core.create_core_tables()
+SELECT core.create_core_tables()

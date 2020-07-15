@@ -10,4 +10,4 @@ LANGUAGE plpgsql;
 
 --------------------------
 
-create_schemas()
+SELECT create_schemas()
