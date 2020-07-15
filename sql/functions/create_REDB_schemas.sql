@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION core.create_schemas()
+CREATE OR REPLACE FUNCTION create_schemas()
 RETURNS void AS $$
 BEGIN
     CREATE SCHEMA IF NOT EXISTS staging_1;
@@ -10,4 +10,4 @@ LANGUAGE plpgsql;
 
 --------------------------
 
-core.create_schemas()
+create_schemas()
