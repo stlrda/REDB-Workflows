@@ -2,6 +2,7 @@
 import os
 import csv
 import tempfile
+from subprocess import (check_output, CalledProcessError)
 
 # Third party
 import pandas as pd

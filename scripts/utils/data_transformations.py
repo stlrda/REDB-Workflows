@@ -1,7 +1,7 @@
 import re
 import csv
 from io import StringIO
-from subprocess import (check_output, Popen, PIPE, CalledProcessError)
+from subprocess import (Popen, PIPE)
 
 # TODO Incorporate column_types into function to make more efficient.
 def convert_scientific_notation(current_row):
