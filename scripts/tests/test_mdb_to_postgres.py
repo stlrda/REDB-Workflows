@@ -7,7 +7,6 @@ import unittest
 sys.path.append("..") # TODO Fix path.
 from scripts.mdb_to_postgres import (get_tables
                                     , get_table_columns
-                                    , generate_rows
                                     , initialize_csv
                                     , append_to_csv)
 
@@ -37,10 +36,6 @@ class TestMDBtoPostgres(unittest.TestCase):
 
 
     def test_get_table_columns(self):
-        pass
-
-
-    def test_generate_rows(self):
         pass
 
 
