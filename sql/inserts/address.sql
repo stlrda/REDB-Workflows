@@ -22,9 +22,13 @@ BEGIN
         ,state
         ,country
         ,zip
+		,create_date
+		,current_flag
+		,removed_flag
+		,update_date
         )
         SELECT
-            *
+            * ,CURRENT_DATE, TRUE, FALSE, CURRENT_DATE
         FROM formatted_addresses fa
         WHERE NOT EXISTS(
             SELECT
@@ -63,9 +67,13 @@ BEGIN
         ,"country"
         ,"zip"
         ,"county_id"
+		,create_date
+		,current_flag
+		,removed_flag
+		,update_date
         )
         SELECT
-            *
+            * ,CURRENT_DATE, TRUE, FALSE, CURRENT_DATE
         FROM owner_addresses oa
         WHERE NOT EXISTS(
             SELECT
