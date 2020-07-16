@@ -386,10 +386,13 @@ CREATE OR REPLACE VIEW "core".current_neighborhood AS
 
 CREATE OR REPLACE VIEW "core".current_address AS
 (
-	SELECT "county_id"
-		, "parcel_id"
-		, "county_parcel_id"
-		, "county_parcel_id_type"
+	SELECT "address_id"
+		, "street_address"
+		, "county_id"
+		, "city"
+		, "state"
+		, "country"
+		, "zip"
 	FROM "core"."address"
 	WHERE "current_flag" = TRUE
 );
@@ -467,3 +470,67 @@ CREATE OR REPLACE VIEW "core".current_unit AS
 END;
 $$
 LANGUAGE plpgsql;
+
+---------------------------------------------------
+CREATE OR REPLACE FUNCTION core.dead_parcel_proc()
+RETURNS TRIGGER AS 
+$$
+BEGIN
+
+	UPDATE "core"."parcel" 
+	SET "removed_flag" = NEW."removed_flag"
+	WHERE "parcel"."parcel_id" = NEW."parcel_id";
+	RETURN NULL;
+
+END;
+$$
+LANGUAGE plpgsql;
+
+CREATE TRIGGER dead_parcel_trigger 
+AFTER INSERT OR UPDATE 
+OF "current_flag"
+ON "core"."parcel"
+FOR EACH ROW
+EXECUTE PROCEDURE core.dead_parcel_proc();
+---------------------------------------------------
+CREATE OR REPLACE FUNCTION core.dead_building_proc()
+RETURNS TRIGGER AS 
+$$
+BEGIN
+
+	UPDATE "core"."building" 
+	SET "removed_flag" = NEW."removed_flag"
+	WHERE "building"."building_id" = NEW."building_id";
+	RETURN NULL;
+
+END;
+$$
+LANGUAGE plpgsql;
+
+CREATE TRIGGER dead_building_trigger 
+AFTER INSERT OR UPDATE 
+OF "current_flag"
+ON "core"."building"
+FOR EACH ROW
+EXECUTE PROCEDURE core.dead_building_proc();
+---------------------------------------------------
+CREATE OR REPLACE FUNCTION core.dead_unit_proc()
+RETURNS TRIGGER AS 
+$$
+BEGIN
+
+	UPDATE "core"."unit" 
+	SET "removed_flag" = NEW."removed_flag"
+	WHERE "unit"."unit_id" = NEW."unit_id";
+	RETURN NULL;
+
+END;
+$$
+LANGUAGE plpgsql;
+
+CREATE TRIGGER dead_unit_trigger 
+AFTER INSERT OR UPDATE 
+OF "current_flag"
+ON "core"."unit"
+FOR EACH ROW
+EXECUTE PROCEDURE core.dead_unit_proc();
