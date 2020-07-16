@@ -2,8 +2,6 @@
 import os
 import csv
 import tempfile
-from io import StringIO
-from subprocess import (check_output, Popen, PIPE, CalledProcessError)
 
 # Third party
 import pandas as pd
@@ -12,7 +10,9 @@ import pandas as pd
 from .S3 import S3
 from .Database import Database
 from .utils.custom_logging import print_time
-from .utils.data_transformations import (convert_scientific_notation, merge_split_rows)
+from .utils.data_transformations import (convert_scientific_notation
+                                        , generate_rows
+                                        , merge_split_rows)
 
 
 pd.set_option('display.max_columns', None)  
@@ -94,29 +94,6 @@ def get_table_columns(table, path_to_database):
     print(f'Columns ({len(columns)}) for table: {table} @ {path_to_database}:\n{columns}')
 
     return columns
-
-
-def generate_rows(filepath, table, **kwargs):
-    """Reads an MS Access file
-    Args:
-        filepath (str): The mdb file path.
-        table (str): The table to load.
-        kwargs (dict): Keyword arguments that are passed to the csv reader.
-    Yields:
-        dict: A row of data whose keys are the field names.
-    """
-    pkwargs = {'stdout': PIPE, 'bufsize': 1, 'universal_newlines': True}
-
-    with Popen(['mdb-export', filepath, table, '-d |'], **pkwargs).stdout as pipe:
-        first_line = StringIO(str(pipe.readline()))
-        names = next(csv.reader(first_line, **kwargs))
-        headers = [name.rstrip() for name in names]
-
-        for line in iter(pipe.readline, b''):
-            next_line = StringIO(str(line))
-            values = next(csv.reader(next_line, **kwargs))
-            values = [value.rstrip() for value in values]
-            yield dict(zip(headers, values))
 
 
 def initialize_csv(table, columns, csv_path, limit=50_000):
@@ -257,14 +234,12 @@ def main(**kwargs):
     mdb_files_in_s3 = s3.list_objects(extension=".mdb", field="Key")
 
     for mdb in mdb_files_in_s3:
-
         with tempfile.TemporaryDirectory() as tmp:
             path_to_database =  os.path.join(tmp, mdb)
             s3.download_file(s3.bucket_name, mdb, path_to_database)
 
             # Creates CSVs from tables.
             for table in get_tables(path_to_database):
-
                 columns = get_table_columns(table, path_to_database)
                 column_names = [column[0] for column in columns]
 
