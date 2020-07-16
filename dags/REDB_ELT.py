@@ -118,6 +118,7 @@ chain(
     , insert_neighborhood
     , insert_parcel
     , insert_special_parcel_type
+    , insert_sub_parcel_type
     , insert_unit
     , update_address
     , update_building
@@ -127,5 +128,7 @@ chain(
     , update_neighborhood
     , update_parcel
     , update_special_parcel_type
+    , update_sub_parcel_type
     , update_unit
+    , staging_1_to_staging_2
 )
