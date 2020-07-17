@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS core.county (
 --Creates table for neighborhood IDs----------------------------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS core.neighborhood (
     neighborhood_id SERIAL PRIMARY KEY
-    , neighborhood_name varchar
+    , neighborhood_name varchar CONSTRAINT UC_Neighborhood UNIQUE
     , county_id varchar
     , create_date date
     , current_flag boolean
@@ -21,10 +21,6 @@ CREATE TABLE IF NOT EXISTS core.neighborhood (
     , etl_job varchar
     , update_date date
     );
-
--- Neighborhood name should NEVER be null.  So a unique constraint should work.
-ALTER TABLE "core"."neighborhood"
-    ADD CONSTRAINT UC_Neighborhood UNIQUE ("neighborhood_name");
 
 --Creates table for address ids which are uniquely assigned via the serial Primary Key "address_id"-------------------------------
 CREATE TABLE IF NOT EXISTS core.address (
@@ -54,7 +50,7 @@ CREATE UNIQUE INDEX UI_Address ON "core"."address"(COALESCE("street_address", 'N
 CREATE TABLE IF NOT EXISTS "core"."county_id_mapping_table" (
 	county_id varchar -- county_id
 	, parcel_id varchar PRIMARY KEY -- REDB identifier
-	, county_parcel_id varchar -- The identifier the county uses
+	, county_parcel_id varchar CONSTRAINT UC_Mapping UNIQUE -- The identifier the county uses
 	, county_parcel_id_type varchar -- The name the county uses to refer to their identifier EG:'parcel_11'
 	, create_date date
 	, current_flag boolean
@@ -62,10 +58,6 @@ CREATE TABLE IF NOT EXISTS "core"."county_id_mapping_table" (
 	, etl_job varchar
 	, update_date date
 	);
-
--- county_parcel_id should NEVER be null so a constraint should work well enough
-ALTER TABLE "core"."county_id_mapping_table" 
-    ADD CONSTRAINT UC_Mapping UNIQUE (county_parcel_id);
 
 CREATE SEQUENCE IF NOT EXISTS core.id_mapping
 INCREMENT BY 1 
