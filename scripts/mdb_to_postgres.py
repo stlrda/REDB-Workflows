@@ -246,7 +246,7 @@ def main(**kwargs):
                 # The Generator (row) can thus be shared throughout the script.
                 row = generate_rows(path_to_database, table=table, delimiter="|")
                 mdb_name = mdb[:-4] # name of Access database
-                table = mdb_name + "_" + table.lower() # prepends database name to table
+                table = mdb_name.lower() + "_" + table.lower() # prepends database name to table
                 csv_path = f"dags/efs/redb/resources/{table}.csv"
 
                 initialize_csv(table, columns, csv_path, limit=50_000)
