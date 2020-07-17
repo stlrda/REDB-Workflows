@@ -3,6 +3,7 @@ import csv
 from io import StringIO
 from subprocess import (Popen, PIPE)
 
+
 # TODO Incorporate column_types into function to make more efficient.
 def convert_scientific_notation(current_row):
     """ Identifies scientific notation values then converts to float.
@@ -50,13 +51,16 @@ def generate_rows(filepath, table, **kwargs):
 
 
 # TODO Output the location / values of the malformed rows and fields to a log file.
-def merge_split_rows(column_names, broken_row, row_generator):
+def merge_split_rows(column_names, broken_row, row_generator, debug=False):
 
     """ Will merge rows that have been broken into multiple parts thanks to a newline in one of the fields.
 
     :param column names: A List of column names to be returned in fixed row.
-    :current_row: Current iteration of Generator object representing broken row.
+    :param broken_row: Current iteration of Generator object representing broken row.
+    :param row_generator: The actual generator object.
+    :param debug: Boolean that determines whether function prints to stdout.
     """
+    delimiter = "|"
     row = row_generator
     
     # Start with a fresh row.
@@ -66,14 +70,16 @@ def merge_split_rows(column_names, broken_row, row_generator):
     pending_columns = column_names.copy()
 
     # Add all of the columns and values already present in broken row to pending row.
-    for key, value in broken_row.items():
+    for value in broken_row.values():
         pending_column = pending_columns.pop(0)
         pending_row[pending_column] = value
 
     # The last column present in broken row is the row with the newline.
     column_with_newline = pending_column
-    print(f"Merging fields split by newline. Column with newline: {column_with_newline}\n{pending_row[column_with_newline]}")
-    print(f"Current row data where the newline is currently being handled:\n {broken_row}")
+
+    if debug == True:
+        print(f"Merging fields split by newline. Column with newline: {column_with_newline}\n{pending_row[column_with_newline]}")
+        print(f"Current row data where the newline is currently being handled:\n{broken_row}")
         
     next_row = next(row)
 
@@ -89,8 +95,14 @@ def merge_split_rows(column_names, broken_row, row_generator):
     next_line = next_row_values.pop(0)
 
     if next_line == "\n":
-        # if the next value is just a newline, concatenate the newline into the broken/split field
+        # If the next value is just a newline, concatenate the newline into the broken/split field.
         pending_row[column_with_newline] += next_line
+
+    elif next_line[0:2] == f' {delimiter}':
+        # If the newline comes at the end of the string, the next_line will include the delimiter.
+        value_for_next_column = next_line[2:-1] # Strips both the escaped delimiter and trailing quote.
+        next_row_values.insert(0, value_for_next_column) 
+
     else:
         # Because the newline is omitted from the string, add the newline back in before concatenating with field.
         pending_row[column_with_newline] += ("\n" + next_line)
@@ -108,6 +120,7 @@ def merge_split_rows(column_names, broken_row, row_generator):
         # Removes trailing double quote from broken field.
         pending_row[column_with_newline] = pending_row[column_with_newline][0:-1]
 
-        print(f"Fixed row:\n {pending_row}")
+        if debug == True:
+            print(f"Fixed row:\n {pending_row}")
 
         return pending_row

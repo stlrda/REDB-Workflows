@@ -106,10 +106,16 @@ def initialize_csv(table, columns, csv_path, limit=50_000):
     global row, snapshot_row
 
     batch = []
-    
-    # snapshot_row is used to initialize table via "replace_table" method and to assign columns to "table_dataframe".
-    # snapshot_row is initialized globally as to be available throughout script.
-    snapshot_row = next(row)
+
+    try:
+        # snapshot_row is used to initialize table via "replace_table" method and to assign columns to "table_dataframe".
+        # snapshot_row is initialized globally as to be available throughout script.
+        snapshot_row = next(row)
+    except RuntimeError:
+        print(f"{table} doesn't have any rows or rows are not valid. Skipping...")
+        row = None
+        return None
+
     snapshot_row = convert_scientific_notation(snapshot_row)
     batch.append(snapshot_row)
 
@@ -130,7 +136,6 @@ def initialize_csv(table, columns, csv_path, limit=50_000):
                 current_row = merge_split_rows(column_names, current_row, row)
 
             current_row = convert_scientific_notation(current_row)
-            
             batch.append(current_row)
             rows_generated += 1
 
@@ -226,7 +231,6 @@ def main(**kwargs):
     global row, snapshot_row
 
     initialize_global_IO(kwargs) # Initializes S3 Bucket and target database to global scope.
-
     mdb_files_in_s3 = s3.list_objects(extension=".mdb", field="Key")
 
     for mdb in mdb_files_in_s3:
@@ -237,7 +241,6 @@ def main(**kwargs):
             # Creates CSVs from tables.
             for table in get_tables(path_to_database):
                 columns = get_table_columns(table, path_to_database)
-                column_names = [column[0] for column in columns]
 
                 # "generate_rows" returns a Python Generator that is being initialized globally via the "global" keyword. 
                 # The Generator (row) can thus be shared throughout the script.
@@ -251,15 +254,18 @@ def main(**kwargs):
                 if row != None:
                     append_to_csv(table, columns, csv_path, limit=50_000)
 
-                # Opens CSV then copies to database.
-                with open(csv_path, 'r+') as csvfile:
-                    db.replace_table("staging_1", table, snapshot_row) # snapshot_row created upon invoking "initialize_csv" function.
-                    conn = db.get_raw_connection()
-                    cursor = conn.cursor()
-                    cmd = f'COPY staging_1."{table}" FROM STDIN WITH (FORMAT CSV, DELIMITER "|", HEADER TRUE, ENCODING "utf-8")'
-                    cursor.copy_expert(cmd, csvfile)
-                    conn.commit()
-                    print(f"{table} copied into staging_1.")
-                
-                os.remove(csv_path)
+                try:
+                    # Opens CSV then copies to database.
+                    with open(csv_path, 'r+') as csvfile:
+                        db.replace_table("staging_1", table, snapshot_row) # snapshot_row created upon invoking "initialize_csv" function.
+                        conn = db.get_raw_connection()
+                        cursor = conn.cursor()
+                        cmd = f'COPY staging_1."{table}" FROM STDIN WITH (FORMAT CSV, DELIMITER "|", HEADER TRUE, ENCODING "utf-8")'
+                        cursor.copy_expert(cmd, csvfile)
+                        conn.commit()
+                        print(f"{table} copied into staging_1.")
+                    os.remove(csv_path)
+                except Exception as err:
+                    print(f"Warning: {err} - Table being skipped.")
+                    continue
             

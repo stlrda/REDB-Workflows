@@ -4,7 +4,7 @@ import sys
 import unittest
 
 # Custom
-sys.path.append("..") # TODO Fix path.
+sys.path.append("..")
 from scripts.transfer_to_s3 import (get_list_of_files, tempfile_to_s3)
 
 # TODO Write unit tests.

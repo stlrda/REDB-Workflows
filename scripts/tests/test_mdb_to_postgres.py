@@ -4,7 +4,7 @@ import sys
 import unittest
 
 # Custom
-sys.path.append("..") # TODO Fix path.
+sys.path.append("..")
 from scripts.mdb_to_postgres import (get_tables
                                     , get_table_columns
                                     , initialize_csv

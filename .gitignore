@@ -5,8 +5,8 @@ connections.json
 
 ## Theo Local ##
 InstallDependenciesLocal.py
-*.mdb
-scripts/tests/*.txt
+resources/*.mdb
+resources/*.txt
 
 ## Kevin Local ##
 sql/updates/test_environment_code.sql
