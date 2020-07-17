@@ -39,7 +39,15 @@ CREATE TABLE IF NOT EXISTS core.address (
     );
 
 -- Unique Index is necessary to account for potential nulls in address fields.
-CREATE UNIQUE INDEX UI_Address ON "core"."address"(COALESCE("street_address", 'NULL')
+-- CREATE UNIQUE INDEX UI_StreetAddress ON "core"."address"(COALESCE("LowAddrNum", 'NULL')
+-- 	, COALESCE("HighAddrNum", 'NULL')
+--     , COALESCE("StPreDir", 'NULL')
+--     , COALESCE("StName", 'NULL')
+--     , COALESCE("StType", 'NULL')
+-- 	);
+	
+-- Unique Index is necessary to account for potential nulls in address fields.
+CREATE UNIQUE INDEX UI_OwnerAddress ON "core"."address"(COALESCE("street_address", 'NULL')
 	, COALESCE("city", 'NULL')
     , COALESCE("state", 'NULL')
     , COALESCE("country", 'NULL')
@@ -526,3 +534,45 @@ OF "current_flag"
 ON "core"."unit"
 FOR EACH ROW
 EXECUTE PROCEDURE core.dead_unit_proc();
+-----------------------------------------------
+CREATE OR REPLACE FUNCTION core.row_level_format_street_address
+(
+	IN LowAddrNum varchar(1000)
+	, IN HighAddrNum varchar(1000)
+	, IN StPreDir varchar(1000)
+	, IN StName varchar(1000)
+	, IN StType varchar(1000)
+	, IN LowAddrSuf varchar(1000)
+	, IN HighAddrSuf varchar(1000)
+)
+RETURNS text AS
+$BODY$
+DECLARE
+	val varchar;
+	AddrSuf varchar = COALESCE(LowAddrSuf, HighAddrSuf, '');
+	address varchar;
+BEGIN
+	
+	StPreDir = COALESCE(StPreDir, '');
+	
+	IF LowAddrNum = HighAddrNum THEN
+		val := LowAddrNum;
+	ELSE
+		val := CONCAT(LowAddrNum, '-', HighAddrNum);
+	END IF;
+	
+	IF StPreDir = '' THEN
+		address := CONCAT(val, ' ', StName, ' ', StType);
+	ELSE
+		address := CONCAT(val, ' ', StPreDir, ' ', StName, ' ', StType);
+	END IF;
+	
+	IF AddrSuf != '' THEN
+		address := CONCAT(address, ' ', '#', AddrSuf);
+	END IF;
+	
+	RETURN address;
+	
+END
+$BODY$
+LANGUAGE plpgsql;
