@@ -103,7 +103,7 @@ def tempfile_to_s3(SOURCES_DATAFRAME, s3):
 
 def main(bucket, aws_access_key_id, aws_secret_access_key):
 
-    SOURCES_CSV = "./resources/redb_source_databases_all-info.csv" # Prepend "../" if executing outside Airflow container. 
+    SOURCES_CSV = "/usr/local/airflow/dags/efs/redb/resources/redb_source_databases_all-info.csv" # Prepend "../" if executing outside Airflow container. 
     SOURCES_DATAFRAME = pd.read_csv(SOURCES_CSV)
 
     s3 = S3(bucket, aws_access_key_id, aws_secret_access_key)

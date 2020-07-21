@@ -3,8 +3,10 @@ CreateConnections.py
 create_connections.py
 connections.json
 
-## Theo Local(?) ##
+## Theo Local ##
 InstallDependenciesLocal.py
+resources/*.mdb
+resources/*.txt
 
 ## Kevin Local ##
 sql/updates/test_environment_code.sql
