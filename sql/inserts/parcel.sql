@@ -190,9 +190,9 @@ ON CONFLICT (COALESCE("parcel_id", 'NULL')
     , COALESCE("gis_city_block", 'NULL')
     , COALESCE("gis_parcel", 'NULL')
     , COALESCE("gis_owner_code", 'NULL'))
-    DO UPDATE
+DO UPDATE
 SET "current_flag" = TRUE
-    , "removed_flag" = FALSE
+	, "removed_flag" = FALSE
     , "update_date" = CURRENT_DATE;
 
 END;

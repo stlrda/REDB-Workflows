@@ -37,14 +37,6 @@ CREATE TABLE IF NOT EXISTS core.address (
     , etl_job varchar
     , update_date date
     );
-
--- Unique Index is necessary to account for potential nulls in address fields.
--- CREATE UNIQUE INDEX UI_StreetAddress ON "core"."address"(COALESCE("LowAddrNum", 'NULL')
--- 	, COALESCE("HighAddrNum", 'NULL')
---     , COALESCE("StPreDir", 'NULL')
---     , COALESCE("StName", 'NULL')
---     , COALESCE("StType", 'NULL')
--- 	);
 	
 -- Unique Index is necessary to account for potential nulls in address fields.
 CREATE UNIQUE INDEX UI_OwnerAddress ON "core"."address"(COALESCE("street_address", 'NULL')
@@ -471,69 +463,73 @@ END;
 $$
 LANGUAGE plpgsql;
 
+-- Triggers aren't currently working out in prod 
+-- I believe the issue is update functions are switching the removed flag
+-- back to true after they are switched to match a row that has it's current flag changed
+-- will need to revisit this later when time allows.  KB 7/21/20
 ---------------------------------------------------
-CREATE OR REPLACE FUNCTION core.dead_parcel_proc()
-RETURNS TRIGGER AS 
-$$
-BEGIN
+-- CREATE OR REPLACE FUNCTION core.dead_parcel_proc()
+-- RETURNS TRIGGER AS 
+-- $$
+-- BEGIN
 
-	UPDATE "core"."parcel" 
-	SET "removed_flag" = NEW."removed_flag"
-	WHERE "parcel"."parcel_id" = NEW."parcel_id";
-	RETURN NULL;
+-- 	UPDATE "core"."parcel" 
+-- 	SET "removed_flag" = NEW."removed_flag"
+-- 	WHERE "parcel"."parcel_id" = NEW."parcel_id";
+-- 	RETURN NULL;
 
-END;
-$$
-LANGUAGE plpgsql;
+-- END;
+-- $$
+-- LANGUAGE plpgsql;
 
-CREATE TRIGGER dead_parcel_trigger 
-AFTER INSERT OR UPDATE 
-OF "current_flag"
-ON "core"."parcel"
-FOR EACH ROW
-EXECUTE PROCEDURE core.dead_parcel_proc();
----------------------------------------------------
-CREATE OR REPLACE FUNCTION core.dead_building_proc()
-RETURNS TRIGGER AS 
-$$
-BEGIN
+-- CREATE TRIGGER dead_parcel_trigger 
+-- AFTER INSERT OR UPDATE 
+-- OF "current_flag"
+-- ON "core"."parcel"
+-- FOR EACH ROW
+-- EXECUTE PROCEDURE core.dead_parcel_proc();
+-- ---------------------------------------------------
+-- CREATE OR REPLACE FUNCTION core.dead_building_proc()
+-- RETURNS TRIGGER AS 
+-- $$
+-- BEGIN
 
-	UPDATE "core"."building" 
-	SET "removed_flag" = NEW."removed_flag"
-	WHERE "building"."building_id" = NEW."building_id";
-	RETURN NULL;
+-- 	UPDATE "core"."building" 
+-- 	SET "removed_flag" = NEW."removed_flag"
+-- 	WHERE "building"."building_id" = NEW."building_id";
+-- 	RETURN NULL;
 
-END;
-$$
-LANGUAGE plpgsql;
+-- END;
+-- $$
+-- LANGUAGE plpgsql;
 
-CREATE TRIGGER dead_building_trigger 
-AFTER INSERT OR UPDATE 
-OF "current_flag"
-ON "core"."building"
-FOR EACH ROW
-EXECUTE PROCEDURE core.dead_building_proc();
----------------------------------------------------
-CREATE OR REPLACE FUNCTION core.dead_unit_proc()
-RETURNS TRIGGER AS 
-$$
-BEGIN
+-- CREATE TRIGGER dead_building_trigger 
+-- AFTER INSERT OR UPDATE 
+-- OF "current_flag"
+-- ON "core"."building"
+-- FOR EACH ROW
+-- EXECUTE PROCEDURE core.dead_building_proc();
+-- ---------------------------------------------------
+-- CREATE OR REPLACE FUNCTION core.dead_unit_proc()
+-- RETURNS TRIGGER AS 
+-- $$
+-- BEGIN
 
-	UPDATE "core"."unit" 
-	SET "removed_flag" = NEW."removed_flag"
-	WHERE "unit"."unit_id" = NEW."unit_id";
-	RETURN NULL;
+-- 	UPDATE "core"."unit" 
+-- 	SET "removed_flag" = NEW."removed_flag"
+-- 	WHERE "unit"."unit_id" = NEW."unit_id";
+-- 	RETURN NULL;
 
-END;
-$$
-LANGUAGE plpgsql;
+-- END;
+-- $$
+-- LANGUAGE plpgsql;
 
-CREATE TRIGGER dead_unit_trigger 
-AFTER INSERT OR UPDATE 
-OF "current_flag"
-ON "core"."unit"
-FOR EACH ROW
-EXECUTE PROCEDURE core.dead_unit_proc();
+-- CREATE TRIGGER dead_unit_trigger 
+-- AFTER INSERT OR UPDATE 
+-- OF "current_flag"
+-- ON "core"."unit"
+-- FOR EACH ROW
+-- EXECUTE PROCEDURE core.dead_unit_proc();
 -----------------------------------------------
 CREATE OR REPLACE FUNCTION core.row_level_format_street_address
 (
