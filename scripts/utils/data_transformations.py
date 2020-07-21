@@ -50,6 +50,29 @@ def generate_rows(filepath, table, **kwargs):
             yield dict(zip(headers, values))
 
 
+def generate_rows_from_txt(filepath, table, **kwargs):
+    """Reads an MS Access file
+    Args:
+        filepath (str): The mdb file path.
+        table (str): The table to load.
+        kwargs (dict): Keyword arguments that are passed to the csv reader.
+    Yields:
+        dict: A row of data whose keys are the field names.
+    """
+    pkwargs = {'stdout': PIPE, 'bufsize': 1, 'universal_newlines': True}
+
+    with Popen(['mdb-export', filepath, table, '-d |'], **pkwargs).stdout as pipe:
+        first_line = StringIO(str(pipe.readline()))
+        names = next(csv.reader(first_line, **kwargs))
+        headers = [name.rstrip() for name in names]
+
+        for line in iter(pipe.readline, b''):
+            next_line = StringIO(str(line))
+            values = next(csv.reader(next_line, **kwargs))
+            values = [value.rstrip() for value in values]
+            yield dict(zip(headers, values))
+
+
 # TODO Output the location / values of the malformed rows and fields to a log file.
 def merge_split_rows(column_names, broken_row, row_generator, debug=False):
 

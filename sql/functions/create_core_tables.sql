@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS core.county (
 --Creates table for neighborhood IDs----------------------------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS core.neighborhood (
     neighborhood_id SERIAL PRIMARY KEY
-    , neighborhood_name varchar
+    , neighborhood_name varchar CONSTRAINT UC_Neighborhood UNIQUE
     , county_id varchar
     , create_date date
     , current_flag boolean
@@ -21,10 +21,6 @@ CREATE TABLE IF NOT EXISTS core.neighborhood (
     , etl_job varchar
     , update_date date
     );
-
--- Neighborhood name should NEVER be null.  So a unique constraint should work.
-ALTER TABLE "core"."neighborhood"
-    ADD CONSTRAINT UC_Neighborhood UNIQUE ("neighborhood_name");
 
 --Creates table for address ids which are uniquely assigned via the serial Primary Key "address_id"-------------------------------
 CREATE TABLE IF NOT EXISTS core.address (
@@ -41,9 +37,9 @@ CREATE TABLE IF NOT EXISTS core.address (
     , etl_job varchar
     , update_date date
     );
-
+	
 -- Unique Index is necessary to account for potential nulls in address fields.
-CREATE UNIQUE INDEX UI_Address ON "core"."address"(COALESCE("street_address", 'NULL')
+CREATE UNIQUE INDEX UI_OwnerAddress ON "core"."address"(COALESCE("street_address", 'NULL')
 	, COALESCE("city", 'NULL')
     , COALESCE("state", 'NULL')
     , COALESCE("country", 'NULL')
@@ -54,7 +50,7 @@ CREATE UNIQUE INDEX UI_Address ON "core"."address"(COALESCE("street_address", 'N
 CREATE TABLE IF NOT EXISTS "core"."county_id_mapping_table" (
 	county_id varchar -- county_id
 	, parcel_id varchar PRIMARY KEY -- REDB identifier
-	, county_parcel_id varchar -- The identifier the county uses
+	, county_parcel_id varchar CONSTRAINT UC_Mapping UNIQUE -- The identifier the county uses
 	, county_parcel_id_type varchar -- The name the county uses to refer to their identifier EG:'parcel_11'
 	, create_date date
 	, current_flag boolean
@@ -62,10 +58,6 @@ CREATE TABLE IF NOT EXISTS "core"."county_id_mapping_table" (
 	, etl_job varchar
 	, update_date date
 	);
-
--- county_parcel_id should NEVER be null so a constraint should work well enough
-ALTER TABLE "core"."county_id_mapping_table" 
-    ADD CONSTRAINT UC_Mapping UNIQUE (county_parcel_id);
 
 CREATE SEQUENCE IF NOT EXISTS core.id_mapping
 INCREMENT BY 1 
@@ -176,7 +168,7 @@ CREATE UNIQUE INDEX UI_Building ON "core"."building"(COALESCE("parcel_id", 'NULL
 	
 --Creates the table for assigning unique Unit IDs.------------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS "core"."unit" (
-    "unit_id" varchar PRIMARY KEY -- CCCCCC.PPPPPPPP.BBB.UUUU (county_id.parcel_number.building_number.unit_number)
+    "unit_id" varchar -- CCCCCC.PPPPPPPP.BBB.UUUU (county_id.parcel_number.building_number.unit_number)
 	, "building_id" varchar
 	, "description" varchar
 	, "condominium" boolean
@@ -187,10 +179,16 @@ CREATE TABLE IF NOT EXISTS "core"."unit" (
 	, "update_date" date
 );
 
+CREATE UNIQUE INDEX UI_Active_Unit ON "core"."unit"(unit_id, current_flag) WHERE current_flag = TRUE;
+
+CREATE UNIQUE INDEX UI_Unit ON "core"."unit"(COALESCE("unit_id", 'NULL')
+	, COALESCE("building_id", 'NULL')
+	, COALESCE("description", 'NULL')
+	, "condominium"
+	);
+	
 END;
 $$
 LANGUAGE plpgsql;
-
---------------------------
 
 SELECT core.create_core_tables()
