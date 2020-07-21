@@ -1,22 +1,19 @@
 # Standard library
 import os
-import re
 import csv
 import tempfile
-from io import StringIO
-from datetime import datetime
-from subprocess import check_output, Popen, PIPE, CalledProcessError
+from subprocess import (check_output, CalledProcessError)
 
 # Third party
 import pandas as pd
 
 # Custom
-from .Database import Database
 from .S3 import S3
-
-pd.set_option('display.max_columns', None)  
-pd.set_option('display.expand_frame_repr', False)
-pd.set_option('max_colwidth', -1)
+from .Database import Database
+from .utils.custom_logging import print_time
+from .utils.data_transformations import (convert_scientific_notation
+                                        , generate_rows
+                                        , merge_split_rows)
 
 
 def initialize_global_IO(kwargs):
@@ -95,152 +92,6 @@ def get_table_columns(table, path_to_database):
     return columns
 
 
-def generate_rows(filepath, table, **kwargs):
-    """Reads an MS Access file
-    Args:
-        filepath (str): The mdb file path.
-        table (str): The table to load.
-        kwargs (dict): Keyword arguments that are passed to the csv reader.
-    Yields:
-        dict: A row of data whose keys are the field names.
-    Examples:
-        >>> records = generate_rows(filepath, table)
-        >>> expected = {
-        ...     'surname': 'Aaron',
-        ...     'forenames': 'William',
-        ...     'freedom': '07/03/60 00:00:00',
-        ...     'notes': 'Order of Court'}
-        >>> first_row = next(records)
-        >>> (expected == first_row) if first_row else True
-        True
-    """
-    pkwargs = {'stdout': PIPE, 'bufsize': 1, 'universal_newlines': True}
-
-    # https://stackoverflow.com/a/2813530/408556
-    # https://stackoverflow.com/a/17698359/408556
-    with Popen(['mdb-export', filepath, table, '-d |'], **pkwargs).stdout as pipe:
-        first_line = StringIO(str(pipe.readline()))
-        names = next(csv.reader(first_line, **kwargs))
-        headers = [name.rstrip() for name in names]
-
-        for line in iter(pipe.readline, b''):
-            next_line = StringIO(str(line))
-            values = next(csv.reader(next_line, **kwargs))
-            values = [value.rstrip() for value in values]
-            yield dict(zip(headers, values))
-
-
-def print_time(phase="unspecified", table="unspecified"):
-    """
-    Prints time to stdout / console in custom format.
-    """
-
-    now = datetime.now()
-    now = f"{now.hour}:{now.minute}:{now.second}"
-    init_start = f"Table: {table} has begun initializing. Time : {now}"
-    init_complete = f"Table: {table} has initialized. Time : {now}"
-    append_start = f"Table: {table} is being appended. Time : {now}"
-    append_complete = f"Table: {table} successfully appended. Time : {now}"
-
-    if phase == "unspecified":
-        print(now)
-    elif phase == "init_start":
-        print(init_start)
-    elif phase == "init_complete":
-        print(init_complete)
-    elif phase == "append_start":
-        print(append_start)
-    elif phase == "append_complete":
-        print(append_complete)
-    else:
-        print("Qué?" + " " + now)
-
-
-# TODO Incorporate column_types into function to make more efficient.
-def convert_scientific_notation(current_row):
-    """ Identifies scientific notation values then converts to float.
-
-    :param current_row: The row that is to be converted.
-    The current_row must be passed in as a Python Dictionary.
-    """
-    converted_row = {}
-
-    for key, value in current_row.items():
-
-        value = str(value)
-        
-        # Regex reads: one digit > period > zero or more digits > "E" or "e" > "+" or "-" > one or more digits.
-        if re.search(r'^\d{1}[.]\d*[Ee][+-]\d+$', value):
-            converted_row[key] = float(value)
-            
-        else:
-            converted_row[key] = value
-
-    return converted_row
-
-
-# TODO Output the location / values of the malformed rows and fields to a log file.
-def merge_split_rows(column_names, broken_row):
-    """ Will merge rows that have been broken into multiple parts thanks to a newline in one of the fields.
-
-    :param column names: A List of column names to be returned in fixed row.
-    :current_row: Current iteration of Generator object representing broken row.
-    """
-
-    # Start with a fresh row.
-    pending_row = {}
-
-    # Assign columns to be added to fresh row.
-    pending_columns = column_names.copy()
-
-    # Add all of the columns and values already present in broken row to pending row.
-    for key, value in broken_row.items():
-        pending_column = pending_columns.pop(0)
-        pending_row[pending_column] = value
-
-    # The last column present in broken row is the row with the newline.
-    column_with_newline = pending_column
-    print(f"Merging fields split by newline. Column with newline: {column_with_newline}\n{pending_row[column_with_newline]}")
-    print(f"Current row data where the newline is currently being handled:\n {broken_row}")
-        
-    next_row = next(row)
-
-    # An empty Dictionary is passed if two back to back newlines occur...
-    # this statement replaces the empty dict with appropriate key/value.
-    if len(next_row.keys()) == 0:
-        next_row = {column_names[0] : "\n"}
-   
-    # Creates a List of all the values in the next Dictionary.
-    next_row_values = list(next_row.values())
-    
-    # The first value in the next row was the field split in half by the newline.
-    next_line = next_row_values.pop(0)
-
-    if next_line == "\n":
-        # if the next value is just a newline, concatenate the newline into the broken/split field
-        pending_row[column_with_newline] += next_line
-    else:
-        # Because the newline is omitted from the string, add the newline back in before concatenating with field.
-        pending_row[column_with_newline] += ("\n" + next_line)
-
-    # For the remaining values, add the next pending column and current value to pending row.
-    for value in next_row_values:
-        pending_column = pending_columns.pop(0)
-        pending_row[pending_column] = value
-    
-    # If all columns have not been added to pending row,
-    # execute merge function again with pending row as broken row argument.
-    if len(pending_columns) != 0:
-        return merge_split_rows(column_names, pending_row)
-    else:
-        # Removes trailing double quote from broken field.
-        pending_row[column_with_newline] = pending_row[column_with_newline][0:-1]
-
-        print(f"Fixed row:\n {pending_row}")
-
-        return pending_row
-    
-
 def initialize_csv(table, columns, csv_path, limit=50_000):
     """ Creates a CSV from a Python Generator with a select number of rows.
 
@@ -255,10 +106,16 @@ def initialize_csv(table, columns, csv_path, limit=50_000):
     global row, snapshot_row
 
     batch = []
-    
-    # snapshot_row is used to initialize table via "replace_table" method and to assign columns to "table_dataframe".
-    # snapshot_row is initialized globally as to be available throughout script.
-    snapshot_row = next(row)
+
+    try:
+        # snapshot_row is used to initialize table via "replace_table" method and to assign columns to "table_dataframe".
+        # snapshot_row is initialized globally as to be available throughout script.
+        snapshot_row = next(row)
+    except RuntimeError:
+        print(f"{table} doesn't have any rows or rows are not valid. Skipping...")
+        row = None
+        return None
+
     snapshot_row = convert_scientific_notation(snapshot_row)
     batch.append(snapshot_row)
 
@@ -276,10 +133,9 @@ def initialize_csv(table, columns, csv_path, limit=50_000):
             current_row = next(row)
 
             if len(current_row.keys()) < column_count:
-                current_row = merge_split_rows(column_names, current_row)
+                current_row = merge_split_rows(column_names, current_row, row)
 
             current_row = convert_scientific_notation(current_row)
-            
             batch.append(current_row)
             rows_generated += 1
 
@@ -302,7 +158,7 @@ def initialize_csv(table, columns, csv_path, limit=50_000):
 
 
 def append_to_csv(table, columns, csv_path, limit=50_000):
-    """ Recursively appends table rows from a Python Generator to an existing CSV.
+    """Appends table rows from a Python Generator to an existing CSV.
 
     :param table: The name of the table and target CSV.
     :param limit: The amount of rows appended to CSV at a time.
@@ -328,7 +184,7 @@ def append_to_csv(table, columns, csv_path, limit=50_000):
             current_row = next(row)
 
             if len(current_row.keys()) < column_count:
-                current_row = merge_split_rows(column_names, current_row)
+                current_row = merge_split_rows(column_names, current_row, row)
 
             current_row = convert_scientific_notation(current_row)
             batch.append(current_row)
@@ -353,11 +209,12 @@ def append_to_csv(table, columns, csv_path, limit=50_000):
     print_time("append_complete", table)
 
     if row != None:
+        # Iteration is preferred here as opposed to recursion to save on RAM.
         append_to_csv(table, columns, csv_path, limit)
 
 
 def main(**kwargs):
-    """ Mainline logic for script. Downloads .mdb files from S3 Bucket,
+    """Downloads .mdb files from S3 Bucket,
     creates CSVs for each table within .mdb file, then copies CSV
     to target database (one table/csv at a time).
 
@@ -374,26 +231,22 @@ def main(**kwargs):
     global row, snapshot_row
 
     initialize_global_IO(kwargs) # Initializes S3 Bucket and target database to global scope.
-
     mdb_files_in_s3 = s3.list_objects(extension=".mdb", field="Key")
 
     for mdb in mdb_files_in_s3:
-
         with tempfile.TemporaryDirectory() as tmp:
             path_to_database =  os.path.join(tmp, mdb)
             s3.download_file(s3.bucket_name, mdb, path_to_database)
 
             # Creates CSVs from tables.
             for table in get_tables(path_to_database):
-
                 columns = get_table_columns(table, path_to_database)
-                column_names = [column[0] for column in columns]
 
                 # "generate_rows" returns a Python Generator that is being initialized globally via the "global" keyword. 
                 # The Generator (row) can thus be shared throughout the script.
                 row = generate_rows(path_to_database, table=table, delimiter="|")
                 mdb_name = mdb[:-4] # name of Access database
-                table = mdb_name + "_" + table.lower() # prepends database name to table
+                table = mdb_name.lower() + "_" + table.lower() # prepends database name to table
                 csv_path = f"dags/efs/redb/resources/{table}.csv"
 
                 initialize_csv(table, columns, csv_path, limit=50_000)
@@ -401,15 +254,18 @@ def main(**kwargs):
                 if row != None:
                     append_to_csv(table, columns, csv_path, limit=50_000)
 
-                # Opens CSV then copies to database.
-                with open(csv_path, 'r+') as csvfile:
-                    db.replace_table("staging_1", table, snapshot_row) # snapshot_row created upon invoking "initialize_csv" function.
-                    conn = db.get_raw_connection()
-                    cursor = conn.cursor()
-                    cmd = f'COPY staging_1."{table}" FROM STDIN WITH (FORMAT CSV, DELIMITER "|", HEADER TRUE, ENCODING "utf-8")'
-                    cursor.copy_expert(cmd, csvfile)
-                    conn.commit()
-                    print(f"{table} copied into staging_1.")
-                
-                os.remove(csv_path)
+                try:
+                    # Opens CSV then copies to database.
+                    with open(csv_path, 'r+') as csvfile:
+                        db.replace_table("staging_1", table, snapshot_row) # snapshot_row created upon invoking "initialize_csv" function.
+                        conn = db.get_raw_connection()
+                        cursor = conn.cursor()
+                        cmd = f'COPY staging_1."{table}" FROM STDIN WITH (FORMAT CSV, DELIMITER "|", HEADER TRUE, ENCODING "utf-8")'
+                        cursor.copy_expert(cmd, csvfile)
+                        conn.commit()
+                        print(f"{table} copied into staging_1.")
+                    os.remove(csv_path)
+                except Exception as err:
+                    print(f"Warning: {err} - Table being skipped.")
+                    continue
             
