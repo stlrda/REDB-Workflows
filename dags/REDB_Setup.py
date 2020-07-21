@@ -42,7 +42,11 @@ with DAG('REDB_Setup',
     # Create tables (once) (sql/functions)
     create_tables = PostgresOperator(task_id="create_tables", postgres_conn_id="redb_postgres", sql="functions/create_core_tables.sql", database=DATABASE_NAME)
 
+    # Create views (once) (sql/functions)
+    create_views = PostgresOperator(task_id="create_views", postgres_conn_id="redb_postgres", sql="functions/create_current_views.sql", database=DATABASE_NAME)
+
 chain(
     create_schemas
     , create_tables
+    , create_views
 )
