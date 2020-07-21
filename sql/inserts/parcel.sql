@@ -22,7 +22,7 @@ CREATE OR REPLACE VIEW staging_1.ID_TABLE_VIEW AS
 			AND COALESCE("OwnerCity", ' ') = COALESCE("city", ' ') 
 			AND COALESCE("OwnerState", ' ') = COALESCE("state", ' ')
 			AND COALESCE("OwnerCountry", ' ') = COALESCE("country", ' ') 
-			AND COALESCE("OwnerZIP", ' ') = COALESCE(A."zip", ' ')
+			AND COALESCE("OwnerZIP", ' ') = COALESCE("zip", ' ')
 		) qry
 	LEFT JOIN "core"."legal_entity"
         ON COALESCE("OwnerName", ' ') = COALESCE("legal_entity_name", ' ')
@@ -32,35 +32,34 @@ CREATE OR REPLACE VIEW staging_1.ID_TABLE_VIEW AS
 
 ----------------------ADDITIONAL VIEW NECESSARY FOR INSERTING NEW PARCELS AND DETECTING CHANGES IN EXISTING ONES--------------------------------
 CREATE OR REPLACE VIEW staging_1.NEW_REDB_IDS AS
-	(
-	WITH NEW_PARCEL_IDS AS
-		(
-			SELECT CURRENT_WEEK."ParcelId"
-			FROM "staging_1"."prcl_prcl" AS CURRENT_WEEK
-			LEFT JOIN "staging_2"."prcl_prcl" AS PREVIOUS_WEEK
-			ON (CURRENT_WEEK."ParcelId" = PREVIOUS_WEEK."ParcelId"
+    (
+    WITH NEW_PARCEL_IDS AS
+        (
+            SELECT CURRENT_WEEK."ParcelId"
+            FROM "staging_1"."prcl_prcl" AS CURRENT_WEEK
+            LEFT JOIN "staging_2"."prcl_prcl" AS PREVIOUS_WEEK
+            ON (CURRENT_WEEK."ParcelId" = PREVIOUS_WEEK."ParcelId"
                 --Used for legal_entity Table
-				AND COALESCE(CURRENT_WEEK."OwnerName", 'NULL') = COALESCE(PREVIOUS_WEEK."OwnerName", 'NULL')
+                AND COALESCE(CURRENT_WEEK."OwnerName", 'NULL') = COALESCE(PREVIOUS_WEEK."OwnerName", 'NULL')
                 AND COALESCE(CURRENT_WEEK."OwnerName2", 'NULL') = COALESCE(PREVIOUS_WEEK."OwnerName2", 'NULL')
                 --Used for address Table
-				--TODO Add StreetAddress InfoFields
-				AND COALESCE(CURRENT_WEEK."OwnerAddr", 'NULL') = COALESCE(PREVIOUS_WEEK."OwnerAddr", 'NULL')
+                AND COALESCE(CURRENT_WEEK."OwnerAddr", 'NULL') = COALESCE(PREVIOUS_WEEK."OwnerAddr", 'NULL')
                 AND COALESCE(CURRENT_WEEK."OwnerCity", 'NULL') = COALESCE(PREVIOUS_WEEK."OwnerCity", 'NULL')
                 AND COALESCE(CURRENT_WEEK."OwnerCity", 'NULL') = COALESCE(PREVIOUS_WEEK."OwnerCity", 'NULL')
                 AND COALESCE(CURRENT_WEEK."OwnerState", 'NULL') = COALESCE(PREVIOUS_WEEK."OwnerState", 'NULL')
                 AND COALESCE(CURRENT_WEEK."OwnerCountry", 'NULL') = COALESCE(PREVIOUS_WEEK."OwnerCountry", 'NULL')
                 AND COALESCE(CURRENT_WEEK."OwnerZIP", 'NULL') = COALESCE(PREVIOUS_WEEK."OwnerZIP", 'NULL')
-			    ---- Parcel Addresses
+                ---- Parcel Addresses
                 AND COALESCE(CURRENT_WEEK."LowAddrNum", 'NULL') = COALESCE(PREVIOUS_WEEK."LowAddrNum", 'NULL')
-			    AND COALESCE(CURRENT_WEEK."HighAddrNum", 'NULL') = COALESCE(PREVIOUS_WEEK."HighAddrNum", 'NULL')
-			    AND COALESCE(CURRENT_WEEK."StPreDir", 'NULL') = COALESCE(PREVIOUS_WEEK."StPreDir", 'NULL')
-			    AND COALESCE(CURRENT_WEEK."StName", 'NULL') = COALESCE(PREVIOUS_WEEK."StName", 'NULL')
-			    AND COALESCE(CURRENT_WEEK."StType", 'NULL') = COALESCE(PREVIOUS_WEEK."StType", 'NULL')
+                AND COALESCE(CURRENT_WEEK."HighAddrNum", 'NULL') = COALESCE(PREVIOUS_WEEK."HighAddrNum", 'NULL')
+                AND COALESCE(CURRENT_WEEK."StPreDir", 'NULL') = COALESCE(PREVIOUS_WEEK."StPreDir", 'NULL')
+                AND COALESCE(CURRENT_WEEK."StName", 'NULL') = COALESCE(PREVIOUS_WEEK."StName", 'NULL')
+                AND COALESCE(CURRENT_WEEK."StType", 'NULL') = COALESCE(PREVIOUS_WEEK."StType", 'NULL')
                 AND COALESCE(CURRENT_WEEK."LowAddrSuf", 'NULL') = COALESCE(PREVIOUS_WEEK."LowAddrSuf", 'NULL')
                 AND COALESCE(CURRENT_WEEK."HighAddrSuf", 'NULL') = COALESCE(PREVIOUS_WEEK."HighAddrSuf", 'NULL')
                 AND COALESCE(CURRENT_WEEK."ZIP", 'NULL') = COALESCE(PREVIOUS_WEEK."ZIP", 'NULL')
                 --Used for parcel Table
-				AND COALESCE(CURRENT_WEEK."CityBlock", 'NULL') = COALESCE(PREVIOUS_WEEK."CityBlock", 'NULL')
+                AND COALESCE(CURRENT_WEEK."CityBlock", 'NULL') = COALESCE(PREVIOUS_WEEK."CityBlock", 'NULL')
                 AND COALESCE(CURRENT_WEEK."LegalDesc1", 'NULL') = COALESCE(PREVIOUS_WEEK."LegalDesc1", 'NULL')
                 AND COALESCE(CURRENT_WEEK."LegalDesc2", 'NULL') = COALESCE(PREVIOUS_WEEK."LegalDesc2", 'NULL') 
                 AND COALESCE(CURRENT_WEEK."LegalDesc3", 'NULL') = COALESCE(PREVIOUS_WEEK."LegalDesc3", 'NULL') 
@@ -81,49 +80,22 @@ CREATE OR REPLACE VIEW staging_1.NEW_REDB_IDS AS
                 AND COALESCE(CURRENT_WEEK."GisParcel", 'NULL') = COALESCE(PREVIOUS_WEEK."GisParcel", 'NULL')
                 AND COALESCE(CURRENT_WEEK."GisOwnerCode", 'NULL') = COALESCE(PREVIOUS_WEEK."GisOwnerCode", 'NULL')
                 )
-			WHERE PREVIOUS_WEEK."ParcelId" IS NULL
-		)
-	SELECT DISTINCT "county_id", "parcel_id", "county_parcel_id", "create_date", "current_flag", "removed_flag", "etl_job", "update_date"
-	FROM "core"."county_id_mapping_table"
-	JOIN NEW_PARCEL_IDS
-	ON NEW_PARCEL_IDS."ParcelId" = "county_id_mapping_table"."county_parcel_id"
-	);
+            WHERE PREVIOUS_WEEK."ParcelId" IS NULL
+        )
+    SELECT DISTINCT "county_id", "parcel_id", "county_parcel_id", "create_date", "current_flag", "removed_flag", "etl_job", "update_date"
+    FROM "core"."county_id_mapping_table"
+    JOIN NEW_PARCEL_IDS
+    ON NEW_PARCEL_IDS."ParcelId" = "county_id_mapping_table"."county_parcel_id"
+    );
 
-CREATE OR REPLACE VIEW staging_1.parcel_addresses AS
-	(
-	SELECT "ParcelId", "legal_entity_id"
-	FROM (
-		SELECT "ParcelId"
-            , "OwnerName"
-            , "OwnerName2"
-            , "address_id"
-            , "OwnerAddr"
-            , "OwnerCity"
-            , "OwnerState"
-            , "OwnerCountry"
-            , "OwnerZIP"
-		FROM "staging_1"."prcl_prcl" AS P
-		LEFT JOIN "core"."address" AS A
-			ON COALESCE("OwnerAddr", ' ') = COALESCE("street_address", ' ')
-			AND COALESCE("OwnerCity", ' ') = COALESCE("city", ' ')
-			AND COALESCE("OwnerState", ' ') = COALESCE("state", ' ')
-			AND COALESCE("OwnerCountry", ' ') = COALESCE("country", ' ')
-			AND COALESCE("OwnerZIP", ' ') = COALESCE("zip", ' ')
-		) qry
-	LEFT JOIN "core"."legal_entity"
-        ON COALESCE("OwnerName", ' ') = COALESCE("legal_entity_name", ' ')
-        AND COALESCE("OwnerName2", ' ') = COALESCE("legal_entity_secondary_name", ' ')
-        AND ("legal_entity"."address_id" = "qry"."address_id")
-	);
-	
 --Update Current_flag & Update date on existing parcels if a new version is detected------------
 UPDATE "core"."parcel"
 SET "update_date" = (CASE
-						WHEN "parcel"."current_flag" = TRUE 
-						THEN CURRENT_DATE
-						ELSE "parcel"."update_date"
-					END)
-	, "current_flag" = FALSE
+                        WHEN "parcel"."current_flag" = TRUE 
+                        THEN CURRENT_DATE
+                        ELSE "parcel"."update_date"
+                    END)
+    , "current_flag" = FALSE
 FROM staging_1.NEW_REDB_IDS
 WHERE "parcel"."parcel_id" = NEW_REDB_IDS."parcel_id";
 
@@ -151,7 +123,7 @@ INSERT INTO "core"."parcel" ("parcel_id"
     , "gis_parcel"
     , "gis_owner_code"
     , "create_date"
-	, "current_flag"
+    , "current_flag"
     , "removed_flag"
     , "etl_job"
     , "update_date"
@@ -218,10 +190,10 @@ ON CONFLICT (COALESCE("parcel_id", 'NULL')
     , COALESCE("gis_city_block", 'NULL')
     , COALESCE("gis_parcel", 'NULL')
     , COALESCE("gis_owner_code", 'NULL'))
-	DO UPDATE
+DO UPDATE
 SET "current_flag" = TRUE
 	, "removed_flag" = FALSE
-	, "update_date" = CURRENT_DATE;
+    , "update_date" = CURRENT_DATE;
 
 END;
 $$
