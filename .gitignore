@@ -17,6 +17,7 @@ scripts/Create_Address_Tbl.py
 scripts/Create_County_Tbl.py
 scripts/Create_LegalEntity_Tbl.py
 scripts/Create_Neighborhood_Tbl.py
+prcl.mdb
 
 
 # Files created upon Dockerization for Airflow testing environment (via Docker volume)
