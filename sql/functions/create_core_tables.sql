@@ -120,7 +120,7 @@ CREATE TABLE IF NOT EXISTS "core"."parcel" (
 
 CREATE UNIQUE INDEX IF NOT EXISTS UI_Active_Parcel ON "core"."parcel"(parcel_id, current_flag) WHERE current_flag = TRUE;
 
-CREATE UNIQUE INDEX UI_Parcel ON "core"."parcel"(COALESCE("parcel_id", 'NULL')
+CREATE UNIQUE INDEX IF NOT EXISTS UI_Parcel ON "core"."parcel"(COALESCE("parcel_id", 'NULL')
     , COALESCE("county_id", 'NULL')
     , COALESCE("city_block_number", 'NULL')
     , COALESCE("parcel_number", 'NULL')
