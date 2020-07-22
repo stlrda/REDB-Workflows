@@ -7,7 +7,6 @@ from zipfile import ZipFile
 # Third party
 import wget
 import pandas as pd
-from colorama import Fore, Style
 
 # Custom
 from .S3 import S3
@@ -77,7 +76,7 @@ def tempfile_to_s3(SOURCES_DATAFRAME, s3):
 
         # ? strings for stdout
         downloading = f'\nDownloading {file_name}- {link_name} \nFrom: {url}'
-        success = f'\nDownload for {file_name}: {Fore.GREEN}SUCCESSFUL{Style.RESET_ALL}'
+        success = f'\nDownload for {file_name}: SUCCESSFUL'
 
         if (url not in SOURCES_VISITED):
             with tempfile.TemporaryDirectory() as tmp:
@@ -93,7 +92,7 @@ def tempfile_to_s3(SOURCES_DATAFRAME, s3):
                     unzip(get_list_of_files(tmp), tmp)
                     
                 except Exception as err:
-                    message = f'\nDownload for {file_name}: {Fore.RED}UNSUCCESSFUL:{Style.RESET_ALL} {err}'
+                    message = f'\nDownload for {file_name}: UNSUCCESSFUL: {err}'
                     print(message)
 
                 for file in os.listdir(tmp):

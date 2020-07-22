@@ -2,6 +2,8 @@ from sqlalchemy import *
 
 
 # Class for target database that overrides default sqlalchemy functionality with custom features.
+# The most import feature here is the "replace_table" method which dynamically creates tables
+# without the need for knowing and defining them beforehand.
 class Database():
 
     def __init__(self, user, password, host, port, database_name, schema=None):
@@ -39,7 +41,7 @@ class Database():
             table.append_column(Column(key, VARCHAR(1000)))
 
         if self.ENGINE.dialect.has_table(self.ENGINE, table_name, schema=schema):
-            table.drop()
+            self.get_raw_connection().cursor().execute(f"DROP TABLE {schema}.{table_name} CASCADE;")
 
         try:
             table.create()
@@ -71,9 +73,6 @@ class Database():
         except Exception as err:
             print(err)
             return False
-
-    def select(self):
-        pass
 
 
     def get_raw_connection(self):

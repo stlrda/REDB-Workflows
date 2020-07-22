@@ -12,8 +12,7 @@ from .S3 import S3
 from .Database import Database
 from .utils.custom_logging import print_time
 from .utils.data_transformations import (convert_scientific_notation
-                                        , generate_rows
-                                        , merge_split_rows)
+                                        , generate_rows)
 
 
 def initialize_global_IO(kwargs):
@@ -59,40 +58,7 @@ def get_tables(path_to_database):
     return tables
 
 
-def get_table_columns(table, path_to_database):
-    """ Returns a list of every column name and column type for a specified .mdb table.
-
-    :param table: Name of table to search for columns.
-    :param path_to_database: A path to .mdb database to search for table.
-    """
-
-    columns = []
-
-    try:
-        # Will not work via DAG in Airflow.
-        arr = check_output(["mdb-schema", "--table", table, path_to_database])
-
-    except CalledProcessError as exc:
-        # Will assign the same value as the try block, but DOES work via Airflow.
-        arr = exc.output
-
-    arr = arr.decode().split()
-
-    for index, element in enumerate(arr):
-        if element.startswith("[") and element.endswith("]"):
-            column_name = element.replace("[", "").replace("]", "")
-            column_type = arr[index + 1]
-            column = (column_name, column_type)
-            columns.append(column)
-
-    columns.pop(0) # The first column is just the table name and an open bracket.
-
-    print(f'Columns ({len(columns)}) for table: {table} @ {path_to_database}:\n{columns}')
-
-    return columns
-
-
-def initialize_csv(table, columns, csv_path, limit=50_000):
+def initialize_csv(table, csv_path, limit=50_000):
     """ Creates a CSV from a Python Generator with a select number of rows.
 
     :param table: The name of the table and target CSV.
@@ -111,38 +77,27 @@ def initialize_csv(table, columns, csv_path, limit=50_000):
         # snapshot_row is used to initialize table via "replace_table" method and to assign columns to "table_dataframe".
         # snapshot_row is initialized globally as to be available throughout script.
         snapshot_row = next(row)
-    except RuntimeError:
+    except StopIteration:
         print(f"{table} doesn't have any rows or rows are not valid. Skipping...")
         row = None
         return None
 
     snapshot_row = convert_scientific_notation(snapshot_row)
     batch.append(snapshot_row)
-
-
     rows_generated = 1
-
-    column_count = len(columns)
-    column_names = [column[0] for column in columns]
-    column_types = [column[1] for column in columns]
 
     print_time("init_start", table)
 
     while (rows_generated < limit) and (row != None):
         try:
             current_row = next(row)
-
-            if len(current_row.keys()) < column_count:
-                current_row = merge_split_rows(column_names, current_row, row)
-
             current_row = convert_scientific_notation(current_row)
             batch.append(current_row)
             rows_generated += 1
 
-        # Python 3.4 returns "RuntimeError" once Generator reaches the end.
-        except RuntimeError as err:
+        # Python 3.4 returns "StopIteration" once Generator reaches the end.
+        except StopIteration:
             row = None
-            print(err)
             break
     
     table_dataframe = pd.DataFrame(batch, columns=snapshot_row.keys())
@@ -157,7 +112,7 @@ def initialize_csv(table, columns, csv_path, limit=50_000):
     print_time("init_complete", table)
 
 
-def append_to_csv(table, columns, csv_path, limit=50_000):
+def append_to_csv(table, csv_path, limit=50_000):
     """Appends table rows from a Python Generator to an existing CSV.
 
     :param table: The name of the table and target CSV.
@@ -173,27 +128,18 @@ def append_to_csv(table, columns, csv_path, limit=50_000):
     batch = []
     rows_generated = 0
 
-    column_count = len(columns)
-    column_names = [column[0] for column in columns]
-    column_types = [column[1] for column in columns]
-
     print_time("append_start", table)
 
     while (rows_generated < limit) and (row != None):
         try:
             current_row = next(row)
-
-            if len(current_row.keys()) < column_count:
-                current_row = merge_split_rows(column_names, current_row, row)
-
             current_row = convert_scientific_notation(current_row)
             batch.append(current_row)
             rows_generated += 1
 
-        # Python 3.4 returns "RuntimeError" once Generator reaches the end.
-        except RuntimeError as err:
+        # Python 3.4 returns "StopIteration" once Generator reaches the end.
+        except StopIteration:
             row = None
-            print(err)
             break
     
     table_dataframe = pd.DataFrame(batch, columns=snapshot_row.keys())
@@ -210,7 +156,27 @@ def append_to_csv(table, columns, csv_path, limit=50_000):
 
     if row != None:
         # Iteration is preferred here as opposed to recursion to save on RAM.
-        append_to_csv(table, columns, csv_path, limit)
+        append_to_csv(table, csv_path, limit)
+
+
+def copy_csv_to_database(csv_path, new_table_name, snapshot_row):
+    try:
+        f = open(csv_path, 'r')
+        f.close()
+    except Exception as err:
+        print(f"WARNING: {err} - Table being skipped.")
+        return None
+    
+    # Opens CSV then copies to database.
+    with open(csv_path, 'r+') as csvfile:
+        db.replace_table("staging_1", new_table_name, snapshot_row) # snapshot_row created upon invoking "initialize_csv" function.
+        conn = db.get_raw_connection()
+        cursor = conn.cursor()
+        cmd = f'COPY staging_1."{new_table_name}" FROM STDIN WITH (FORMAT CSV, DELIMITER "|", HEADER TRUE, ENCODING "utf-8")'
+        cursor.copy_expert(cmd, csvfile)
+        conn.commit()
+        print(f"{new_table_name} copied into staging_1.")
+    os.remove(csv_path)
 
 
 def main(**kwargs):
@@ -238,34 +204,15 @@ def main(**kwargs):
             path_to_database =  os.path.join(tmp, mdb)
             s3.download_file(s3.bucket_name, mdb, path_to_database)
 
-            # Creates CSVs from tables.
-            for table in get_tables(path_to_database):
-                columns = get_table_columns(table, path_to_database)
-
-                # "generate_rows" returns a Python Generator that is being initialized globally via the "global" keyword. 
-                # The Generator (row) can thus be shared throughout the script.
-                row = generate_rows(path_to_database, table=table, delimiter="|")
+            for og_table_name in get_tables(path_to_database):
                 mdb_name = mdb[:-4] # name of Access database
-                table = mdb_name.lower() + "_" + table.lower() # prepends database name to table
-                csv_path = f"dags/efs/redb/resources/{table}.csv"
+                new_table_name = mdb_name.lower() + "_" + og_table_name.lower() # prepends database name to table
+                csv_path = f"dags/efs/redb/resources/{new_table_name}.csv"
+                row = generate_rows(path_to_database, og_table_name) # Initialized globally via the "global" keyword.
 
-                initialize_csv(table, columns, csv_path, limit=50_000)
+                initialize_csv(new_table_name, csv_path, limit=50_000)
 
                 if row != None:
-                    append_to_csv(table, columns, csv_path, limit=50_000)
+                    append_to_csv(new_table_name, csv_path, limit=50_000)
 
-                try:
-                    # Opens CSV then copies to database.
-                    with open(csv_path, 'r+') as csvfile:
-                        db.replace_table("staging_1", table, snapshot_row) # snapshot_row created upon invoking "initialize_csv" function.
-                        conn = db.get_raw_connection()
-                        cursor = conn.cursor()
-                        cmd = f'COPY staging_1."{table}" FROM STDIN WITH (FORMAT CSV, DELIMITER "|", HEADER TRUE, ENCODING "utf-8")'
-                        cursor.copy_expert(cmd, csvfile)
-                        conn.commit()
-                        print(f"{table} copied into staging_1.")
-                    os.remove(csv_path)
-                except Exception as err:
-                    print(f"Warning: {err} - Table being skipped.")
-                    continue
-            
+                copy_csv_to_database(csv_path, new_table_name, snapshot_row)
