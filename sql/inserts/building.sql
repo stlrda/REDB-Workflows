@@ -11,21 +11,13 @@ CREATE OR REPLACE VIEW staging_1.UNION_BLDGS AS
 			(
 			WITH UNION_PREVIOUS_BUILDINGS AS
 				(
-				SELECT core.format_parcelId(prcl_bldgcom."CityBlock", prcl_bldgcom."Parcel", prcl_bldgcom."OwnerCode") AS "ParcelId"
-					, "prcl_bldgcom"."BldgNum"
+				SELECT "prcl_bldgall"."ParcelId"
+					, "prcl_bldgall"."BldgNum"
 					, "NbrOfApts"
 					, CONCAT("LegalDesc1",' ',"LegalDesc2",' ',"LegalDesc3",' ',"LegalDesc4",' ',"LegalDesc5") AS description
-				FROM "staging_2"."prcl_bldgcom"
+				FROM "staging_2"."prcl_bldgall"
 				JOIN "staging_2"."prcl_prcl"
-				ON (SELECT core.format_parcelId(prcl_bldgcom."CityBlock", prcl_bldgcom."Parcel", prcl_bldgcom."OwnerCode")) = "prcl_prcl"."ParcelId"
-				UNION ALL
-				SELECT core.format_parcelId(prcl_bldgres."CityBlock", prcl_bldgres."Parcel", prcl_bldgres."OwnerCode") AS "ParcelId"
-					, "prcl_bldgres"."BldgNum"
-					, "NbrOfApts"
-					, CONCAT("LegalDesc1",' ',"LegalDesc2",' ',"LegalDesc3",' ',"LegalDesc4",' ',"LegalDesc5") AS description
-				FROM "staging_2"."prcl_bldgres"
-				JOIN "staging_2"."prcl_prcl"
-				ON (SELECT core.format_parcelId(prcl_bldgres."CityBlock", prcl_bldgres."Parcel", prcl_bldgres."OwnerCode")) = "prcl_prcl"."ParcelId"
+				ON "prcl_bldgall"."ParcelId" = "prcl_prcl"."ParcelId"
 				)
 			SELECT UPB."ParcelId"
 				, UPB."BldgNum"
@@ -80,21 +72,13 @@ CREATE OR REPLACE VIEW staging_1.NEW_OR_CHANGED_BUILDINGS AS --Compares CURRENT(
 				FROM "staging_1"."prcl_prcl"
 				WHERE "Parcel" != "GisParcel" AND "OwnerCode" != '8'
 				)				
-			SELECT "ParcelId"
+			SELECT BUILDING_RECORD."ParcelId"
 				, "BldgNum"
 				, "NbrOfApts"
 				, "description"
 			FROM BUILDING_RECORD
-			JOIN "staging_1"."prcl_bldgcom"
-			ON (SELECT core.format_parcelId(prcl_bldgcom."CityBlock", prcl_bldgcom."Parcel", prcl_bldgcom."OwnerCode")) = BUILDING_RECORD."ParcelId"
-			UNION ALL
-			SELECT "ParcelId"
-				, "BldgNum"
-				, "NbrOfApts"
-				, "description"
-			FROM BUILDING_RECORD
-			JOIN "staging_1"."prcl_bldgres"
-			ON (SELECT core.format_parcelId(prcl_bldgres."CityBlock", prcl_bldgres."Parcel", prcl_bldgres."OwnerCode")) = BUILDING_RECORD."ParcelId"	
+			JOIN "staging_1"."prcl_bldgall"
+			ON "prcl_bldgall"."ParcelId" = BUILDING_RECORD."ParcelId"
 			)
 		SELECT DISTINCT ADD_OWNER_ID."ParcelId"
 			, "parcel"."owner_id"

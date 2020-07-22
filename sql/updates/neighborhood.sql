@@ -16,7 +16,7 @@ SET  "current_flag" = FALSE
 	, "removed_flag" = TRUE
 	, "update_date" = CURRENT_DATE
 FROM DEAD_NEIGHBORHOODS
-WHERE "neighborhood"."neighborhood_name" = DEAD_NEIGHBORHOODS."Nbrhd"
+WHERE "neighborhood"."neighborhood_name" = DEAD_NEIGHBORHOODS."Nbrhd";
 
 END;
 $$
