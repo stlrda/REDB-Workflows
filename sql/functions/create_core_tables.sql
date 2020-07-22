@@ -149,6 +149,7 @@ CREATE TABLE IF NOT EXISTS "core"."building" (
 	, "building_id" varchar -- CCCCCC.PPPPPPPP.BBB.0000 (county_id.parcel_number.building_number.unit_number)
 	, "owner_id" varchar
 	, "description" varchar
+	, "building_use" varchar
 	, "apartment_count" int
 	, "create_date" date
 	, "current_flag" boolean
@@ -163,6 +164,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS UI_Building ON "core"."building"(COALESCE("par
 	, COALESCE("building_id", 'NULL')
 	, COALESCE("owner_id", 'NULL')
 	, COALESCE("description", 'NULL')
+	, COALESCE("building_use", 'NULL')
 	, COALESCE("apartment_count", '777')
 	);
 	

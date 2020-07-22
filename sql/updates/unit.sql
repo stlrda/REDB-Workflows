@@ -24,7 +24,8 @@ WITH DEAD_UNITS AS
 			ON "prcl_bldgall"."ParcelId" = BUILDING_RECORD."ParcelId"
 			)
 		SELECT (SELECT core.format_parcelId(prcl_bldgsect."CityBlock", prcl_bldgsect."Parcel", prcl_bldgsect."OwnerCode")) AS "ParcelId"
-			, "prcl_bldgsect"."BldgNum", "prcl_bldgsect"."SectNum" -- SectNum = Unit Number
+			, "prcl_bldgsect"."BldgNum"
+			, "prcl_bldgsect"."SectNum" -- SectNum = Unit Number
 			, "Condominium"
 		FROM "staging_2"."prcl_bldgsect"
 		JOIN BUILDING_TABLE

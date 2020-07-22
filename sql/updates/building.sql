@@ -9,19 +9,29 @@ WITH DEAD_BUILDINGS AS --Compares Past(staging_2) to Current(staging_1) and retu
 		(	
 		WITH BUILDING_RECORD AS --Selects records from prcl_prcl that meet our building criteria and returns NbrOfApts along with ParcelId
 			(
-			SELECT "prcl_prcl"."ParcelId", "NbrOfApts" 
+			SELECT "prcl_prcl"."ParcelId"
+				, "NbrOfApts" 
 			FROM "staging_2"."prcl_prcl"
 			WHERE "Parcel" != "GisParcel" AND "OwnerCode" != '8'
 			)
-		SELECT BUILDING_RECORD."ParcelId", "BldgNum", "NbrOfApts"
+		SELECT BUILDING_RECORD."ParcelId"
+			, "BldgNum"
+			, "BldgUse"
+			, "NbrOfApts"
 		FROM BUILDING_RECORD
 		JOIN "staging_2"."prcl_bldgall"
 		ON (SELECT core.format_parcelId(prcl_bldgall."CityBlock", prcl_bldgall."Parcel", prcl_bldgall."OwnerCode")) = BUILDING_RECORD."ParcelId"
 		)		
-	SELECT "county_id_mapping_table"."parcel_id", BUILDING_TABLE."ParcelId", BUILDING_TABLE."BldgNum", BUILDING_TABLE."NbrOfApts"
+	SELECT "county_id_mapping_table"."parcel_id"
+		, BUILDING_TABLE."ParcelId"
+		, BUILDING_TABLE."BldgNum"
+		, BUILDING_TABLE."BldgUse"
+		, BUILDING_TABLE."NbrOfApts"
 	FROM BUILDING_TABLE
 	LEFT JOIN "staging_1"."prcl_bldgall"
-	ON "prcl_bldgall"."ParcelId" = BUILDING_TABLE."ParcelId" AND "prcl_bldgall"."BldgNum" = BUILDING_TABLE."BldgNum"
+	ON "prcl_bldgall"."ParcelId" = BUILDING_TABLE."ParcelId" 
+		AND "prcl_bldgall"."BldgNum" = BUILDING_TABLE."BldgNum" 
+		AND COALESCE("prcl_bldgall"."BldgUse", 'NULL') = COALESCE(BUILDING_TABLE."BldgUse", 'NULL') --sometimes BldgUse is null for some reason
 	JOIN "core"."county_id_mapping_table"
 	ON BUILDING_TABLE."ParcelId" = county_id_mapping_table."county_parcel_id"
 	WHERE "prcl_bldgall"."ParcelId" IS NULL
