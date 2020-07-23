@@ -66,7 +66,6 @@ with DAG('REDB_ELT',
 
     # Replace functions (weekly) (sql/functions)
     # TODO update function scripts such that they delete function if exists before creating.
-    define_add_county = PostgresOperator(task_id="define_add_county", postgres_conn_id="redb_postgres", sql="functions/add_county.sql", database=DATABASE_NAME)
     define_format_parcel_address = PostgresOperator(task_id="define_format_parcel_address", postgres_conn_id="redb_postgres", sql="functions/format_parcel_address.sql", database=DATABASE_NAME)
     define_format_parcelId = PostgresOperator(task_id="define_format_parcelId", postgres_conn_id="redb_postgres", sql="functions/format_parcelId.sql", database=DATABASE_NAME)
     define_insert_week1_to_staging1 = PostgresOperator(task_id="define_insert_week1_to_staging1", postgres_conn_id="redb_postgres", sql="functions/insert_week1_to_staging1.sql", database=DATABASE_NAME)
@@ -75,25 +74,19 @@ with DAG('REDB_ELT',
     # Compare and Insert (weekly) (sql/inserts)
     insert_address = PostgresOperator(task_id="insert_address", postgres_conn_id="redb_postgres", sql="inserts/address.sql", database=DATABASE_NAME)
     insert_building = PostgresOperator(task_id="insert_building", postgres_conn_id="redb_postgres", sql="inserts/building.sql", database=DATABASE_NAME)
-    insert_county = PostgresOperator(task_id="insert_county", postgres_conn_id="redb_postgres", sql="inserts/county.sql", database=DATABASE_NAME)
     insert_county_id_mapping_table = PostgresOperator(task_id="insert_county_id_mapping_table", postgres_conn_id="redb_postgres", sql="inserts/county_id_mapping_table.sql", database=DATABASE_NAME)
     insert_legal_entity = PostgresOperator(task_id="insert_legal_entity", postgres_conn_id="redb_postgres", sql="inserts/legal_entity.sql", database=DATABASE_NAME)
     insert_neighborhood = PostgresOperator(task_id="insert_neighborhood", postgres_conn_id="redb_postgres", sql="inserts/neighborhood.sql", database=DATABASE_NAME)
     insert_parcel = PostgresOperator(task_id="insert_parcel", postgres_conn_id="redb_postgres", sql="inserts/parcel.sql", database=DATABASE_NAME)
-    insert_special_parcel_type = PostgresOperator(task_id="insert_special_parcel_type", postgres_conn_id="redb_postgres", sql="inserts/special_parcel_type.sql", database=DATABASE_NAME)
-    insert_sub_parcel_type = PostgresOperator(task_id="insert_sub_parcel_type", postgres_conn_id="redb_postgres", sql="inserts/sub_parcel_type.sql", database=DATABASE_NAME)
     insert_unit = PostgresOperator(task_id="insert_unit", postgres_conn_id="redb_postgres", sql="inserts/unit.sql", database=DATABASE_NAME)
 
     # Update (weekly) (sql/updates)
     update_address = PostgresOperator(task_id="update_address", postgres_conn_id="redb_postgres", sql="updates/address.sql", database=DATABASE_NAME)
     update_building = PostgresOperator(task_id="update_building", postgres_conn_id="redb_postgres", sql="updates/building.sql", database=DATABASE_NAME)
-    update_county = PostgresOperator(task_id="update_county", postgres_conn_id="redb_postgres", sql="updates/county.sql", database=DATABASE_NAME)
     update_county_id_mapping_table = PostgresOperator(task_id="update_county_id_mapping_table", postgres_conn_id="redb_postgres", sql="updates/county_id_mapping_table.sql", database=DATABASE_NAME)
     update_legal_entity = PostgresOperator(task_id="update_legal_entity", postgres_conn_id="redb_postgres", sql="updates/legal_entity.sql", database=DATABASE_NAME)
     update_neighborhood = PostgresOperator(task_id="update_neighborhood", postgres_conn_id="redb_postgres", sql="updates/neighborhood.sql", database=DATABASE_NAME)
     update_parcel = PostgresOperator(task_id="update_parcel", postgres_conn_id="redb_postgres", sql="updates/parcel.sql", database=DATABASE_NAME)
-    update_special_parcel_type = PostgresOperator(task_id="update_special_parcel_type", postgres_conn_id="redb_postgres", sql="updates/special_parcel_type.sql", database=DATABASE_NAME)
-    update_sub_parcel_type = PostgresOperator(task_id="update_sub_parcel_type", postgres_conn_id="redb_postgres", sql="updates/sub_parcel_type.sql", database=DATABASE_NAME)
     update_unit = PostgresOperator(task_id="update_unit", postgres_conn_id="redb_postgres", sql="updates/unit.sql", database=DATABASE_NAME)
     
     
@@ -105,30 +98,23 @@ with DAG('REDB_ELT',
 chain(
     SourcesToS3
     , MDBtoREDB
-    , define_add_county
     , define_format_parcel_address
     , define_format_parcelId
     , define_insert_week1_to_staging1
     , define_insert_week2_to_staging1
     , insert_address
     , insert_building
-    , insert_county
     , insert_county_id_mapping_table
     , insert_legal_entity
     , insert_neighborhood
     , insert_parcel
-    , insert_special_parcel_type
-    , insert_sub_parcel_type
     , insert_unit
     , update_address
     , update_building
-    , update_county
     , update_county_id_mapping_table
     , update_legal_entity
     , update_neighborhood
     , update_parcel
-    , update_special_parcel_type
-    , update_sub_parcel_type
     , update_unit
     , staging_1_to_staging_2
 )

@@ -8,8 +8,8 @@ from subprocess import (check_output, CalledProcessError)
 import pandas as pd
 
 # Custom
-from .S3 import S3
-from .Database import Database
+from .classes.S3 import S3
+from .classes.Database import Database
 from .utils.custom_logging import print_time
 from .utils.data_transformations import (convert_scientific_notation
                                         , generate_rows)

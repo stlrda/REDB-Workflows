@@ -9,7 +9,7 @@ import wget
 import pandas as pd
 
 # Custom
-from .S3 import S3
+from .classes.S3 import S3
 
 
 def get_list_of_files(directory):
