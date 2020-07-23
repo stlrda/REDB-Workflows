@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS core.address (
     );
 	
 -- Unique Index is necessary to account for potential nulls in address fields.
-CREATE UNIQUE INDEX UI_OwnerAddress ON "core"."address"(COALESCE("street_address", 'NULL')
+CREATE UNIQUE INDEX IF NOT EXISTS UI_OwnerAddress ON "core"."address"(COALESCE("street_address", 'NULL')
 	, COALESCE("city", 'NULL')
     , COALESCE("state", 'NULL')
     , COALESCE("country", 'NULL')
@@ -79,7 +79,7 @@ CREATE TABLE IF NOT EXISTS core.legal_entity (
     );
 
 --index necessary to account for potential nulls in fields needed to create legal entity
-CREATE UNIQUE INDEX UI_Legal_Entity ON "core"."legal_entity" (COALESCE("legal_entity_address", 'NULL_ADDRESS')
+CREATE UNIQUE INDEX IF NOT EXISTS UI_Legal_Entity ON "core"."legal_entity" (COALESCE("legal_entity_address", 'NULL_ADDRESS')
 , COALESCE("legal_entity_name", 'NULL_NAME_1')
 , COALESCE("legal_entity_secondary_name", 'NULL_NAME_2')
 , "address_id");
@@ -118,9 +118,9 @@ CREATE TABLE IF NOT EXISTS "core"."parcel" (
     , "update_date" date -- NYI
 );
 
-CREATE UNIQUE INDEX UI_Active_Parcel ON "core"."parcel"(parcel_id, current_flag) WHERE current_flag = TRUE;
+CREATE UNIQUE INDEX IF NOT EXISTS UI_Active_Parcel ON "core"."parcel"(parcel_id, current_flag) WHERE current_flag = TRUE;
 
-CREATE UNIQUE INDEX UI_Parcel ON "core"."parcel"(COALESCE("parcel_id", 'NULL')
+CREATE UNIQUE INDEX IF NOT EXISTS UI_Parcel ON "core"."parcel"(COALESCE("parcel_id", 'NULL')
     , COALESCE("county_id", 'NULL')
     , COALESCE("city_block_number", 'NULL')
     , COALESCE("parcel_number", 'NULL')
@@ -157,9 +157,9 @@ CREATE TABLE IF NOT EXISTS "core"."building" (
 	, "update_date" date
 );
 
-CREATE UNIQUE INDEX UI_Active_Building ON "core"."building"(building_id, current_flag) WHERE current_flag = TRUE;
+CREATE UNIQUE INDEX IF NOT EXISTS UI_Active_Building ON "core"."building"(building_id, current_flag) WHERE current_flag = TRUE;
 
-CREATE UNIQUE INDEX UI_Building ON "core"."building"(COALESCE("parcel_id", 'NULL')
+CREATE UNIQUE INDEX IF NOT EXISTS UI_Building ON "core"."building"(COALESCE("parcel_id", 'NULL')
 	, COALESCE("building_id", 'NULL')
 	, COALESCE("owner_id", 'NULL')
 	, COALESCE("description", 'NULL')
@@ -179,9 +179,9 @@ CREATE TABLE IF NOT EXISTS "core"."unit" (
 	, "update_date" date
 );
 
-CREATE UNIQUE INDEX UI_Active_Unit ON "core"."unit"(unit_id, current_flag) WHERE current_flag = TRUE;
+CREATE UNIQUE INDEX IF NOT EXISTS UI_Active_Unit ON "core"."unit"(unit_id, current_flag) WHERE current_flag = TRUE;
 
-CREATE UNIQUE INDEX UI_Unit ON "core"."unit"(COALESCE("unit_id", 'NULL')
+CREATE UNIQUE INDEX IF NOT EXISTS UI_Unit ON "core"."unit"(COALESCE("unit_id", 'NULL')
 	, COALESCE("building_id", 'NULL')
 	, COALESCE("description", 'NULL')
 	, "condominium"
