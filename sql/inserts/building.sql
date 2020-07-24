@@ -11,26 +11,20 @@ CREATE OR REPLACE VIEW staging_1.UNION_BLDGS AS
 			(
 			WITH UNION_PREVIOUS_BUILDINGS AS
 				(
-				SELECT core.format_parcelId(prcl_bldgcom."CityBlock", prcl_bldgcom."Parcel", prcl_bldgcom."OwnerCode") AS "ParcelId"
-					, "prcl_bldgcom"."BldgNum"
+				SELECT "prcl_bldgall"."ParcelId"
+					, "prcl_bldgall"."BldgNum"
 					, "NbrOfApts"
 					, CONCAT("LegalDesc1",' ',"LegalDesc2",' ',"LegalDesc3",' ',"LegalDesc4",' ',"LegalDesc5") AS description
-				FROM "staging_2"."prcl_bldgcom"
+					, "prcl_bldgall"."BldgUse"
+				FROM "staging_2"."prcl_bldgall"
 				JOIN "staging_2"."prcl_prcl"
-				ON (SELECT core.format_parcelId(prcl_bldgcom."CityBlock", prcl_bldgcom."Parcel", prcl_bldgcom."OwnerCode")) = "prcl_prcl"."ParcelId"
-				UNION ALL
-				SELECT core.format_parcelId(prcl_bldgres."CityBlock", prcl_bldgres."Parcel", prcl_bldgres."OwnerCode") AS "ParcelId"
-					, "prcl_bldgres"."BldgNum"
-					, "NbrOfApts"
-					, CONCAT("LegalDesc1",' ',"LegalDesc2",' ',"LegalDesc3",' ',"LegalDesc4",' ',"LegalDesc5") AS description
-				FROM "staging_2"."prcl_bldgres"
-				JOIN "staging_2"."prcl_prcl"
-				ON (SELECT core.format_parcelId(prcl_bldgres."CityBlock", prcl_bldgres."Parcel", prcl_bldgres."OwnerCode")) = "prcl_prcl"."ParcelId"
+				ON "prcl_bldgall"."ParcelId" = "prcl_prcl"."ParcelId"
 				)
 			SELECT UPB."ParcelId"
 				, UPB."BldgNum"
 				, UPB."NbrOfApts"
 				, UPB."description"
+				, UPB."BldgUse"
 				, "OwnerName"
 				, "OwnerName2"
 				, "OwnerAddr"
@@ -46,6 +40,7 @@ CREATE OR REPLACE VIEW staging_1.UNION_BLDGS AS
 			, "BldgNum"
 			, "NbrOfApts"
 			, "description"
+			, "BldgUse"
 			, "OwnerName"
 			, "OwnerName2"
 			, "OwnerAddr"
@@ -60,6 +55,7 @@ CREATE OR REPLACE VIEW staging_1.UNION_BLDGS AS
 		, "BldgNum"
 		, "NbrOfApts"
 		, "description"
+		, "BldgUse"
 	FROM JOIN_LEGAL_ENTITY_TO_BLDGS_UNION AS JLE
 	JOIN "core"."legal_entity" CLE
 	ON CONCAT(JLE."OwnerAddr", JLE."OwnerName", JLE."OwnerName2", JLE."address_id") 
@@ -80,27 +76,21 @@ CREATE OR REPLACE VIEW staging_1.NEW_OR_CHANGED_BUILDINGS AS --Compares CURRENT(
 				FROM "staging_1"."prcl_prcl"
 				WHERE "Parcel" != "GisParcel" AND "OwnerCode" != '8'
 				)				
-			SELECT "ParcelId"
+			SELECT BUILDING_RECORD."ParcelId"
 				, "BldgNum"
 				, "NbrOfApts"
 				, "description"
+				, "BldgUse"
 			FROM BUILDING_RECORD
-			JOIN "staging_1"."prcl_bldgcom"
-			ON (SELECT core.format_parcelId(prcl_bldgcom."CityBlock", prcl_bldgcom."Parcel", prcl_bldgcom."OwnerCode")) = BUILDING_RECORD."ParcelId"
-			UNION ALL
-			SELECT "ParcelId"
-				, "BldgNum"
-				, "NbrOfApts"
-				, "description"
-			FROM BUILDING_RECORD
-			JOIN "staging_1"."prcl_bldgres"
-			ON (SELECT core.format_parcelId(prcl_bldgres."CityBlock", prcl_bldgres."Parcel", prcl_bldgres."OwnerCode")) = BUILDING_RECORD."ParcelId"	
+			JOIN "staging_1"."prcl_bldgall"
+			ON "prcl_bldgall"."ParcelId" = BUILDING_RECORD."ParcelId"
 			)
 		SELECT DISTINCT ADD_OWNER_ID."ParcelId"
 			, "parcel"."owner_id"
 			, ADD_OWNER_ID."BldgNum"
 			, ADD_OWNER_ID."NbrOfApts"
-			, ADD_OWNER_ID."description" 
+			, ADD_OWNER_ID."description"
+			, ADD_OWNER_ID."BldgUse"
 		FROM ADD_OWNER_ID
 		JOIN "core"."county_id_mapping_table" 
 		ON "county_id_mapping_table"."county_parcel_id" = ADD_OWNER_ID."ParcelId"
@@ -113,6 +103,7 @@ CREATE OR REPLACE VIEW staging_1.NEW_OR_CHANGED_BUILDINGS AS --Compares CURRENT(
 		, BUILDING_TABLE."BldgNum"
 		, BUILDING_TABLE."NbrOfApts"
 		, BUILDING_TABLE."description"
+		, BUILDING_TABLE."BldgUse"
     FROM BUILDING_TABLE
     LEFT JOIN staging_1.UNION_BLDGS
     ON UNION_BLDGS."ParcelId" = BUILDING_TABLE."ParcelId"
@@ -120,6 +111,7 @@ CREATE OR REPLACE VIEW staging_1.NEW_OR_CHANGED_BUILDINGS AS --Compares CURRENT(
 		AND UNION_BLDGS."BldgNum" = BUILDING_TABLE."BldgNum"
         AND UNION_BLDGS."NbrOfApts" = BUILDING_TABLE."NbrOfApts"
         AND UNION_BLDGS."description" = BUILDING_TABLE."description"
+		AND COALESCE(UNION_BLDGS."BldgUse", 'NULL') = COALESCE(BUILDING_TABLE."BldgUse", 'NULL')
 	WHERE UNION_BLDGS."ParcelId" IS NULL
 	);
 	
@@ -140,6 +132,7 @@ INSERT INTO "core"."building" ("parcel_id"
     , "building_id"
     , "owner_id"
     , "description"
+	, "building_use"
     , "apartment_count"
     , "create_date"
     , "current_flag"
@@ -150,6 +143,7 @@ INSERT INTO "core"."building" ("parcel_id"
     , CONCAT(SUBSTRING("county_id_mapping_table"."parcel_id" FROM 1 FOR 15), (CAST(NEW_OR_CHANGED_BUILDINGS."BldgNum" AS INT) + 100),'.0000') AS building_id
     , "parcel"."owner_id"
     , NEW_OR_CHANGED_BUILDINGS."description"
+ 	, NEW_OR_CHANGED_BUILDINGS."BldgUse"
     , CAST("NbrOfApts" AS INT)
     , CURRENT_DATE
     , TRUE
@@ -166,7 +160,8 @@ ON CONFLICT (COALESCE("parcel_id", 'NULL')
     , COALESCE("building_id", 'NULL')
     , COALESCE("owner_id", 'NULL')
     , COALESCE("description", 'NULL')
-    , COALESCE("apartment_count", '777'))
+	, COALESCE("building_use", 'NULL')
+	, COALESCE("apartment_count", '777'))
 DO UPDATE
 SET "current_flag" = TRUE
     , "removed_flag" = FALSE

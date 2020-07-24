@@ -22,4 +22,4 @@ END;
 $$
 LANGUAGE plpgsql;
 -------------------------
-core.dead_county_id();
+SELECT core.dead_county_id();

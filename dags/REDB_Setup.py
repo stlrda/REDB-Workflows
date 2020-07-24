@@ -16,10 +16,6 @@ sys.path.append("/usr/local/airflow")
 # Credentials for Database
 DATABASE_CONN = BaseHook.get_connection('redb_postgres')
 DATABASE_NAME = DATABASE_CONN.schema
-DATABASE_HOST = DATABASE_CONN.host
-DATABASE_USER = DATABASE_CONN.login
-DATABASE_PORT = DATABASE_CONN.port
-DATABASE_PASSWORD = DATABASE_CONN.password
 
 
 default_args = {
@@ -42,7 +38,24 @@ with DAG('REDB_Setup',
     # Create tables (once) (sql/functions)
     create_tables = PostgresOperator(task_id="create_tables", postgres_conn_id="redb_postgres", sql="functions/create_core_tables.sql", database=DATABASE_NAME)
 
+    # Create views (once) (sql/functions)
+    create_views = PostgresOperator(task_id="create_views", postgres_conn_id="redb_postgres", sql="functions/create_current_views.sql", database=DATABASE_NAME)
+
+    # Definitions (once) (sql/functions)
+    define_add_county = PostgresOperator(task_id="define_add_county", postgres_conn_id="redb_postgres", sql="functions/add_county.sql", database=DATABASE_NAME)
+
+    # Inserts (once) (sql/inserts)
+    insert_county = PostgresOperator(task_id="insert_county", postgres_conn_id="redb_postgres", sql="inserts/county.sql", database=DATABASE_NAME)
+    insert_special_parcel_type = PostgresOperator(task_id="insert_special_parcel_type", postgres_conn_id="redb_postgres", sql="inserts/special_parcel_type.sql", database=DATABASE_NAME)
+    insert_sub_parcel_type = PostgresOperator(task_id="insert_sub_parcel_type", postgres_conn_id="redb_postgres", sql="inserts/sub_parcel_type.sql", database=DATABASE_NAME)
+    
+
 chain(
     create_schemas
     , create_tables
+    , create_views
+    , define_add_county
+    , insert_county
+    , insert_special_parcel_type
+    , insert_sub_parcel_type
 )

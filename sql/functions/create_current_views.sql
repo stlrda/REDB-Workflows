@@ -79,6 +79,7 @@ CREATE OR REPLACE VIEW "core".current_building AS
 		, "building_id"
 		, "owner_id"
 		, "description"
+		, "building_use"
 		, "apartment_count"
 	FROM "core"."building"
 	WHERE "current_flag" = TRUE
