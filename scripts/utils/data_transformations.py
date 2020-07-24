@@ -5,7 +5,6 @@ import tempfile
 from io import StringIO
 
 
-# TODO Incorporate column_types into function to make more efficient.
 def convert_scientific_notation(current_row):
     """ Identifies scientific notation values then converts to float.
 

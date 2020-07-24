@@ -26,7 +26,7 @@ class Database():
             return False
 
 
-    def replace_table(self, schema, table_name, example_row):
+    def replace_table(self, schema, table_name, columns):
         """ Creates table within database with no constraints and all types as VARCHAR(250)
         Will delete table if it already exists in the target database.
 
@@ -37,11 +37,11 @@ class Database():
 
         table = Table(table_name, self.METADATA, schema=schema)
 
-        for key in example_row.keys():
-            table.append_column(Column(key, VARCHAR(1000)))
+        for column in columns:
+            table.append_column(Column(column, VARCHAR(1000)))
 
         if self.ENGINE.dialect.has_table(self.ENGINE, table_name, schema=schema):
-            self.get_raw_connection().cursor().execute(f"DROP TABLE {schema}.{table_name} CASCADE;")
+            self.ENGINE.execute(f"DROP TABLE {schema}.{table_name} CASCADE;")
 
         try:
             table.create()
