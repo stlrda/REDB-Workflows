@@ -11,7 +11,6 @@ from utils.data_transformations import (convert_scientific_notation
                                         , mdb_to_txt)
 
 
-# TODO Write unit tests.
 class TestDataTransformations(unittest.TestCase):
 
     @classmethod
@@ -67,12 +66,39 @@ class TestDataTransformations(unittest.TestCase):
         self.assertIsInstance(self.column_names, list)
         self.assertEqual(len(self.column_names), self.column_count)
 
-    # TODO finish test
+    
     def test_convert_scientific_notation(self):
-        example1 = "1.0000000000000000e+00"
-        example2 = "5.0000000000000000e+00"
-        example3 = "0.0000000000000000e+00"
-        pass
+        notation1 = "1.0000000000000000e+00"
+        notation2 = "5.0000000000000000e+00"
+        notation3 = "0.0000000000000000e+00"
+
+        expected1 = 1.0
+        expected2 = 5.0
+        expected3 = 0.0
+
+        _dict = {
+            "Key1": notation1
+            , "Key2": notation2
+            , "Key3": notation3
+            , "Key4": "Shouldn't change."
+            , "Key5": 123456
+        }
+
+        expected_dict = {
+            "Key1": expected1
+            , "Key2": expected2
+            , "Key3": expected3
+            , "Key4": "Shouldn't change."
+            , "Key5": "123456"
+        }
+
+        actual_dict = convert_scientific_notation(_dict)
+
+        for key in actual_dict.keys():
+            actual = actual_dict[key]
+            expected = expected_dict[key]
+
+            self.assertEqual(actual, expected)
 
 
 if __name__ == '__main__':
