@@ -68,8 +68,6 @@ with DAG('REDB_ELT',
     # TODO update function scripts such that they delete function if exists before creating.
     define_format_parcel_address = PostgresOperator(task_id="define_format_parcel_address", postgres_conn_id="redb_postgres", sql="functions/format_parcel_address.sql", database=DATABASE_NAME)
     define_format_parcelId = PostgresOperator(task_id="define_format_parcelId", postgres_conn_id="redb_postgres", sql="functions/format_parcelId.sql", database=DATABASE_NAME)
-    define_insert_week1_to_staging1 = PostgresOperator(task_id="define_insert_week1_to_staging1", postgres_conn_id="redb_postgres", sql="functions/insert_week1_to_staging1.sql", database=DATABASE_NAME)
-    define_insert_week2_to_staging1 = PostgresOperator(task_id="define_insert_week2_to_staging1", postgres_conn_id="redb_postgres", sql="functions/insert_week2_to_staging1.sql", database=DATABASE_NAME)
 
     # Compare and Insert (weekly) (sql/inserts)
     insert_address = PostgresOperator(task_id="insert_address", postgres_conn_id="redb_postgres", sql="inserts/address.sql", database=DATABASE_NAME)
@@ -100,8 +98,6 @@ chain(
     , MDBtoREDB
     , define_format_parcel_address
     , define_format_parcelId
-    , define_insert_week1_to_staging1
-    , define_insert_week2_to_staging1
     , insert_address
     , insert_building
     , insert_county_id_mapping_table

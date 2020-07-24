@@ -18,9 +18,9 @@ CREATE TABLE "staging_2"."prcl_bldgsect"
 AS TABLE "staging_1"."prcl_bldgsect";
 
 --Clear staging_1
-DELETE FROM "staging_1"."prcl_bldgall";
-DELETE FROM "staging_1"."prcl_bldgsect";
-DELETE FROM "staging_1"."prcl_prcl";
+DROP TABLE IF EXISTS "staging_1"."prcl_bldgall" CASCADE;
+DROP TABLE IF EXISTS "staging_1"."prcl_bldgsect" CASCADE;
+DROP TABLE IF EXISTS "staging_1"."prcl_prcl" CASCADE;
 
 END;
 $$
