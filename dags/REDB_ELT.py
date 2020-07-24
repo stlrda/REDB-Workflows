@@ -42,7 +42,7 @@ default_args = {
 with DAG('REDB_ELT',
         default_args=default_args,
         template_searchpath="/usr/local/airflow/dags/efs/redb/sql/",
-        schedule_interval='@once',
+        schedule_interval='@weekly',
         ) as dag:
 
     # Download and unzip, then upload files to S3.
