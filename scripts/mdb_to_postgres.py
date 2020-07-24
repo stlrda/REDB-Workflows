@@ -15,13 +15,11 @@ from .utils.data_transformations import (convert_scientific_notation
                                         , generate_rows)
 
 
-def initialize_global_IO(kwargs):
-    """Initializes S3 Bucket and Database using the credentials passed in via DAG.
-    The S3 Bucket and Database objects then become global variables.
+def initializeIO(kwargs):
+    """Initializes S3 Bucket and Database using the credentials passed in via Dictionary.
+    Returns S3 Bucket and Database object as tuple.
     Expecting : {credential_name : credential_value, ...}
     """
-    
-    global s3, db
 
     BUCKET_NAME = kwargs["bucket"]
     AWS_ACCESS_KEY_ID = kwargs["aws_access_key_id"]
@@ -36,6 +34,8 @@ def initialize_global_IO(kwargs):
     s3 = S3(BUCKET_NAME, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
     db = Database(PG_USER, PG_PASSWORD, PG_HOST, PG_PORT, PG_DATABASE)
     db.create_schema("staging_1")
+
+    return (s3, db)
 
 
 def get_tables(path_to_database):
@@ -58,7 +58,39 @@ def get_tables(path_to_database):
     return tables
 
 
-def initialize_csv(table, csv_path, limit=50_000):
+def get_table_columns(table, path_to_database):
+    """ Returns a list of every column name for a specified .mdb table.
+    :param table: Name of table to search for columns.
+    :param path_to_database: A path to .mdb database to search for table.
+    """
+
+    columns = []
+
+    try:
+        # Will not work via DAG in Airflow.
+        arr = check_output(["mdb-schema", "--table", table, path_to_database])
+
+    except CalledProcessError as exc:
+        # Will assign the same value as the try block, but DOES work via Airflow.
+        arr = exc.output
+
+    arr = arr.decode().split()
+
+    for index, element in enumerate(arr):
+        if element.startswith("[") and element.endswith("]"):
+            column_name = element.replace("[", "").replace("]", "")
+            column_type = arr[index + 1]
+            column = column_name
+            columns.append(column)
+
+    columns.pop(0) # The first column is just the table name and an open bracket.
+
+    print(f'Columns ({len(columns)}) for table: {table} @ {path_to_database}:\n{columns}')
+
+    return columns
+
+
+def initialize_csv(table, columns, row, csv_path, limit=50_000):
     """ Creates a CSV from a Python Generator with a select number of rows.
 
     :param table: The name of the table and target CSV.
@@ -69,13 +101,9 @@ def initialize_csv(table, csv_path, limit=50_000):
     creates the initial CSV.
     """
 
-    global row, snapshot_row
-
     batch = []
 
     try:
-        # snapshot_row is used to initialize table via "replace_table" method and to assign columns to "table_dataframe".
-        # snapshot_row is initialized globally as to be available throughout script.
         snapshot_row = next(row)
     except StopIteration:
         print(f"{table} doesn't have any rows or rows are not valid. Skipping...")
@@ -100,7 +128,7 @@ def initialize_csv(table, csv_path, limit=50_000):
             row = None
             break
     
-    table_dataframe = pd.DataFrame(batch, columns=snapshot_row.keys())
+    table_dataframe = pd.DataFrame(batch, columns=columns)
     batch.clear()
     table_dataframe.to_csv(csv_path,
                            index=False,
@@ -111,8 +139,10 @@ def initialize_csv(table, csv_path, limit=50_000):
                            
     print_time("init_complete", table)
 
+    return csv_path
 
-def append_to_csv(table, csv_path, limit=50_000):
+
+def append_to_csv(table, columns, row, csv_path, limit=50_000):
     """Appends table rows from a Python Generator to an existing CSV.
 
     :param table: The name of the table and target CSV.
@@ -122,8 +152,6 @@ def append_to_csv(table, csv_path, limit=50_000):
     bulk transformation to Pandas DataFrame. That DataFrame is then
     appended to the CSV.
     """
-
-    global row
 
     batch = []
     rows_generated = 0
@@ -142,7 +170,7 @@ def append_to_csv(table, csv_path, limit=50_000):
             row = None
             break
     
-    table_dataframe = pd.DataFrame(batch, columns=snapshot_row.keys())
+    table_dataframe = pd.DataFrame(batch, columns=columns)
     batch.clear()
     table_dataframe.to_csv(csv_path,
                             header=False,
@@ -156,27 +184,31 @@ def append_to_csv(table, csv_path, limit=50_000):
 
     if row != None:
         # Iteration is preferred here as opposed to recursion to save on RAM.
-        append_to_csv(table, csv_path, limit)
+        append_to_csv(table, columns, row, csv_path, limit)
+    else:
+        return csv_path
 
 
-def copy_csv_to_database(csv_path, new_table_name, snapshot_row):
+def copy_csv_to_database(redb_table_name, columns, csv_path, db):
+    """
+    """
     try:
         f = open(csv_path, 'r')
         f.close()
     except Exception as err:
         print(f"WARNING: {err} - Table being skipped.")
-        return None
+        return False
     
     # Opens CSV then copies to database.
     with open(csv_path, 'r+') as csvfile:
-        db.replace_table("staging_1", new_table_name, snapshot_row) # snapshot_row created upon invoking "initialize_csv" function.
+        db.replace_table("staging_1", redb_table_name, columns) # snapshot_row created upon invoking "initialize_csv" function.
         conn = db.get_raw_connection()
         cursor = conn.cursor()
-        cmd = f'COPY staging_1."{new_table_name}" FROM STDIN WITH (FORMAT CSV, DELIMITER "|", HEADER TRUE, ENCODING "utf-8")'
+        cmd = f'COPY staging_1."{redb_table_name}" FROM STDIN WITH (FORMAT CSV, DELIMITER "|", HEADER TRUE, ENCODING "utf-8")'
         cursor.copy_expert(cmd, csvfile)
         conn.commit()
-        print(f"{new_table_name} copied into staging_1.")
-    os.remove(csv_path)
+        print(f"{redb_table_name} copied into staging_1.")
+    return True
 
 
 def main(**kwargs):
@@ -194,25 +226,24 @@ def main(**kwargs):
     :param pg_port:
     """
 
-    global row, snapshot_row
+    (s3, db) = initializeIO(kwargs)
+    access_files_in_s3 = s3.list_objects(extension=".mdb", field="Key")
 
-    initialize_global_IO(kwargs) # Initializes S3 Bucket and target database to global scope.
-    mdb_files_in_s3 = s3.list_objects(extension=".mdb", field="Key")
-
-    for mdb in mdb_files_in_s3:
+    for access_file in access_files_in_s3:
         with tempfile.TemporaryDirectory() as tmp:
-            path_to_database =  os.path.join(tmp, mdb)
-            s3.download_file(s3.bucket_name, mdb, path_to_database)
+            path_to_database =  os.path.join(tmp, access_file)
+            s3.download_file(s3.bucket_name, access_file, path_to_database)
 
-            for og_table_name in get_tables(path_to_database):
-                mdb_name = mdb[:-4] # name of Access database
-                new_table_name = mdb_name.lower() + "_" + og_table_name.lower() # prepends database name to table
-                csv_path = f"dags/efs/redb/resources/{new_table_name}.csv"
-                row = generate_rows(path_to_database, og_table_name) # Initialized globally via the "global" keyword.
+            for city_table_name in get_tables(path_to_database):
+                columns = get_table_columns(city_table_name, path_to_database)
+                access_name = access_file[:-4] # name of Access database
+                redb_table_name = access_name.lower() + "_" + city_table_name.lower()
+                csv_path = os.path.join(tmp, f"{redb_table_name}.csv")
+                row = generate_rows(path_to_database, city_table_name)
 
-                initialize_csv(new_table_name, csv_path, limit=50_000)
+                initialize_csv(redb_table_name, columns, row, csv_path)
 
                 if row != None:
-                    append_to_csv(new_table_name, csv_path, limit=50_000)
+                    append_to_csv(redb_table_name, columns, row, csv_path)
 
-                copy_csv_to_database(csv_path, new_table_name, snapshot_row)
+                copy_csv_to_database(redb_table_name, columns, csv_path, db)
