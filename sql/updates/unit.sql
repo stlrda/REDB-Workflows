@@ -66,7 +66,7 @@ SET "removed_flag" = FALSE
 		FROM "core"."unit"
 		JOIN "core"."county_id_mapping_table"
 		ON "county_id_mapping_table"."parcel_id" = CONCAT(SUBSTRING("unit"."unit_id" FROM 1 FOR 15), '000.0000')
-		JOIN "staging_1"."prcl_bldgs"
+		JOIN "staging_1"."prcl_bldgsect"
 		ON "county_id_mapping_table"."county_parcel_id" = (SELECT core.format_parcelId(prcl_bldgsect."CityBlock", prcl_bldgsect."Parcel", prcl_bldgsect."OwnerCode"))
 	   		AND (CAST(SUBSTRING("unit_id" FROM 16 FOR 3) AS INT) - 100) = CAST("prcl_bldgsect"."BldgNum" AS INT)
 			AND (CAST(SUBSTRING("unit_id" FROM 20 FOR 4) AS INT) - 1000) = CAST("prcl_bldgsect"."SectNum" AS INT));
