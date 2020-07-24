@@ -17,15 +17,10 @@ CREATE OR REPLACE VIEW "staging_1".NEW_OR_CHANGED_UNITS AS -- joins to our ID Lo
 				FROM "staging_1"."prcl_prcl"
 				WHERE "Parcel" != "GisParcel" AND "OwnerCode" != '8'
 				)
-			SELECT "ParcelId", "prcl_bldgcom"."BldgNum" AS "BldgNum", "description", "Condominium"
+			SELECT BUILDING_RECORD."ParcelId", "prcl_bldgall"."BldgNum", "description", "Condominium"
 			FROM BUILDING_RECORD
-			JOIN "staging_1"."prcl_bldgcom"
-			ON (SELECT core.format_parcelId(prcl_bldgcom."CityBlock", prcl_bldgcom."Parcel", prcl_bldgcom."OwnerCode")) = BUILDING_RECORD."ParcelId"
-			UNION ALL
-			SELECT "ParcelId", "prcl_bldgres"."BldgNum" AS "BldgNum", "description", "Condominium"
-			FROM BUILDING_RECORD
-			JOIN "staging_1"."prcl_bldgres"
-			ON (SELECT core.format_parcelId(prcl_bldgres."CityBlock", prcl_bldgres."Parcel", prcl_bldgres."OwnerCode")) = BUILDING_RECORD."ParcelId"
+			JOIN "staging_1"."prcl_bldgall"
+			ON "prcl_bldgall"."ParcelId" = BUILDING_RECORD."ParcelId"
 			)
 		SELECT (SELECT core.format_parcelId(prcl_bldgsect."CityBlock", prcl_bldgsect."Parcel", prcl_bldgsect."OwnerCode")) AS "ParcelId"
 			, "prcl_bldgsect"."BldgNum", "prcl_bldgsect"."SectNum" -- SectNum = Unit Number
@@ -47,26 +42,18 @@ CREATE OR REPLACE VIEW "staging_1".NEW_OR_CHANGED_UNITS AS -- joins to our ID Lo
 				, "prcl_bldgsect"."SectNum"
 				, UNION_BLDGS."description"
 				, CAST(UNION_BLDGS."Condominium" AS BOOLEAN) AS "Condominium"
-				FROM (SELECT core.format_parcelId(prcl_bldgcom."CityBlock", prcl_bldgcom."Parcel", prcl_bldgcom."OwnerCode") AS "ParcelId"
-					, "prcl_bldgcom"."BldgNum"
-					, "Condominium"
+				FROM (SELECT PB."ParcelId"
+					, PB."BldgNum"
+					, PP."Condominium"
 					, CONCAT("LegalDesc1",' ',"LegalDesc2",' ',"LegalDesc3",' ',"LegalDesc4",' ',"LegalDesc5") AS description
-					FROM "staging_2"."prcl_bldgcom"
-					JOIN "staging_2"."prcl_prcl"
-					ON (SELECT core.format_parcelId(prcl_bldgcom."CityBlock", prcl_bldgcom."Parcel", prcl_bldgcom."OwnerCode")) = "prcl_prcl"."ParcelId"
-					UNION ALL
-					SELECT core.format_parcelId(prcl_bldgres."CityBlock", prcl_bldgres."Parcel", prcl_bldgres."OwnerCode") AS "ParcelId"
-					, "prcl_bldgres"."BldgNum"
-					, "Condominium"
-					, CONCAT("LegalDesc1",' ',"LegalDesc2",' ',"LegalDesc3",' ',"LegalDesc4",' ',"LegalDesc5") AS description
-					FROM "staging_2"."prcl_bldgres"
-					JOIN "staging_2"."prcl_prcl"
-					ON (SELECT core.format_parcelId(prcl_bldgres."CityBlock", prcl_bldgres."Parcel", prcl_bldgres."OwnerCode")) = "prcl_prcl"."ParcelId"
+					FROM "staging_2"."prcl_bldgall" AS PB
+					JOIN "staging_2"."prcl_prcl" AS PP
+					ON PB."ParcelId" = PP."ParcelId"
 					) UNION_BLDGS	
 				JOIN "staging_2"."prcl_bldgsect"
 				ON (SELECT core.format_parcelId(prcl_bldgsect."CityBlock", prcl_bldgsect."Parcel", prcl_bldgsect."OwnerCode")) = UNION_BLDGS."ParcelId" 
 					AND UNION_BLDGS."BldgNum" = "prcl_bldgsect"."BldgNum"
-			) UNION_UNITS --UNION UNITS GRABS EVERYTHING IN STAGING 2 PRCL_BLDGSECT AND ADDS THE DESCRIPTION AND CONDO TAG FROM PRCL_PRCL ONTO IT
+				) UNION_UNITS --UNION UNITS GRABS EVERYTHING IN STAGING 2 PRCL_BLDGSECT AND ADDS THE DESCRIPTION AND CONDO TAG FROM PRCL_PRCL ONTO IT
 	ON UNION_UNITS."ParcelId" = UNIT_TABLE."ParcelId"
 		AND UNION_UNITS."BldgNum" = UNIT_TABLE."BldgNum"
  		AND UNION_UNITS."SectNum" = UNIT_TABLE."SectNum"
