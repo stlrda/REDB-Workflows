@@ -235,10 +235,12 @@ def main(**kwargs):
             s3.download_file(s3.bucket_name, access_file, path_to_database)
 
             for city_table_name in get_tables(path_to_database):
-                columns = get_table_columns(city_table_name, path_to_database)
+                
                 access_name = access_file[:-4] # name of Access database
                 redb_table_name = access_name.lower() + "_" + city_table_name.lower()
                 csv_path = os.path.join(tmp, f"{redb_table_name}.csv")
+                
+                columns = get_table_columns(city_table_name, path_to_database)
                 row = generate_rows(path_to_database, city_table_name)
 
                 initialize_csv(redb_table_name, columns, row, csv_path)
