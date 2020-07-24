@@ -32,7 +32,7 @@ DATABASE_PASSWORD = DATABASE_CONN.password
 
 default_args = {
     'owner': 'redb',
-    'start_date': dt.datetime.now(),
+    'start_date': dt.datetime(2020,7,23),
     'concurrency': 1,
     'retries': 0,
     'catchup': False
