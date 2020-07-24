@@ -79,7 +79,6 @@ INSERT INTO "core"."unit" ("unit_id"
     , "condominium"
     , "create_date"
     , "current_flag"
-    , "removed_flag"
     --, "etl_job"
     , "update_date")
 (SELECT DISTINCT CONCAT(SUBSTRING("county_id_mapping_table"."parcel_id" FROM 1 FOR 15), (CAST(NEW_OR_CHANGED_UNITS."BldgNum" AS INT) + 100), '.', (CAST(NEW_OR_CHANGED_UNITS."SectNum" AS INT) + 1000)) AS unit_id
@@ -88,7 +87,6 @@ INSERT INTO "core"."unit" ("unit_id"
     , NEW_OR_CHANGED_UNITS."Condominium"
     , CURRENT_DATE
     , TRUE
-    , FALSE
     , CURRENT_DATE
 FROM staging_1.NEW_OR_CHANGED_UNITS
 JOIN "core"."county_id_mapping_table" 
@@ -103,7 +101,6 @@ ON CONFLICT (COALESCE("unit_id", 'NULL')
     , "condominium")
     DO UPDATE
 SET "current_flag" = TRUE
-    , "removed_flag" = FALSE
     , "update_date" = CURRENT_DATE;
 	
 END;

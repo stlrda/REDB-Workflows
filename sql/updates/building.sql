@@ -37,12 +37,36 @@ WITH DEAD_BUILDINGS AS --Compares Past(staging_2) to Current(staging_1) and retu
 	WHERE "prcl_bldgall"."ParcelId" IS NULL
 	)
 UPDATE "core"."building"
-SET "removed_flag" = TRUE,
-	"current_flag" = FALSE,
+SET "current_flag" = FALSE,
 	"update_date" = CURRENT_DATE
 FROM DEAD_BUILDINGS
 WHERE CONCAT(SUBSTRING(DEAD_BUILDINGS."parcel_id" FROM 1 FOR 14), '.', CAST("BldgNum" AS INT) + 100) = SUBSTRING("building"."building_id" FROM 1 FOR 18);
 
+-- Update removed flag of Buildings in core that are present in staging 1 to FALSE
+UPDATE "core"."building"
+SET "removed_flag" = FALSE 
+	WHERE "building"."building_id" 
+	IN (SELECT "building"."building_id"
+		FROM "core"."building"
+		JOIN "core"."county_id_mapping_table"
+		ON "county_id_mapping_table"."parcel_id" = "building"."parcel_id"
+		JOIN "staging_1"."prcl_bldgall"
+		ON "county_id_mapping_table"."county_parcel_id" = "prcl_bldgall"."ParcelId"
+	   		AND (CAST(SUBSTRING("building_id" FROM 16 FOR 3) AS INT) - 100) = CAST("prcl_bldgall"."BldgNum" AS INT));
+
+-- Update removed flag of Buildings in core that are NOT present in staging 1 to TRUE
+UPDATE "core"."building"
+SET "removed_flag" = TRUE 
+	WHERE "building"."building_id" 
+	IN (SELECT "building"."building_id"
+		FROM "core"."building"
+		JOIN "core"."county_id_mapping_table"
+		ON "county_id_mapping_table"."parcel_id" = "building"."parcel_id"
+		LEFT JOIN "staging_1"."prcl_bldgall"
+		ON "county_id_mapping_table"."county_parcel_id" = "prcl_bldgall"."ParcelId"
+	   		AND (CAST(SUBSTRING("building_id" FROM 16 FOR 3) AS INT) - 100) = CAST("prcl_bldgall"."BldgNum" AS INT)
+		WHERE "prcl_bldgall"."ParcelId" IS NULL);
+		
 END;
 $$
 LANGUAGE plpgsql;

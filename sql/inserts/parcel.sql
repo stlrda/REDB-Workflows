@@ -82,7 +82,7 @@ CREATE OR REPLACE VIEW staging_1.NEW_REDB_IDS AS
                 )
             WHERE PREVIOUS_WEEK."ParcelId" IS NULL
         )
-    SELECT DISTINCT "county_id", "parcel_id", "county_parcel_id", "create_date", "current_flag", "removed_flag", "etl_job", "update_date"
+    SELECT DISTINCT "county_id", "parcel_id", "county_parcel_id", "create_date", "current_flag", "etl_job", "update_date"
     FROM "core"."county_id_mapping_table"
     JOIN NEW_PARCEL_IDS
     ON NEW_PARCEL_IDS."ParcelId" = "county_id_mapping_table"."county_parcel_id"
@@ -124,7 +124,6 @@ INSERT INTO "core"."parcel" ("parcel_id"
     , "gis_owner_code"
     , "create_date"
     , "current_flag"
-    , "removed_flag"
     , "etl_job"
     , "update_date"
     )
@@ -152,7 +151,6 @@ INSERT INTO "core"."parcel" ("parcel_id"
     , "GisOwnerCode"
     , NEW_REDB_IDS."create_date"
     , NEW_REDB_IDS."current_flag"
-    , NEW_REDB_IDS."removed_flag"
     , NEW_REDB_IDS."etl_job"
     , NEW_REDB_IDS."update_date"
 FROM "staging_1"."prcl_prcl" pp
@@ -192,7 +190,6 @@ ON CONFLICT (COALESCE("parcel_id", 'NULL')
     , COALESCE("gis_owner_code", 'NULL'))
 DO UPDATE
 SET "current_flag" = TRUE
-	, "removed_flag" = FALSE
     , "update_date" = CURRENT_DATE;
 
 END;
