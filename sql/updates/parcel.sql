@@ -19,12 +19,30 @@ WITH REDB_PARCEL_IDS AS
 	ON DEAD_PARCEL_IDS."ParcelId" = "county_id_mapping_table"."county_parcel_id"
 	)
 UPDATE "core"."parcel" 
-SET "removed_flag" = TRUE,
-	"current_flag" = FALSE,
+SET "current_flag" = FALSE,
 	"update_date" = CURRENT_DATE
 FROM REDB_PARCEL_IDS
 WHERE "redb_county_id" = SUBSTRING("parcel"."parcel_id" FROM 1 FOR 14);
 
+-- Update removed flag of Parcels in core that are present in staging 1 to FALSE
+UPDATE "core"."parcel"
+SET "removed_flag" = FALSE 
+	WHERE "parcel"."parcel_id" 
+	IN (SELECT "parcel_id" 
+		FROM "core"."county_id_mapping_table"
+		JOIN "staging_1"."prcl_prcl"
+		ON "county_id_mapping_table"."county_parcel_id" = "prcl_prcl"."ParcelId");
+
+-- Update removed flag of Parcels in core that are NOT present in staging 1 to TRUE
+UPDATE "core"."parcel"
+SET "removed_flag" = TRUE 
+	WHERE "parcel"."parcel_id" 
+	IN (SELECT "parcel_id" 
+		FROM "core"."county_id_mapping_table"
+		LEFT JOIN "staging_1"."prcl_prcl"
+		ON "county_id_mapping_table"."county_parcel_id" = "prcl_prcl"."ParcelId"
+	   	WHERE "prcl_prcl"."ParcelId" IS NULL);
+					
 END;
 $$
 LANGUAGE plpgsql;

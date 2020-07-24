@@ -136,7 +136,6 @@ INSERT INTO "core"."building" ("parcel_id"
     , "apartment_count"
     , "create_date"
     , "current_flag"
-    , "removed_flag"
     --, "etl_job"
     , "update_date")
 (SELECT DISTINCT "county_id_mapping_table"."parcel_id"
@@ -147,7 +146,6 @@ INSERT INTO "core"."building" ("parcel_id"
     , CAST("NbrOfApts" AS INT)
     , CURRENT_DATE
     , TRUE
-    , FALSE
     , CURRENT_DATE
 FROM staging_1.NEW_OR_CHANGED_BUILDINGS
 JOIN "core"."county_id_mapping_table" 
@@ -164,7 +162,6 @@ ON CONFLICT (COALESCE("parcel_id", 'NULL')
 	, COALESCE("apartment_count", '777'))
 DO UPDATE
 SET "current_flag" = TRUE
-    , "removed_flag" = FALSE
     , "update_date" = CURRENT_DATE;
 
 END;
