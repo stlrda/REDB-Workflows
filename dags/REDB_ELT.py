@@ -51,7 +51,7 @@ with DAG('REDB_ELT',
                             op_kwargs={'bucket': BUCKET_NAME,
                                     'aws_access_key_id': AWS_ACCESS_KEY_ID,
                                     'aws_secret_access_key': AWS_SECRET_ACCESS_KEY})
-                                    
+
     # Copy data from mdb files (in S3) to REDB (staging_1).
     MDBtoREDB = PythonOperator(task_id='MDBtoREDB',
                                     python_callable=mdbToREDB.main,
