@@ -161,7 +161,13 @@ ON pp."ParcelId" = staging_1.NEW_REDB_IDS."county_parcel_id"
 JOIN "core"."neighborhood"
 ON pp."Nbrhd" = "neighborhood"."neighborhood_name"
 JOIN "core"."address" ca
-ON (SELECT  * FROM core.format_parcel_address(pp)) = ca."street_address"
+ON (SELECT core.format_parcel_address(pp."LowAddrNum"
+									, pp."HighAddrNum"
+									, pp."StPreDir"
+									, pp."StName"
+									, pp."StType"
+									, pp."LowAddrSuf"
+									, pp."HighAddrSuf")) = ca."street_address"
     AND ca.zip  = pp."ZIP"
     AND ca.city = ''
     AND ca.state = 'MO'

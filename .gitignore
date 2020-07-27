@@ -10,6 +10,7 @@ resources/*.txt
 
 ## Kevin Local ##
 sql/updates/test_environment_code.sql
+sql/functions/insert_week1_to_staging1.sql
 great_expectations
 dags/CreateAddressTbl.py
 dags/CreateCountyTbl.py
