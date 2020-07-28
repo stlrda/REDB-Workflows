@@ -50,14 +50,14 @@ SET "current_flag" = FALSE
 	, "removed_flag" = TRUE
 	, "update_date" = CURRENT_DATE
 FROM DEAD_STREET_ADDRESS
-WHERE (SELECT core.row_level_format_street_address(DEAD_STREET_ADDRESS."LowAddrNum"
-													, DEAD_STREET_ADDRESS."HighAddrNum"
-													, DEAD_STREET_ADDRESS."StPreDir"
-													, DEAD_STREET_ADDRESS."StName"
-													, DEAD_STREET_ADDRESS."StType"
-													, DEAD_STREET_ADDRESS."LowAddrSuf"
-													, DEAD_STREET_ADDRESS."HighAddrSuf")) = "address"."street_address";
-	
+WHERE (SELECT core.format_parcel_address(DEAD_STREET_ADDRESS."LowAddrNum"
+										, DEAD_STREET_ADDRESS."HighAddrNum"
+										, DEAD_STREET_ADDRESS."StPreDir"
+										, DEAD_STREET_ADDRESS."StName"
+										, DEAD_STREET_ADDRESS."StType"
+										, DEAD_STREET_ADDRESS."LowAddrSuf"
+										, DEAD_STREET_ADDRESS."HighAddrSuf")) = "address"."street_address";
+
 END;
 $$
 LANGUAGE plpgsql;
