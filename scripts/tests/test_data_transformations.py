@@ -27,19 +27,7 @@ class TestDataTransformations(unittest.TestCase):
             cls.column_names[-1] = cls.column_names[-1].replace("\n", "")
             cls.column_count = len(cls.column_names)
 
-    @classmethod
-    def tearDownClass(cls):
-        pass
 
-
-    def setUp(self):
-        pass
-
-
-    def tearDown(self):
-        pass
-
-    
     def test_generate_rows(self):
         column_count = self.column_count
         row = self.generated_row

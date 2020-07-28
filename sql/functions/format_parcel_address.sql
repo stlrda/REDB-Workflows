@@ -1,23 +1,27 @@
 CREATE OR REPLACE FUNCTION core.format_parcel_address
 (
-	IN _row staging_1.prcl_prcl
+	IN LowAddrNum varchar(1000)
+	, IN HighAddrNum varchar(1000)
+	, IN StPreDir varchar(1000)
+	, IN StName varchar(1000)
+	, IN StType varchar(1000)
+	, IN LowAddrSuf varchar(1000)
+	, IN HighAddrSuf varchar(1000)
 )
 RETURNS text AS
 $BODY$
 DECLARE
 	val varchar;
-	Low varchar = _row."LowAddrNum";
-	High varchar = _row."HighAddrNum";
-	StPreDir varchar = COALESCE(_row."StPreDir", '');
-	StName varchar = _row."StName";
-	StType varchar = _row."StType";
-	AddrSuf varchar = COALESCE(_row."LowAddrSuf", _row."HighAddrSuf", '');
+	AddrSuf varchar = COALESCE(LowAddrSuf, HighAddrSuf, '');
 	address varchar;
 BEGIN
-	IF Low = High THEN
-		val := Low;
+	
+	StPreDir = COALESCE(StPreDir, '');
+	
+	IF LowAddrNum = HighAddrNum THEN
+		val := LowAddrNum;
 	ELSE
-		val := CONCAT(Low, '-', High);
+		val := CONCAT(LowAddrNum, '-', HighAddrNum);
 	END IF;
 	
 	IF StPreDir = '' THEN
@@ -31,6 +35,7 @@ BEGIN
 	END IF;
 	
 	RETURN address;
+	
 END
 $BODY$
 LANGUAGE plpgsql;
