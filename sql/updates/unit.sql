@@ -54,10 +54,36 @@ WITH DEAD_UNITS AS
 	)
 UPDATE "core"."unit"
 SET "current_flag" = FALSE,
-	"removed_flag" = TRUE,
 	"update_date" = CURRENT_DATE
 FROM DEAD_UNITS
 WHERE "unit_id" = CONCAT(SUBSTRING(DEAD_UNITS."parcel_id" FROM 1 FOR 15), (CAST(DEAD_UNITS."BldgNum" AS INT) + 100), '.' , (CAST(DEAD_UNITS."SectNum" AS INT) + 1000));
+
+-- Update removed flag of Unit in core that are present in staging 1 to FALSE
+UPDATE "core"."unit"
+SET "removed_flag" = FALSE 
+WHERE "unit"."unit_id" 
+IN (SELECT "unit"."unit_id"
+	FROM "core"."unit"
+	JOIN "core"."county_id_mapping_table"
+	ON "county_id_mapping_table"."parcel_id" = CONCAT(SUBSTRING("unit"."unit_id" FROM 1 FOR 15), '000.0000')
+	JOIN "staging_1"."prcl_bldgsect"
+	ON "county_id_mapping_table"."county_parcel_id" = (SELECT core.format_parcelId(prcl_bldgsect."CityBlock", prcl_bldgsect."Parcel", prcl_bldgsect."OwnerCode"))
+		AND (CAST(SUBSTRING("unit_id" FROM 16 FOR 3) AS INT) - 100) = CAST("prcl_bldgsect"."BldgNum" AS INT)
+		AND (CAST(SUBSTRING("unit_id" FROM 20 FOR 4) AS INT) - 1000) = CAST("prcl_bldgsect"."SectNum" AS INT));
+
+-- Update removed flag of Unit in core that are NOT present in staging 1 to TRUE
+UPDATE "core"."unit"
+SET "removed_flag" = TRUE 
+WHERE "unit"."unit_id" 
+IN (SELECT "unit"."unit_id"
+	FROM "core"."unit"
+	JOIN "core"."county_id_mapping_table"
+	ON "county_id_mapping_table"."parcel_id" = CONCAT(SUBSTRING("unit"."unit_id" FROM 1 FOR 15), '000.0000')
+	LEFT JOIN "staging_1"."prcl_bldgsect"
+	ON "county_id_mapping_table"."county_parcel_id" = (SELECT core.format_parcelId(prcl_bldgsect."CityBlock", prcl_bldgsect."Parcel", prcl_bldgsect."OwnerCode"))
+		AND (CAST(SUBSTRING("unit_id" FROM 16 FOR 3) AS INT) - 100) = CAST("prcl_bldgsect"."BldgNum" AS INT)
+		AND (CAST(SUBSTRING("unit_id" FROM 20 FOR 4) AS INT) - 1000) = CAST("prcl_bldgsect"."SectNum" AS INT)
+	WHERE "prcl_bldgsect"."Parcel" IS NULL);
 
 END;
 $$

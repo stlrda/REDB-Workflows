@@ -6,7 +6,13 @@ RETURNS void AS $$
 BEGIN
     WITH formatted_addresses AS (
         SELECT DISTINCT
-            (SELECT core.format_parcel_address(prcl_table)) as street_address
+            (SELECT core.format_parcel_address(prcl_table."LowAddrNum"
+											, prcl_table."HighAddrNum"
+											, prcl_table."StPreDir"
+											, prcl_table."StName"
+											, prcl_table."StType"
+											, prcl_table."LowAddrSuf"
+											, prcl_table."HighAddrSuf")) as street_address
             ,(SELECT county_id FROM core.county WHERE county.county_name = 'Saint Louis City County') as county_id
             ,'' as city
             ,'MO' as state

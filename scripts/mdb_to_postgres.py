@@ -4,15 +4,11 @@ import csv
 import tempfile
 from subprocess import (check_output, CalledProcessError)
 
-# Third party
-import pandas as pd
-
 # Custom
 from .classes.S3 import S3
 from .classes.Database import Database
 from .utils.custom_logging import print_time
-from .utils.data_transformations import (convert_scientific_notation
-                                        , generate_rows)
+from .utils.data_transformations import generate_rows
 
 
 def initializeIO(kwargs):
@@ -90,103 +86,23 @@ def get_table_columns(table, path_to_database):
     return columns
 
 
-def initialize_csv(table, columns, row, csv_path, limit=50_000):
+def create_csv(table, columns, row, csv_path):
     """ Creates a CSV from a Python Generator with a select number of rows.
 
     :param table: The name of the table and target CSV.
     :param limit: The amount of rows appended to CSV at a time.
-
-    The "batch" list will store @limit number of rows into RAM before
-    bulk transformation to Pandas DataFrame. That DataFrame then
-    creates the initial CSV.
     """
-
-    batch = []
-
+    print_time("csv_start", table)
     try:
-        snapshot_row = next(row)
-    except StopIteration:
-        print(f"{table} doesn't have any rows or rows are not valid. Skipping...")
-        row = None
-        return None
-
-    snapshot_row = convert_scientific_notation(snapshot_row)
-    batch.append(snapshot_row)
-    rows_generated = 1
-
-    print_time("init_start", table)
-
-    while (rows_generated < limit) and (row != None):
-        try:
-            current_row = next(row)
-            current_row = convert_scientific_notation(current_row)
-            batch.append(current_row)
-            rows_generated += 1
-
-        # Python 3.4 returns "StopIteration" once Generator reaches the end.
-        except StopIteration:
-            row = None
-            break
-    
-    table_dataframe = pd.DataFrame(batch, columns=columns)
-    batch.clear()
-    table_dataframe.to_csv(csv_path,
-                           index=False,
-                           sep="|",
-                           na_rep="",
-                           line_terminator="\r\n",
-                           encoding="utf-8")
-                           
-    print_time("init_complete", table)
+        with open(csv_path, 'w', newline='') as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=columns, delimiter="|")
+            writer.writeheader()
+            writer.writerows(row)
+    except IOError as err:
+        print(err)
+    print_time("csv_complete", table)
 
     return csv_path
-
-
-def append_to_csv(table, columns, row, csv_path, limit=50_000):
-    """Appends table rows from a Python Generator to an existing CSV.
-
-    :param table: The name of the table and target CSV.
-    :param limit: The amount of rows appended to CSV at a time.
-
-    The "batch" list will store @limit number of rows into RAM before
-    bulk transformation to Pandas DataFrame. That DataFrame is then
-    appended to the CSV.
-    """
-
-    batch = []
-    rows_generated = 0
-
-    print_time("append_start", table)
-
-    while (rows_generated < limit) and (row != None):
-        try:
-            current_row = next(row)
-            current_row = convert_scientific_notation(current_row)
-            batch.append(current_row)
-            rows_generated += 1
-
-        # Python 3.4 returns "StopIteration" once Generator reaches the end.
-        except StopIteration:
-            row = None
-            break
-    
-    table_dataframe = pd.DataFrame(batch, columns=columns)
-    batch.clear()
-    table_dataframe.to_csv(csv_path,
-                            header=False,
-                            index=False,
-                            mode="a",
-                            sep="|",
-                            line_terminator="\r\n",
-                            encoding="utf-8")
-
-    print_time("append_complete", table)
-
-    if row != None:
-        # Iteration is preferred here as opposed to recursion to save on RAM.
-        append_to_csv(table, columns, row, csv_path, limit)
-    else:
-        return csv_path
 
 
 def copy_csv_to_database(redb_table_name, columns, csv_path, db):
@@ -201,7 +117,7 @@ def copy_csv_to_database(redb_table_name, columns, csv_path, db):
     
     # Opens CSV then copies to database.
     with open(csv_path, 'r+') as csvfile:
-        db.replace_table("staging_1", redb_table_name, columns) # snapshot_row created upon invoking "initialize_csv" function.
+        db.replace_table("staging_1", redb_table_name, columns)
         conn = db.get_raw_connection()
         cursor = conn.cursor()
         cmd = f'COPY staging_1."{redb_table_name}" FROM STDIN WITH (FORMAT CSV, DELIMITER "|", HEADER TRUE, ENCODING "utf-8")'
@@ -235,15 +151,14 @@ def main(**kwargs):
             s3.download_file(s3.bucket_name, access_file, path_to_database)
 
             for city_table_name in get_tables(path_to_database):
-                columns = get_table_columns(city_table_name, path_to_database)
+                
                 access_name = access_file[:-4] # name of Access database
                 redb_table_name = access_name.lower() + "_" + city_table_name.lower()
-                csv_path = os.path.join(tmp, f"{redb_table_name}.csv")
+                csv_path = os.path.join(tmp, f"{redb_table_name}.csv") # Save location for csv.
+                
+                columns = get_table_columns(city_table_name, path_to_database)
                 row = generate_rows(path_to_database, city_table_name)
 
-                initialize_csv(redb_table_name, columns, row, csv_path)
-
-                if row != None:
-                    append_to_csv(redb_table_name, columns, row, csv_path)
+                create_csv(redb_table_name, columns, row, csv_path)
 
                 copy_csv_to_database(redb_table_name, columns, csv_path, db)
