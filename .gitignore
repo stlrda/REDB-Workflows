@@ -7,6 +7,7 @@ connections.json
 InstallDependenciesLocal.py
 resources/*.mdb
 resources/*.txt
+config.py
 
 ## Kevin Local ##
 sql/updates/test_environment_code.sql

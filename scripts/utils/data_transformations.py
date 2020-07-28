@@ -45,7 +45,8 @@ def generate_rows(filepath, table, delimiter="|"):
             
             for line in csv.reader(csvfile, delimiter=delimiter, quotechar='"'):
                 values = [value.rstrip() for value in line]
-                yield dict(zip(headers, values))
+                row = dict(zip(headers, values))
+                yield convert_scientific_notation(row)
 
 
 def mdb_to_txt(path_to_database, table_name, output_path, delimiter="|"):
