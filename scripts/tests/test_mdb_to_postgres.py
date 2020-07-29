@@ -9,11 +9,10 @@ import sys
 import unittest
 
 # Custom
-sys.path.append("..")
-os.chdir("/usr/local/airflow/dags/efs/redb/scripts/") # Moves to correct directory before attempting imports.
-from scripts.tests.config import config # ! Database and S3 credentials, must be git ignored!
-from scripts.utils.data_transformations import generate_rows
-from scripts.mdb_to_postgres import (
+sys.path.append("/usr/local/airflow/dags/efs/")
+#from redb.scripts.tests.config import config # ! Database and S3 credentials, must be git ignored!
+from redb.scripts.utils.data_transformations import generate_rows
+from redb.scripts.mdb_to_postgres import (
                             initializeIO
                             , get_tables
                             , get_table_columns
