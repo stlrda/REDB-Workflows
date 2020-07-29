@@ -25,3 +25,5 @@ DROP TABLE IF EXISTS "staging_1"."prcl_prcl" CASCADE;
 END;
 $$
 LANGUAGE plpgsql;
+-------------------------
+SELECT core.staging1_to_staging2();

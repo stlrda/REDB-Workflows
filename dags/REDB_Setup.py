@@ -43,18 +43,22 @@ with DAG('REDB_Setup',
 
     # Definitions (once) (sql/functions)
     define_add_county = PostgresOperator(task_id="define_add_county", postgres_conn_id="redb_postgres", sql="functions/add_county.sql", database=DATABASE_NAME)
+    define_format_parcel_address = PostgresOperator(task_id="define_format_parcel_address", postgres_conn_id="redb_postgres", sql="functions/format_parcel_address.sql", database=DATABASE_NAME)
+    define_format_parcelId = PostgresOperator(task_id="define_format_parcelId", postgres_conn_id="redb_postgres", sql="functions/format_parcelId.sql", database=DATABASE_NAME)
 
     # Inserts (once) (sql/inserts)
     insert_county = PostgresOperator(task_id="insert_county", postgres_conn_id="redb_postgres", sql="inserts/county.sql", database=DATABASE_NAME)
     insert_special_parcel_type = PostgresOperator(task_id="insert_special_parcel_type", postgres_conn_id="redb_postgres", sql="inserts/special_parcel_type.sql", database=DATABASE_NAME)
     insert_sub_parcel_type = PostgresOperator(task_id="insert_sub_parcel_type", postgres_conn_id="redb_postgres", sql="inserts/sub_parcel_type.sql", database=DATABASE_NAME)
-    
+
 
 chain(
     create_schemas
     , create_tables
     , create_views
     , define_add_county
+    , define_format_parcel_address
+    , define_format_parcelId
     , insert_county
     , insert_special_parcel_type
     , insert_sub_parcel_type
