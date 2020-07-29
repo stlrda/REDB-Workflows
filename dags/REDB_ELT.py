@@ -64,11 +64,6 @@ with DAG('REDB_ELT',
                                         'pg_port': DATABASE_PORT,
                                         'pg_password': DATABASE_PASSWORD})
 
-    # Replace functions (weekly) (sql/functions)
-    # TODO update function scripts such that they delete function if exists before creating.
-    define_format_parcel_address = PostgresOperator(task_id="define_format_parcel_address", postgres_conn_id="redb_postgres", sql="functions/format_parcel_address.sql", database=DATABASE_NAME)
-    define_format_parcelId = PostgresOperator(task_id="define_format_parcelId", postgres_conn_id="redb_postgres", sql="functions/format_parcelId.sql", database=DATABASE_NAME)
-
     # Compare and Insert (weekly) (sql/inserts)
     insert_address = PostgresOperator(task_id="insert_address", postgres_conn_id="redb_postgres", sql="inserts/address.sql", database=DATABASE_NAME)
     insert_building = PostgresOperator(task_id="insert_building", postgres_conn_id="redb_postgres", sql="inserts/building.sql", database=DATABASE_NAME)
@@ -87,7 +82,6 @@ with DAG('REDB_ELT',
     update_parcel = PostgresOperator(task_id="update_parcel", postgres_conn_id="redb_postgres", sql="updates/parcel.sql", database=DATABASE_NAME)
     update_unit = PostgresOperator(task_id="update_unit", postgres_conn_id="redb_postgres", sql="updates/unit.sql", database=DATABASE_NAME)
     
-    
     # staging_1 > staging_2 (weekly) (sql/functions)
     staging_1_to_staging_2 = PostgresOperator(task_id="staging_1_to_staging_2", postgres_conn_id="redb_postgres", sql="functions/staging_1_to_staging_2.sql", database=DATABASE_NAME)
 
@@ -96,21 +90,19 @@ with DAG('REDB_ELT',
 chain(
     SourcesToS3
     , MDBtoREDB
-    , define_format_parcel_address
-    , define_format_parcelId
+    , insert_neighborhood
     , insert_address
-    , insert_building
     , insert_county_id_mapping_table
     , insert_legal_entity
-    , insert_neighborhood
     , insert_parcel
+    , insert_building
     , insert_unit
+    , update_neighborhood
     , update_address
-    , update_building
     , update_county_id_mapping_table
     , update_legal_entity
-    , update_neighborhood
     , update_parcel
+    , update_building
     , update_unit
     , staging_1_to_staging_2
 )
