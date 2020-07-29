@@ -5,6 +5,8 @@ To address this need, the Saint Louis Regional Data Alliance is building the Reg
 
 REDB is being built entirely in AWS, with an eye on being reproducible by other organizations and municipalities. To that end, all code associated with this project is being made available on Github, in three repositories.
 
+<img src="REDB ELT Workflow.jpg" width="900">
+
 * [REDB-Platform](https://github.com/stlrda/REDB-Platform) contains a Terraform module that builds an Airflow cluster that will run and manage the ETL processes that will create, maintain, and update REDB. Run in isolation, this will create a functioning Airflow cluster and nothing more.
 
 * [REDB-Infrastructure](https://github.com/stlrda/REDB-Infrastructure) builds on the above. It contains Terraform code that pulls in the module above, and adds an S3 bucket (for the Airflow workers to use in their processes) and an Aurora PostGreSQL database (REDB). Run in isolation, this will creating everything an organization needs to start building out their own data workflows.
