@@ -119,7 +119,7 @@ def copy_csv_to_database(redb_table_name, columns, csv_path, db):
     # Opens CSV then copies to database.
     with open(csv_path, 'r+') as csvfile:
         db.replace_table("staging_1", redb_table_name, columns)
-        db.replace_table("staging_2", redb_table_name, columns)
+        db.create_table("staging_2", redb_table_name, columns)
         conn = db.get_raw_connection()
         cursor = conn.cursor()
         cmd = f'COPY staging_1."{redb_table_name}" FROM STDIN WITH (FORMAT CSV, DELIMITER "|", HEADER TRUE, ENCODING "utf-8")'

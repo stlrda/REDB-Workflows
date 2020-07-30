@@ -19,7 +19,7 @@ class Database():
         if self.ENGINE.dialect.has_schema(self.ENGINE, schema=schema):
             print(f"Schema: '{schema}' already exists.")
             return False
-            
+
         try:
             self.ENGINE.execute(f'CREATE SCHEMA IF NOT EXISTS {schema};')
             print(f"Schema: '{schema}' created.")
@@ -28,7 +28,6 @@ class Database():
         except Exception as err:
             print(err)
             return False
-
 
 
     def replace_table(self, schema, table_name, columns):
