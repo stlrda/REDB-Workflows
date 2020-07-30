@@ -1,9 +1,9 @@
 from sqlalchemy import *
 
 
-# Class for target database that overrides default sqlalchemy functionality with custom features.
-# The most import feature here is the "replace_table" method which dynamically creates tables
-# without the need for knowing and defining them beforehand.
+""" Class for target database that overrides default sqlalchemy functionality with custom features.
+The most import feature here is the "replace_table" method which dynamically creates tables
+thus removing the need to define them prior to ingest."""
 class Database():
 
     def __init__(self, user, password, host, port, database_name, schema=None):
@@ -16,14 +16,19 @@ class Database():
 
         :param schema:  Name of schema to be created.
         """
+        if self.ENGINE.dialect.has_schema(self.ENGINE, schema=schema):
+            print(f"Schema: '{schema}' already exists.")
+            return False
+            
         try:
             self.ENGINE.execute(f'CREATE SCHEMA IF NOT EXISTS {schema};')
-            print(f'{schema} created.')
+            print(f"Schema: '{schema}' created.")
             return True
 
         except Exception as err:
             print(err)
             return False
+
 
 
     def replace_table(self, schema, table_name, columns):
@@ -53,21 +58,26 @@ class Database():
             return False
 
 
-    def insert_into(self, schema, table_name, row):
-        """ Inserts row into database
+    def create_table(self, schema, table_name, columns):
+        """Same as replace table, but Will NOT delete table if it already exists.
 
-        :param schema: Name of schema to be inserted into.
-        :param table_name: Name of table to be inserted into.
-        :param row: A dictionary wherein keys represent columns and values represent values.
-        Example for "row" argument -> {"column1": "value1", "column2": value2}
-        Row dictionary must contain key, value pairs for every column in the target table.
+        :param schema: Desired schema for table.
+        :param table_name: Desired name for table.
+        :param example_row: A dictionary containing keys that represent the table's columns
         """
 
-        table = Table(table_name, self.METADATA, autoload=True, schema=schema)
-        insert_statement = table.insert()
+        table = Table(table_name, self.METADATA, schema=schema)
+
+        for column in columns:
+            table.append_column(Column(column, VARCHAR(1000)))
+
+        if self.ENGINE.dialect.has_table(self.ENGINE, table_name, schema=schema):
+            print(f"{table_name} already exists in {schema}.")
+            return False
 
         try:
-            insert_statement.execute(row)
+            table.create()
+            print(f"{table_name} created.")
             return True
 
         except Exception as err:
