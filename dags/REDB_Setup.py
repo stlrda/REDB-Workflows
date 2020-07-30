@@ -32,6 +32,9 @@ with DAG('REDB_Setup',
         schedule_interval='@once',
         ) as dag:
 
+    # Create extensions (once) (sql/functions)
+    create_extensions = PostgresOperator(task_id="create_extensions", postgres_conn_id="redb_postgres", sql="functions/create_extensions.sql", database=DATABASE_NAME)
+
     # Create schemas (once) (sql/functions)
     create_schemas = PostgresOperator(task_id="create_schemas", postgres_conn_id="redb_postgres", sql="functions/create_REDB_schemas.sql", database=DATABASE_NAME)
 
@@ -53,7 +56,8 @@ with DAG('REDB_Setup',
 
 
 chain(
-    create_schemas
+    create_extensions
+    , create_schemas
     , create_tables
     , create_views
     , define_add_county

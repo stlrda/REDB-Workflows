@@ -35,6 +35,7 @@ class TestMDBtoPostgres(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         cls.db.ENGINE.execute(f'DROP TABLE "staging_1"."{cls.redb_table_name}";')
+        cls.db.ENGINE.execute(f'DROP TABLE "staging_2"."{cls.redb_table_name}";')
         os.remove(cls.csv_path)
 
 
@@ -91,14 +92,20 @@ class TestMDBtoPostgres(unittest.TestCase):
             self.assertGreater(len(lines), 0, msg=f"{self.city_table_name}.csv has no data.")
 
         copy_csv_to_database(self.redb_table_name, columns, self.csv_path, self.db)
-        table_created = self.db.ENGINE.execute(f"""SELECT EXISTS (
+        staging1_table_created = self.db.ENGINE.execute(f"""SELECT EXISTS (
                                 SELECT FROM pg_tables
                                 WHERE  schemaname = 'staging_1'
                                 AND    tablename  = '{self.redb_table_name}'
                                 );""")
-        self.assertTrue(table_created)
+        staging2_table_created = self.db.ENGINE.execute(f"""SELECT EXISTS (
+                                SELECT FROM pg_tables
+                                WHERE  schemaname = 'staging_2'
+                                AND    tablename  = '{self.redb_table_name}'
+                                );""")
+        self.assertTrue(staging1_table_created)
+        self.assertTrue(staging2_table_created)
 
 
 if __name__ == '__main__':
     # Buffer suppresses stdout.
-    unittest.main(buffer=True)
+    unittest.main(buffer=False)
