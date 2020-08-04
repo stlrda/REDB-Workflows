@@ -75,6 +75,7 @@ WHERE "unit"."unit_id" = CONCAT(SUBSTRING("county_id_mapping_table"."parcel_id" 
 ---------------------------------------------------
 INSERT INTO "core"."unit" ("unit_id"
     , "building_id"
+	, "owner_id"
     , "description"
     , "condominium"
     , "create_date"
@@ -83,6 +84,7 @@ INSERT INTO "core"."unit" ("unit_id"
     , "update_date")
 (SELECT DISTINCT CONCAT(SUBSTRING("county_id_mapping_table"."parcel_id" FROM 1 FOR 15), (CAST(NEW_OR_CHANGED_UNITS."BldgNum" AS INT) + 100), '.', (CAST(NEW_OR_CHANGED_UNITS."SectNum" AS INT) + 1000)) AS unit_id
     , CONCAT(SUBSTRING("county_id_mapping_table"."parcel_id" FROM 1 FOR 15), (CAST(NEW_OR_CHANGED_UNITS."BldgNum" AS INT) + 100),'.0000') AS building_id
+ 	, "owner_id"
     , NEW_OR_CHANGED_UNITS."description"
     , NEW_OR_CHANGED_UNITS."Condominium"
     , CURRENT_DATE
@@ -97,7 +99,8 @@ WHERE "parcel"."current_flag" = True
 )
 ON CONFLICT (COALESCE("unit_id", 'NULL')
     , COALESCE("building_id", 'NULL')
-    , COALESCE("description", 'NULL')
+	, COALESCE("owner_id", 'NULL')
+	, COALESCE("description", 'NULL')
     , "condominium")
     DO UPDATE
 SET "current_flag" = TRUE

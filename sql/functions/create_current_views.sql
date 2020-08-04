@@ -89,6 +89,7 @@ CREATE OR REPLACE VIEW "core".current_unit AS
 (
 	SELECT "building_id"
 		, "unit_id"
+		, "owner_id"
 		, "description"
 		, "condominium"
 	FROM "core"."unit"

@@ -170,6 +170,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS UI_Building ON "core"."building"(COALESCE("par
 CREATE TABLE IF NOT EXISTS "core"."unit" (
     "unit_id" varchar -- CCCCCC.PPPPPPPP.BBB.UUUU (county_id.parcel_number.building_number.unit_number)
 	, "building_id" varchar
+	, "owner_id" varchar
 	, "description" varchar
 	, "condominium" boolean
 	, "create_date" date
@@ -183,6 +184,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS UI_Active_Unit ON "core"."unit"(unit_id, curre
 
 CREATE UNIQUE INDEX IF NOT EXISTS UI_Unit ON "core"."unit"(COALESCE("unit_id", 'NULL')
 	, COALESCE("building_id", 'NULL')
+	, COALESCE("owner_id", 'NULL')
 	, COALESCE("description", 'NULL')
 	, "condominium"
 	);
