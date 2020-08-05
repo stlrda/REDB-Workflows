@@ -142,7 +142,7 @@ INSERT INTO "core"."building" ("parcel_id"
     , CONCAT(SUBSTRING("county_id_mapping_table"."parcel_id" FROM 1 FOR 15), (CAST(NEW_OR_CHANGED_BUILDINGS."BldgNum" AS INT) + 100),'.0000') AS building_id
     , "parcel"."owner_id"
     , NEW_OR_CHANGED_BUILDINGS."description"
- 	, NEW_OR_CHANGED_BUILDINGS."BldgUse"
+	, NEW_OR_CHANGED_BUILDINGS."BldgUse"
     , CAST("NbrOfApts" AS INT)
     , CURRENT_DATE
     , TRUE
