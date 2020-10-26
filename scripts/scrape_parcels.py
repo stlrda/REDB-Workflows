@@ -4,6 +4,9 @@
 import requests
 import psycopg2
 from psycopg2.extras import Json, DictCursor
+from zipfile import ZipFile
+from dbfread import DBF
+from pandas import DataFrame
 
 # These Secrets are Already Available to Airflow in the RedB Connector
 # See https://github.com/stlrda/REDB-Workflows/blob/master/dags/REDB_ELT.py#L26
@@ -20,6 +23,7 @@ API_KEY = ''
 # Connection to DB (Will get replaced with Airflow Connector)
 conn = psycopg2.connect(host = DB_HOST, port = DB_PORT, user = DB_USER, password = DB_PASS, database = DB_NAME)
 
+
 def api_get_parcel(url, key, handle):
     query = url + '?key=' + key + '&handle=' + handle
     try:
@@ -29,6 +33,7 @@ def api_get_parcel(url, key, handle):
         print('API Failure at Handle: ' + handle)
         data = '{"No": "Data"}'
     return data
+
 
 def scrape_parcel_api(url, key, list_handles):
     for handle in list_handles:
@@ -48,13 +53,28 @@ def scrape_parcel_api(url, key, list_handles):
             print("Could not insert parcel")
         cursor.close()
 
-# Get List of Handles
-# This needs to be changed to either:
-#  A. (Download/extract a list from the city, see https://www.stlouis-mo.gov/data/datasets/dataset.cfm?id=82)
-#  B. (SELECT handle FROM city_api.parcel_data)
 
-with open('handles.csv', 'r') as file:
-    handle_list = file.read()
-handle_list = handle_list.split('\n')[:-1]
+def scrape_handles():
+    # Download zip file to root directory of repo
+    URL = 'https://www.stlouis-mo.gov/data/upload/data-files/prcl_shape.zip'
+    r = requests.get(URL, stream=True)
+    with open('../parcel_shape.zip', 'wb') as fd:
+        for chunk in r.iter_content(chunk_size=128):
+            fd.write(chunk)
 
-scrape_parcel_api('https://portalcw.stlouis-mo.gov/a/property', API_KEY, handle_list)
+    # Extract prcl.dbf from zip file
+    with ZipFile('../parcel_shape.zip', 'r') as zipObject:
+        file_names = zipObject.namelist()
+        for file_name in file_names:
+            if file_name.endswith('.dbf'):
+                zipObject.extract(file_name, '../')
+                print('Extracted ' + file_name + ' from zip file')
+
+    # Convert dbf file to pandas dataframe and return list of handles
+    dbf = DBF('../prcl.dbf')
+    df = DataFrame(iter(dbf))
+
+    return df['HANDLE'].to_list()
+
+
+scrape_parcel_api('https://portalcw.stlouis-mo.gov/a/property', API_KEY, scrape_handles())
