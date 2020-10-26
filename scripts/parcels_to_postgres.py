@@ -77,4 +77,6 @@ def scrape_handles():
     return df['HANDLE'].to_list()
 
 
-scrape_parcel_api('https://portalcw.stlouis-mo.gov/a/property', API_KEY, scrape_handles())
+def main():
+    handles = scrape_handles()
+    scrape_parcel_api('https://portalcw.stlouis-mo.gov/a/property', API_KEY, handles)
