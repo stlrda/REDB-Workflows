@@ -7,7 +7,6 @@ from airflow import DAG
 from airflow.utils.helpers import chain
 from airflow.hooks.base_hook import BaseHook
 from airflow.operators.python_operator import PythonOperator
-from airflow.operators.postgres_operator import PostgresOperator
 
 # Custom
 sys.path.append("/usr/local/airflow/dags/efs")
